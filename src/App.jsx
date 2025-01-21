@@ -5,8 +5,15 @@ import Note from './components/Note'
 const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
-  const [showAll, setShowAll] = useState(true)
+  const [showAll, setShowAll] = useState(false)
   
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/notes')
+      .then(response => {
+        setNotes(response.data)
+      })
+  }, [])
   
   const addNote = (event) => {
     event.preventDefault()
@@ -19,12 +26,12 @@ const App = () => {
     axios
       .post('http://localhost:3001/notes', noteObject) // the obj is sent to the server using axios post method
       .then(response => {  
-        console.log(response) // the registered event handler logs the response that is sent back from the server to the console
+        setNotes(notes.concat(response.data))
+        setNewNote('')
       })
   }
 
   const handleNoteChange = (event) => {
-    console.log(event.target.value)
     setNewNote(event.target.value)
   }
 
