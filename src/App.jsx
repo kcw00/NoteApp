@@ -11,8 +11,8 @@ const App = () => {
   useEffect(() => {
     noteService
       .getAll()
-      .then(response => {
-        setNotes(response.data)
+      .then(initialNotes => {
+        setNotes(initialNotes)
       })
   }, [])
   
@@ -26,8 +26,8 @@ const App = () => {
 
     noteService
       .create(noteObject) // the obj is sent to the server using axios post method
-      .then(response => {  
-        setNotes(notes.concat(response.data))
+      .then(returnedNote => {  
+        setNotes(notes.concat(returnedNote))
         setNewNote('')
       })
   }
@@ -39,14 +39,13 @@ const App = () => {
   const notesToShow = showAll ? notes : notes.filter(note => note.important)
 
   const toggleImportanceOf = (id) => {
-    const url = `http://localhost:3001/notes/${id}`
     const note = notes.find(n => n.id === id)
     const changedNote = { ...note, important: !note.important } // the important property gets the negation of its previous value in the original object
 
     noteService
       .update(id, changedNote)
-      .then(response => {
-      setNotes(notes.map(n => n.id === id ? response.data : n))
+      .then(returnedNote => {
+      setNotes(notes.map(note => note.id === id ? returnedNote : note))
     })
   }
  
