@@ -6,18 +6,6 @@ const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
-
-  const hook = () => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/notes')
-      .then(response => {
-        console.log('promise fulfilled')
-        setNotes(response.data)
-      })
-  }
-
-  useEffect(hook, [])
   
   
   const addNote = (event) => {
@@ -25,11 +13,14 @@ const App = () => {
     const noteObject = {
       content: newNote,
       important: Math.random() < 0.5,
-      id: String(notes.length + 1),
+      // delete the id property since it's better to let the server generates ids for our resources
     }
 
-    setNotes(notes.concat(noteObject))
-    setNewNote('')
+    axios
+      .post('http://localhost:3001/notes', noteObject) // the obj is sent to the server using axios post method
+      .then(response => {  
+        console.log(response) // the registered event handler logs the response that is sent back from the server to the console
+      })
   }
 
   const handleNoteChange = (event) => {
