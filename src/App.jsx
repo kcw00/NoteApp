@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Note from './components/Note'
+import noteService from './services/notes'
 
 const App = () => {
   const [notes, setNotes] = useState([])
@@ -8,8 +9,8 @@ const App = () => {
   const [showAll, setShowAll] = useState(false)
   
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/notes')
+    noteService
+      .getAll()
       .then(response => {
         setNotes(response.data)
       })
@@ -23,8 +24,8 @@ const App = () => {
       // delete the id property since it's better to let the server generates ids for our resources
     }
 
-    axios
-      .post('http://localhost:3001/notes', noteObject) // the obj is sent to the server using axios post method
+    noteService
+      .create(noteObject) // the obj is sent to the server using axios post method
       .then(response => {  
         setNotes(notes.concat(response.data))
         setNewNote('')
@@ -42,7 +43,9 @@ const App = () => {
     const note = notes.find(n => n.id === id)
     const changedNote = { ...note, important: !note.important } // the important property gets the negation of its previous value in the original object
 
-    axios.put(url, changedNote).then(response => {
+    noteService
+      .update(id, changedNote)
+      .then(response => {
       setNotes(notes.map(n => n.id === id ? response.data : n))
     })
   }
