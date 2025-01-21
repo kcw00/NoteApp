@@ -37,6 +37,11 @@ const App = () => {
 
   const notesToShow = showAll ? notes : notes.filter(note => note.important)
 
+  const toggleImportanceOf = (id) => {
+    console.log('importance of ${id} needs to be toggled') // use the dollar-bracket to add parts to the string
+    // also use backticks in template strings instead of quotation marks
+  }
+ 
   return (
     <div>
       <h1>Notes</h1>
@@ -47,7 +52,11 @@ const App = () => {
       </div>
       <ul>
         {notesToShow.map(note =>
-          <Note key={note.id} note={note} />
+          <Note 
+            key={note.id} 
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)} 
+          />
         )}
       </ul>
       <form onSubmit={addNote}>
