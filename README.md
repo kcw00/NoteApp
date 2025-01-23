@@ -21,3 +21,7 @@ this repository starts with its backend part.
 13. start our application with nodemone `node_modules/.bin/nodemon index.js`
 14. install morgan `npm install morgan`
 15. install cors `npm install cors`
+16. flyio
+   1) install flyctl executable `brew install flyctl`
+   2) authenticate `fly auth login`
+   3) initialize an app `fly launch --no-deploy`
