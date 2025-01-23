@@ -1,5 +1,6 @@
 import express from 'express'
 import morgan from 'morgan'
+import cors from 'cors'
 const app = express()
 
 let notes = [
@@ -37,6 +38,7 @@ const requestLogger = (tokens, request, response) => {
 
 app.use(express.json())
 app.use(morgan(requestLogger))
+app.use(cors())
 
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
