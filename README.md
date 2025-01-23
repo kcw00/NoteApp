@@ -20,3 +20,4 @@ this repository starts with its backend part.
 12. install nodemon by by defining it as a development dependency `npm install --save-dev nodemon`
 13. start our application with nodemone `node_modules/.bin/nodemon index.js`
 14. install morgan `npm install morgan`
+15. install cors `npm install cors`
