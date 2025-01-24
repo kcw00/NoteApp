@@ -7,7 +7,6 @@ app = 'kcw-noteapp'
 primary_region = 'sea'
 
 [build]
-  command = "npm start"
 
 [env]
   PORT = "3000"
