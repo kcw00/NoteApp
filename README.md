@@ -26,3 +26,4 @@ this repository starts with its backend part.
    2) authenticate `fly auth login`
    3) initialize an app `fly launch --no-deploy`
 17. A production build for applications created with Vite can be created with the command `npm run build`
+18. copy the production build of the frontend to the root of the backend `cp -r dist ../backend`
