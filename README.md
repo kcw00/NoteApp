@@ -15,3 +15,13 @@ this repository starts with its backend part.
 7. Install JSON server as a development dependency (only used during development) `npm install json-server --save-dev`
 8. add `"server": "json-server -p3001 --watch db.json"` to the scripts part of the package.json file
 9. start the json-server from the project root directory `npm run server`
+10. install Express library `npm install express`
+11. update the dependencies of the project `npm update`
+12. install nodemon by by defining it as a development dependency `npm install --save-dev nodemon`
+13. start our application with nodemone `node_modules/.bin/nodemon index.js`
+14. install morgan `npm install morgan`
+15. install cors `npm install cors`
+16. flyio
+   1) install flyctl executable `brew install flyctl`
+   2) authenticate `fly auth login`
+   3) initialize an app `fly launch --no-deploy`
