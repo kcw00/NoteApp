@@ -39,6 +39,7 @@ const requestLogger = (tokens, request, response) => {
 app.use(express.json())
 app.use(morgan(requestLogger))
 app.use(cors())
+app.use(express.static('dist'))
 
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
