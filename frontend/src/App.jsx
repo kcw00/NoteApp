@@ -40,6 +40,7 @@ const App = () => {
       .getAll()
       .then(initialNotes => {
         setNotes(initialNotes)
+        console.log(initialNotes)
       })
   }, [])
 

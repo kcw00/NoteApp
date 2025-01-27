@@ -25,3 +25,4 @@ this repository starts with its backend part.
    1) install flyctl executable `brew install flyctl`
    2) authenticate `fly auth login`
    3) initialize an app `fly launch --no-deploy`
+17) install mongoose `npm install mongoose`
