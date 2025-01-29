@@ -23,7 +23,7 @@ const Footer = () => {
   return (
     <div style={footerStyle}>
       <br />
-      <em>Note app, Department of Computer Science, University of Helsinki 2024</em>
+      <em>Todo List</em>
     </div>
   )
 }
@@ -87,7 +87,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>Notes</h1>
+      <h1>To Do List</h1>
       <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
