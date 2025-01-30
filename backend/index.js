@@ -3,6 +3,7 @@ const app = express()
 const cors = require('cors')
 require('dotenv').config()
 
+app.use(express.json())
 
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
@@ -33,7 +34,6 @@ const errorHandler = (error, request, response, next) => {
 
 app.use(requestLogger)
 app.use(express.static('dist'))
-app.use(express.json())
 app.use(cors())
 
 app.get('/api/notes', (request, response) => {
@@ -53,6 +53,8 @@ app.post('/api/notes', (request, response, next) => {
   const validation = note.validateSync()
 
   if (validation) {
+    console.log('ERROR: ', validation.message)
+    console.log('---')
     return response.status(400).json({ error: validation.message })
   }
 
@@ -83,6 +85,7 @@ app.delete('/api/notes/:id', (request, response, next) => {
     .catch(error => {
       console.log(error)
       response.status(400).send({ error: 'malformatted id' })
+      next(error)
     })
 })
 

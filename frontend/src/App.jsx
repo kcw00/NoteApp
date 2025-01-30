@@ -4,6 +4,7 @@ import Footer from './components/Footer'
 import Notification from './components/Notification'
 import noteService from './services/notes'
 
+
 const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
@@ -36,6 +37,14 @@ const App = () => {
       .then(returnedNote => {
         setNotes(notes.concat(returnedNote))
         setNewNote('')
+      })
+      .catch(error => {
+        if (error.response.status === 400) {
+          setErrorMessage(error.response.data.error)
+        }
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 10000)
       })
   }
 
