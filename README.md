@@ -1,5 +1,5 @@
 
-# introdemo
+# TodoApp
 
 this repository starts with its backend part.
 

@@ -1,38 +1,14 @@
 import { useState, useEffect } from 'react'
 import Note from './components/Note'
+import Footer from './components/Footer'
+import Notification from './components/Notification'
 import noteService from './services/notes'
-
-const Notification = ({ message }) => {
-  if (message === null) {
-    return null
-  }
-
-  return (
-    <div className='error'>
-      {message}
-    </div>
-  )
-}
-
-const Footer = () => {
-  const footerStyle = {
-    color: 'green',
-    fontStyle: 'italic',
-    fontSize: 16
-  }
-  return (
-    <div style={footerStyle}>
-      <br />
-      <em>Todo List</em>
-    </div>
-  )
-}
 
 const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
-  const [showAll, setShowAll] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [showAll, setShowAll] = useState(true)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     noteService
@@ -41,14 +17,18 @@ const App = () => {
         setNotes(initialNotes)
         console.log(initialNotes)
       })
+      .catch(error => {
+        console.error('fail to fetch data', error)
+        setNotes([])
+      })
   }, [])
 
   const addNote = (event) => {
     event.preventDefault()
+
     const noteObject = {
       content: newNote,
-      important: Math.random() < 0.5,
-      // delete the id property since it's better to let the server generates ids for our resources
+      important: Math.random() > 0.5,
     }
 
     noteService
@@ -59,12 +39,6 @@ const App = () => {
       })
   }
 
-  const handleNoteChange = (event) => {
-    setNewNote(event.target.value)
-  }
-
-  const notesToShow = showAll ? notes : notes.filter(note => note.important)
-
   const toggleImportanceOf = (id) => {
     const note = notes.find(n => n.id === id)
     const changedNote = { ...note, important: !note.important } // the important property gets the negation of its previous value in the original object
@@ -74,16 +48,48 @@ const App = () => {
       .then(returnedNote => {
         setNotes(notes.map(note => note.id === id ? returnedNote : note))
       })
-      .catch(error => { // If the request fails, the event handler registered with the catch method gets called.
-        setErrorMessage(
-          `Note '${note.content}' was already removed from server`
-        )
+      .catch((error) => { // If the request fails, the event handler registered with the catch method gets called.
+        if (error.response.status === 404) {
+          setErrorMessage(
+            `Note '${note.content}' was already removed from server`
+          )
+          setNotes(notes.filter(n => n.id !== id))
+        }
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
-        setNotes(notes.filter(note => note.id !== id))
+
       })
   }
+  
+  const deleteNoteOf = (id) => {
+    const note = notes.find(n => n.id === id)
+    const confirmDelete = window.confirm(`Delete ${note.content}?`)
+    if (confirmDelete) {
+      noteService
+        .remove(id)
+        .then(() => {
+          setNotes(notes.filter(n => n.id !== id))
+        })
+        .catch((error) => {
+          if (error.response.status === 404) {
+            setErrorMessage(
+              `Note '${note.content}' was already removed from server`
+            )
+            setNotes(notes.filter(n => n.id !== id))
+          }
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
+    }
+  }
+
+  const handleNoteChange = (event) => {
+    setNewNote(event.target.value)
+  }
+
+  const notesToShow = showAll ? notes : notes.filter(note => note.important)
 
   return (
     <div>
@@ -100,11 +106,15 @@ const App = () => {
             key={note.id}
             note={note}
             toggleImportance={() => toggleImportanceOf(note.id)}
+            deleteNote={() => deleteNoteOf(note.id)}
           />
         )}
       </ul>
       <form onSubmit={addNote}>
-        <input value={newNote} onChange={handleNoteChange} />
+        <input
+          value={newNote}
+          onChange={handleNoteChange}
+        />
         <button type="submit">save</button>
       </form>
       <Footer />
