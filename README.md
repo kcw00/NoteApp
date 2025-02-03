@@ -18,6 +18,6 @@ this repository starts with its backend part.
 10. install Express library `npm install express`
 11. update the dependencies of the project `npm update`
 12. install nodemon by by defining it as a development dependency `npm install --save-dev nodemon`
-13. start our application with nodemone `node_modules/.bin/nodemon index.js`
+13. start our application with nodemon `node_modules/.bin/nodemon index.js`
 14. install cors `npm install cors`
 15. install mongoose `npm install mongoose`
