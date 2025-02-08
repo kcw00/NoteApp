@@ -1,5 +1,5 @@
 
-# TodoApp
+# Note
 
 this repository starts with its backend part.
 
@@ -11,13 +11,17 @@ this repository starts with its backend part.
 4. From the root directory of your app, we can run the JSON server using the command npx:
 `npx json-server --port 3001 --watch db.json`
 5. You will be able to see that JSON server serves db.json
-6. Install axios `npm install axios`
 7. Install JSON server as a development dependency (only used during development) `npm install json-server --save-dev`
 8. add `"server": "json-server -p3001 --watch db.json"` to the scripts part of the package.json file
 9. start the json-server from the project root directory `npm run server`
-10. install Express library `npm install express`
-11. update the dependencies of the project `npm update`
-12. install nodemon by by defining it as a development dependency `npm install --save-dev nodemon`
-13. start our application with nodemon `node_modules/.bin/nodemon index.js`
-14. install cors `npm install cors`
-15. install mongoose `npm install mongoose`
+
+
+- Install required dependency
+Install Express library `npm install express`
+Install axios `npm install axios`
+Install cors `npm install cors`
+Install mongoose `npm install mongoose`
+Install dotenv `npm install dotenv`
+Install nodemon by by defining it as a development dependency `npm install --save-dev nodemon`
+
+start the app with nodemon `npm run dev`

@@ -3,12 +3,12 @@ const Note = require('../models/note')
 const initialNotes = [
   {
     content: 'HTML is easy',
-    important: false,
+    important: false
   },
   {
     content: 'Browser can execute only JavaScript',
-    important: true,
-  },
+    important: true
+  }
 ]
 
 const nonExistingId = async() => {

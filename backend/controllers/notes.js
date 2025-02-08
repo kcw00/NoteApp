@@ -24,14 +24,6 @@ notesRouter.post('/', async (request, response) => {
     important: body.important || false,
   })
 
-  const validation = note.validateSync()
-
-  if (validation) {
-    console.log('ERROR: ', validation.message)
-    console.log('---')
-    return response.status(400).json({ error: validation.message })
-  }
-
   const savedNote = await note.save()
   response.status(201).json(savedNote)
 })
