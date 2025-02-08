@@ -3,6 +3,7 @@ import Note from './components/Note'
 import Footer from './components/Footer'
 import Notification from './components/Notification'
 import noteService from './services/notes'
+import loginService from './services/login'
 
 
 const App = () => {
@@ -10,6 +11,38 @@ const App = () => {
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
+
+    try {
+      const user = await loginService.login({
+        username, password,
+      })
+      window.localStorage.setItem(
+        'loggedNoteappUser', JSON.stringify(user)
+      )
+      noteService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
+    // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      setErrorMessage('Wrong credentials')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedNoteappUser')
+    noteService.setToken(null)
+    setUser(null)
+  }
 
   useEffect(() => {
     noteService
@@ -23,6 +56,16 @@ const App = () => {
         setNotes([])
       })
   }, [])
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      noteService.setToken(user.token)
+    }
+  }, [])
+
 
   const addNote = (event) => {
     event.preventDefault()
@@ -70,7 +113,7 @@ const App = () => {
 
       })
   }
-  
+
   const deleteNoteOf = (id) => {
     const note = notes.find(n => n.id === id)
     const confirmDelete = window.confirm(`Delete ${note.content}?`)
@@ -100,32 +143,74 @@ const App = () => {
 
   const notesToShow = showAll ? notes : notes.filter(note => note.important)
 
+
+  const loginForm = () => (
+    <form onSubmit={handleLogin}>
+      <div>
+        username
+        <input
+          type="text"
+          value={username}
+          name="Username"
+          onChange={({ target }) => setUsername(target.value)}
+        />
+      </div>
+      <div>
+        password
+        <input
+          type="text"
+          value={password}
+          name="Password"
+          onChange={({ target }) => setPassword(target.value)}
+        />
+      </div>
+      <button type="submit">login</button>
+    </form>
+  )
+
+  const noteForm = () => (
+    <form onSubmit={addNote}>
+      <input
+        value={newNote}
+        onChange={handleNoteChange}
+      />
+      <button type="submit">save</button>
+    </form>
+  )
+
   return (
     <>
       <h1>Notes</h1>
+
       <Notification message={errorMessage} />
+
+      {
+        user === null ?
+          loginForm() :
+          <div>
+            <p>{user.name} logged-in
+            <button onClick={handleLogout}>Logout</button>
+            </p>
+            {noteForm()}
+          </div>
+      }
+
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all'}
         </button>
       </div>
       <ul>
-        {notesToShow.map(note =>
+        {notesToShow.map((note, id) =>
           <Note
-            key={note.id}
+            key={id}
             note={note}
             toggleImportance={() => toggleImportanceOf(note.id)}
             deleteNote={() => deleteNoteOf(note.id)}
           />
         )}
       </ul>
-      <form onSubmit={addNote}>
-        <input
-          value={newNote}
-          onChange={handleNoteChange}
-        />
-        <button type="submit">save</button>
-      </form>
+
       <Footer />
     </>
   )
