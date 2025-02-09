@@ -12,5 +12,10 @@ export default defineConfig({
       },
     }
   },
+  test: {
+    environment: 'jsdom',
+    glocals: true,
+    setupFiles: './testSetup.js'
+  }
 })
 
