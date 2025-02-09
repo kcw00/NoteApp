@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Note from './components/Note'
 import Footer from './components/Footer'
 import Notification from './components/Notification'
@@ -43,11 +43,11 @@ const App = () => {
 
 
   const addNote = (noteObject) => {
+    noteFormRef.current.toggleVisibility()
     noteService
       .create(noteObject) // the obj is sent to the server using axios post method
       .then(returnedNote => {
         setNotes(notes.concat(returnedNote))
-        setNewNote('')
       })
       .catch(error => {
         if (error.response.status === 400) {
@@ -161,12 +161,13 @@ const App = () => {
     )
   }
 
+  const noteFormRef = useRef()
 
   const noteForm = () => (
-    <Togglable buttonLabel='new note'>
-      <NoteForm createNote={addNote} />
-    </Togglable>
-  )
+      <Togglable buttonLabel='new note' ref={noteFormRef}>
+        <NoteForm createNote={addNote} />
+      </Togglable>
+    )
 
   return (
     <>
@@ -178,7 +179,7 @@ const App = () => {
       {user && <div>
         <p>{user.name} logged in <button onClick={handleLogout}>Logout</button></p>
         noteForm()
-      </div>}
+        </div>}
 
       <div>
         <button onClick={() => setShowAll(!showAll)}>
