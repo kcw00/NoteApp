@@ -35,8 +35,11 @@ since there are problems on the keywords test and expect in the tests. These pro
 `npm install --save-dev eslint-plugin-vitest-globals`
 
 enable the plugin by editing the `.eslintrc.cjs` file
-adding `"vitest-globals/env": true` to the env
-adding `'plugin:vitest-globals/recommended'` to the extends
+adding `"vitest-globals/env": true` into the env
+adding `'plugin:vitest-globals/recommended'` into the extends
 
+   - Simulating user input
+   Install user-event library
+   npm install --save-dev @testing-library/user-event
 
 test the app with `npm test`
