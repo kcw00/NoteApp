@@ -25,3 +25,18 @@ Install dotenv `npm install dotenv`
 Install nodemon by by defining it as a development dependency `npm install --save-dev nodemon`
 
 start the app with nodemon `npm run dev`
+
+- Testing with Vitest
+Install Vitest and jsdom library `npm install --save-dev vitest jsdom`
+Install jest-dom to test redering components `npm install --save-dev @testing-library/react @testing-library/jest-dom`
+
+
+since there are problems on the keywords test and expect in the tests. These problems can be solved by installing eslint-plugin-vitest-globals
+`npm install --save-dev eslint-plugin-vitest-globals`
+
+enable the plugin by editing the `.eslintrc.cjs` file
+adding `"vitest-globals/env": true` to the env
+adding `'plugin:vitest-globals/recommended'` to the extends
+
+
+test the app with `npm test`
