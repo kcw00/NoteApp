@@ -43,3 +43,11 @@ adding `'plugin:vitest-globals/recommended'` into the extends
    npm install --save-dev @testing-library/user-event
 
 test the app with `npm test`
+
+- Test coverage
+Find the coverage of tests by running the command `npm test -- --coverage`
+install `@vitest/coverage-v8` by answering `yes` after running the command above
+run the command again
+
+To see the HTML report of the coverage, run this command `open coverage/index.html`
+this report will tell us the lines of untested code in each components
