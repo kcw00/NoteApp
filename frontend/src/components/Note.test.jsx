@@ -4,7 +4,7 @@ import Note from './Note'
 
 test('renders content', () => {
     const note = {
-        content: 'Component testing',
+        content: 'finding elements',
         important: true
     }
 
@@ -12,14 +12,13 @@ test('renders content', () => {
 
     // screen.debug() -> print the HTML of components in terminal
 
-    const element = screen.getByText('Component testing')
-
+    const element = screen.getByText('finding elements', { exact: false })
     screen.debug(element)
 
     expect(element).toBeDefined()
 })
 
-test('clicking the button calls event handler once', async() => {
+test('clicking the button calls event handler once', async () => {
     const note = {
         content: 'Component testing',
         important: true
