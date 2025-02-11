@@ -7,7 +7,7 @@ const Footer = () => {
     return (
         <div style={footerStyle}>
             <br />
-            <em>Todo List</em>
+            <em>Made by React</em>
         </div>
     )
 }

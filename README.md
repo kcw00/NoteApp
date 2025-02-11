@@ -1,5 +1,5 @@
 
-# TodoApp
+# Note
 
 this repository starts with its backend part.
 
@@ -11,13 +11,43 @@ this repository starts with its backend part.
 4. From the root directory of your app, we can run the JSON server using the command npx:
 `npx json-server --port 3001 --watch db.json`
 5. You will be able to see that JSON server serves db.json
-6. Install axios `npm install axios`
 7. Install JSON server as a development dependency (only used during development) `npm install json-server --save-dev`
 8. add `"server": "json-server -p3001 --watch db.json"` to the scripts part of the package.json file
 9. start the json-server from the project root directory `npm run server`
-10. install Express library `npm install express`
-11. update the dependencies of the project `npm update`
-12. install nodemon by by defining it as a development dependency `npm install --save-dev nodemon`
-13. start our application with nodemone `node_modules/.bin/nodemon index.js`
-14. install cors `npm install cors`
-15. install mongoose `npm install mongoose`
+
+
+- Install required dependency
+Install Express library `npm install express`
+Install axios `npm install axios`
+Install cors `npm install cors`
+Install mongoose `npm install mongoose`
+Install dotenv `npm install dotenv`
+Install nodemon by by defining it as a development dependency `npm install --save-dev nodemon`
+
+start the app with nodemon `npm run dev`
+
+- Testing with Vitest
+Install Vitest and jsdom library `npm install --save-dev vitest jsdom`
+Install jest-dom to test redering components `npm install --save-dev @testing-library/react @testing-library/jest-dom`
+
+
+since there are problems on the keywords test and expect in the tests. These problems can be solved by installing eslint-plugin-vitest-globals
+`npm install --save-dev eslint-plugin-vitest-globals`
+
+enable the plugin by editing the `.eslintrc.cjs` file
+adding `"vitest-globals/env": true` into the env
+adding `'plugin:vitest-globals/recommended'` into the extends
+
+   - Simulating user input
+   Install user-event library
+   npm install --save-dev @testing-library/user-event
+
+test the app with `npm test`
+
+- Test coverage
+Find the coverage of tests by running the command `npm test -- --coverage`
+install `@vitest/coverage-v8` by answering `yes` after running the command above
+run the command again
+
+To see the HTML report of the coverage, run this command `open coverage/index.html`
+this report will tell us the lines of untested code in each components
