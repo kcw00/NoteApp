@@ -8,11 +8,11 @@
 
 ## Installation
 
-- Install required dependency
+### Install required dependency
    Install Express library `npm install express`   
    Install a JSON server globally on your machine  
       `npm install -g json-server`  
-   1) if permission denied, use this command `sudo npm install -g json-server`  
+        1) if permission denied, use this command `sudo npm install -g json-server`  
    Install JSON server as a development dependency (only used during development)  
       `npm install json-server --save-dev`  
    Install axios `npm install axios`  
@@ -36,7 +36,7 @@ Start the json-server from the project root directory
 
 ## Integration Testing
 
-- Testing with Vitest
+### Testing with Vitest
 Install Vitest and jsdom library  
    `npm install --save-dev vitest jsdom`
 Install jest-dom to test redering components  
@@ -58,7 +58,7 @@ Install jest-dom to test redering components
 
 Test the app with `npm test`
 
-- Test coverage
+### Test coverage
    To find the coverage of tests, run this command  
       `npm test -- --coverage`
       - install `@vitest/coverage-v8` by answering `yes` after running the command above
