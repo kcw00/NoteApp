@@ -1,0 +1,19 @@
+{
+  "notes": [
+    {
+      "id": "1",
+      "content": "study hard",
+      "important": false
+    },
+    {
+      "id": "2",
+      "content": "work out",
+      "important": false
+    },
+    {
+      "id": "3",
+      "content": "send email",
+      "important": false
+    }
+  ]
+}
