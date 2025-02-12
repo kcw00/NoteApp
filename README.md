@@ -9,27 +9,27 @@
 ## Installation
 
 ### Install required dependency
-   Install Express library `npm install express`   
-   Install a JSON server globally on your machine  
+   - Install Express library `npm install express`   
+   - Install a JSON server globally on your machine  
       `npm install -g json-server`  
-        1) if permission denied, use this command `sudo npm install -g json-server`  
-   Install JSON server as a development dependency (only used during development)  
+       - if permission denied, use this command `sudo npm install -g json-server`  
+   - Install JSON server as a development dependency (only used during development)  
       `npm install json-server --save-dev`  
-   Install axios `npm install axios`  
-   Install cors `npm install cors`  
-   Install mongoose `npm install mongoose`  
-   Install dotenv `npm install dotenv`  
-   Install nodemon by by defining it as a development dependency  
+   - Install axios `npm install axios`  
+   - Install cors `npm install cors`  
+   - Install mongoose `npm install mongoose`  
+   - Install dotenv `npm install dotenv`  
+   - Install nodemon by by defining it as a development dependency  
       `npm install --save-dev nodemon`  
 
 ---
 
 ## Usage
 
-Start the app with nodemon  
+- Start the app with nodemon  
    `npm run dev`  
 
-Start the json-server from the project root directory  
+- Start the json-server from the project root directory  
    `npm run server`
 
 ---
@@ -37,9 +37,11 @@ Start the json-server from the project root directory
 ## Integration Testing
 
 ### Testing with Vitest
-Install Vitest and jsdom library  
+
+- Install Vitest and jsdom library  
    `npm install --save-dev vitest jsdom`
-Install jest-dom to test redering components  
+  
+- Install jest-dom to test redering components  
    `npm install --save-dev @testing-library/react @testing-library/jest-dom`
 
    ### Before running tests with Vitest
@@ -56,17 +58,18 @@ Install jest-dom to test redering components
       Install user-event library  
       `npm install --save-dev @testing-library/user-event`
 
-Test the app with `npm test`
+   ### Testing project with Vitest
+   Test the app with `npm test`
 
 ### Test coverage
    To find the coverage of tests, run this command  
-      `npm test -- --coverage`
-      - install `@vitest/coverage-v8` by answering `yes` after running the command above
+      `npm test -- --coverage`  
+   - install `@vitest/coverage-v8` by answering `yes` after running the command above
       run the command again
 
    To see the HTML report of the coverage, run this command  
-   `open coverage/index.html`
-   this report will tell us the lines of untested code in each components
+   `open coverage/index.html`  
+   - this report will tell us the lines of untested code in each components
 
 ---
 ## Unit testing
