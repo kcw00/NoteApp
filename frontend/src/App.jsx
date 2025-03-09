@@ -1,19 +1,28 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
 import Footer from './components/Footer'
 import Notification from './components/Notification'
 import Notes from './components/Notes'
 import NoteState from './context/noteState'
-
+import Navbar from './components/Navbar'
+import LoginForm from './components/LoginForm'
 
 
 const App = () => {
   return (
     <NoteState>
-      <div className='container'>
-        <h1>Notes</h1>
+      <BrowserRouter>
+        <Navbar />
         <Notification />
-        <Notes />
-        <Footer />
-      </div>
+        <div className='container'>
+          <Routes>
+            <Route path='/' element={<Notes />} />
+            <Route path='/about' element={<h1>About</h1>} />
+            <Route path='/login' element={<LoginForm />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+      <Footer />
     </NoteState>
   )
 }
