@@ -23,11 +23,12 @@ const LoginForm = () => {
             <h2>Login</h2>
             <form onSubmit={handleSubmit}>
                 <div className='mb-3'>
-                    <label htmlFor='username' className='form-label'>Username</label>
+                    <label htmlFor='text' className='form-label'>Username</label>
                     <input
                         id='username'
                         value={username}
                         name="Username"
+                        type="text"
                         className='form-control'
                         onChange={({ target }) => setUsername(target.value)}
                         style={{
@@ -42,6 +43,7 @@ const LoginForm = () => {
                         id='password'
                         value={password}
                         name="Password"
+                        type="current-password"
                         className='form-control'
                         onChange={({ target }) => setPassword(target.value)}
                         style={{

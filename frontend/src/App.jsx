@@ -6,6 +6,7 @@ import Notes from './components/Notes'
 import NoteState from './context/noteState'
 import Navbar from './components/Navbar'
 import LoginForm from './components/LoginForm'
+import SignupForm from './components/SignupForm'
 
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
             <Route path='/' element={<Notes />} />
             <Route path='/about' element={<h1>About</h1>} />
             <Route path='/login' element={<LoginForm />} />
+            <Route path='/signup' element={<SignupForm />} />
           </Routes>
         </div>
       </BrowserRouter>
