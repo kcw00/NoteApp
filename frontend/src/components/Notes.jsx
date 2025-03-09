@@ -18,30 +18,6 @@ const Notes = () => {
         getLoggedUser()
     }, [])
 
-    const loginForm = () => {
-        const hideWhenVisible = { display: loginVisible ? 'none' : '' }
-        const showWhenVisible = { display: loginVisible ? '' : 'none' }
-
-        return (
-            <div>
-                <div style={hideWhenVisible}>
-                    <button onClick={() => setLoginVisible(true)}>log in</button>
-                </div>
-                <div style={showWhenVisible}>
-                    <LoginForm
-                        username={username}
-                        password={password}
-                        handleUsernameChange={({ target }) => setUsername(target.value)}
-                        handlePasswordChange={({ target }) => setPassword(target.value)}
-                        handleSubmit={handleLogin}
-                    />
-                    <button onClick={() => setLoginVisible(false)}>cancel</button>
-                </div>
-            </div>
-        )
-    }
-
-
     const noteForm = () => {
         return (
             <Togglable buttonLabel='new note' ref={noteFormRef}>
@@ -52,28 +28,27 @@ const Notes = () => {
 
 
     return (
+
         <div>
-            {!user && loginForm()}
-            {user && <div>
-                <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-                <div>
-                    <button onClick={() => setShowAll(!showAll)}>
-                        show {showAll ? 'important' : 'all'}
-                    </button>
-                </div>
-                <ul>
-                    {notesToShow.map((note, id) =>
-                        <Note
-                            key={id}
-                            note={note}
-                            toggleImportance={() => toggleImportanceOf(note.id)}
-                            deleteNote={() => deleteNoteOf(note.id)}
-                        />
-                    )}
-                </ul>
-                {noteForm()}</div>
-            }
+            <div>
+                <button onClick={() => setShowAll(!showAll)}>
+                    show {showAll ? 'important' : 'all'}
+                </button>
+            </div>
+            <ul>
+                {notesToShow.map((note, id) =>
+                    <Note
+                        key={id}
+                        note={note}
+                        toggleImportance={() => toggleImportanceOf(note.id)}
+                        deleteNote={() => deleteNoteOf(note.id)}
+                    />
+                )}
+            </ul>
+            {noteForm()}
         </div>
+
+
     )
 }
 

@@ -12,6 +12,11 @@ const NoteState = (props) => {
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const [loginVisible, setLoginVisible] = useState(false)
+    const [button, setButton] = useState('light')
+    const [style, setStyle] = useState({
+        color: "black",
+        backgroundColor: "white"
+    })
 
     // get all notes from the server
     const getNotes = () => {
@@ -52,7 +57,7 @@ const NoteState = (props) => {
                 }
                 setTimeout(() => {
                     setErrorMessage(null)
-                }, 10000)
+                }, 5000)
             })
     }
     // Changes the importance of a note
@@ -137,6 +142,27 @@ const NoteState = (props) => {
         ? notes
         : notes.filter(note => note.important)
 
+    // change mode
+    const changeMode = () => {
+        if (button === 'light') {
+            setStyle({
+                color: "white",
+                backgroundColor: "grey"
+            })
+            setButton('dark')
+            document.body.style.backgroundColor = 'black'
+            document.body.style.color = 'white'
+        } else {
+            setStyle({
+                color: "black",
+                backgroundColor: "white"
+            })
+            setButton('light')
+            document.body.style.backgroundColor = 'white'
+            document.body.style.color = 'black'
+        }
+    }
+
     return (
         <NoteContext.Provider
          value={{ 
@@ -147,6 +173,10 @@ const NoteState = (props) => {
             password,
             user,
             loginVisible,
+            button,
+            style,
+            changeMode,
+            setErrorMessage,
             setLoginVisible,
             setUsername,
             setPassword,

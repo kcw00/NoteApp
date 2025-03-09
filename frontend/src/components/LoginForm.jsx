@@ -1,45 +1,60 @@
-import PropTypes from 'prop-types';
+import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import noteContext from '../context/NoteContext'
 
-const LoginForm = ({
-    handleSubmit,
-    handleUsernameChange,
-    handlePasswordChange,
-    username,
-    password
-}) => {
+const LoginForm = () => {
+    const {
+        handleSubmit,
+        setUsername,
+        setPassword,
+        username,
+        password,
+        button,
+        handleLogin
+    } = useContext(noteContext)
+
+    const navigate = useNavigate()
+    const login = () => {
+        handleLogin()
+        navigate('/')
+    }
     return (
-        <div>
+        <div className='container'>
             <h2>Login</h2>
-
             <form onSubmit={handleSubmit}>
-                <div>
-                    username
+                <div className='mb-3'>
+                    <label htmlFor='username' className='form-label'>Username</label>
                     <input
                         id='username'
                         value={username}
-                        onChange={handleUsernameChange}
+                        name="Username"
+                        className='form-control'
+                        onChange={({ target }) => setUsername(target.value)}
+                        style={{
+                            backgroundColor: button === "light" ? "white" : "#1a2027",
+                            color: button === "light" ? "black" : "white",
+                        }}
                     />
                 </div>
-                <div>
-                    password
+                <div className='mb-3'>
+                    <label htmlFor='password' className='form-label'>Password</label>
                     <input
                         id='password'
                         value={password}
                         name="Password"
-                        onChange={handlePasswordChange}
+                        className='form-control'
+                        onChange={({ target }) => setPassword(target.value)}
+                        style={{
+                            backgroundColor: button === "light" ? "white" : "#1a2027",
+                            color: button === "light" ? "black" : "white",
+                        }}
                     />
                 </div>
-                <button id="login-button" type="submit">login</button>
+                <button id="login-button" type="submit" onClick={login}>login</button>
             </form>
         </div >
     )
 }
-LoginForm.propTypes = {
-    handleSubmit: PropTypes.func.isRequired,
-    handleUsernameChange: PropTypes.func.isRequired,
-    handlePasswordChange: PropTypes.func.isRequired,
-    username: PropTypes.string.isRequired,
-    password: PropTypes.string.isRequired,
-}
+
 
 export default LoginForm
