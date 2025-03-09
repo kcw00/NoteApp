@@ -2,17 +2,17 @@
   "notes": [
     {
       "id": "1",
-      "content": "study hard",
+      "content": "1st note",
       "important": false
     },
     {
       "id": "2",
-      "content": "work out",
+      "content": "2nd note",
       "important": false
     },
     {
       "id": "3",
-      "content": "send email",
+      "content": "3rd note",
       "important": false
     }
   ]

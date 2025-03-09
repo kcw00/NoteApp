@@ -12,14 +12,13 @@ const NoteForm = ({ createNote }) => {
         event.preventDefault()
         createNote({
             content: newNote,
-            important: true
+            important: false
         })
 
         setNewNote('')
     }
     return (
         <div className="formDiv">
-            <h2>Create a new note</h2>
 
             <form onSubmit={addNote}>
                 <input
