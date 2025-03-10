@@ -3,25 +3,25 @@ import Note from "./Note"
 import NoteForm from "./NoteForm"
 import Togglable from "./Togglable"
 import noteContext from "../context/NoteContext"
-import LoginForm from "./LoginForm"
 
 const Notes = () => {
-    const { getNotes, showAll, setShowAll, user, handleLogout, addNote, notesToShow,
-        toggleImportanceOf, deleteNoteOf, getLoggedUser, loginVisible, setLoginVisible,
-        setUsername, setPassword, handleLogin, username, password, noteFormRef } = useContext(noteContext)
-
-    useEffect(() => {
-        getNotes()
-    }, [])
+    const { getNotes, showAll, setShowAll, addNote, notesToShow,
+        toggleImportanceOf, deleteNoteOf, getLoggedUser,
+        noteFormRef, user } = useContext(noteContext)
 
     useEffect(() => {
         getLoggedUser()
     }, [])
 
+    useEffect(() => {
+        if (user)
+            getNotes()
+    }, [user])
+
     const noteForm = () => {
         return (
             <Togglable buttonLabel='new note' ref={noteFormRef}>
-                <NoteForm createNote={addNote} />
+                <NoteForm createNote={addNote} user={user?.id}/>
             </Togglable>
         )
     }

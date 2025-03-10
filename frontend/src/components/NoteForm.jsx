@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
 
-const NoteForm = ({ createNote }) => {
+const NoteForm = ({ createNote, user }) => {
     const [newNote, setNewNote] = useState('')
 
     const handleChange = (event) => {
@@ -12,7 +12,8 @@ const NoteForm = ({ createNote }) => {
         event.preventDefault()
         createNote({
             content: newNote,
-            important: false
+            important: false,
+            user: user
         })
 
         setNewNote('')
