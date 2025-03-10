@@ -56,8 +56,13 @@ const NoteState = (props) => {
                 setNotes(notes.concat(returnedNote))
             })
             .catch(error => {
+                if (error.response){
                 if (error.response.status === 400) {
                     setErrorMessage(error.response.data.error)
+                }} else if (error.request) {
+                    setErrorMessage('Server is not responding')
+                } else {
+                    setErrorMessage(error.message)
                 }
                 setTimeout(() => {
                     setErrorMessage(null)
