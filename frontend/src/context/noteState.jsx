@@ -8,6 +8,7 @@ const NoteState = (props) => {
     const [notes, setNotes] = useState([])
     const [showAll, setShowAll] = useState(true)
     const [errorMessage, setErrorMessage] = useState(null)
+    const [name, setName] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
@@ -37,8 +38,11 @@ const NoteState = (props) => {
         const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON)
+            console.log('Retrieved user from localStorage:', user) 
             setUser(user)
             noteService.setToken(user.token)
+        } else {
+            console.log('No user found in localStorage')
         }
     }
 
@@ -108,16 +112,18 @@ const NoteState = (props) => {
 
     // Login event handler
     const handleLogin = async (event) => {
-        event.preventDefault()
+        if (event) event.preventDefault()
 
         try {
             const user = await loginService.login({
                 username, password,
             })
+            console.log('user from login:', user)
             window.localStorage.setItem(
                 'loggedNoteappUser', JSON.stringify(user)
             )
             noteService.setToken(user.token)
+            console.log('Token after login:', user.token)
             setUser(user)
             setUsername('')
             setPassword('')
@@ -189,7 +195,8 @@ const NoteState = (props) => {
             handleLogout,
             notesToShow,
             setShowAll,
-            noteFormRef
+            noteFormRef,
+            setUser
          }}>
             {props.children}
         </NoteContext.Provider>

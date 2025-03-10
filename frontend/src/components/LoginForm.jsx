@@ -4,7 +4,6 @@ import noteContext from '../context/NoteContext'
 
 const LoginForm = () => {
     const {
-        handleSubmit,
         setUsername,
         setPassword,
         username,
@@ -14,14 +13,15 @@ const LoginForm = () => {
     } = useContext(noteContext)
 
     const navigate = useNavigate()
-    const login = () => {
-        handleLogin()
+    const login = async (event) => {
+        event.preventDefault()
+        await handleLogin(event)
         navigate('/')
     }
     return (
         <div className='container'>
             <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={login}>
                 <div className='mb-3'>
                     <label htmlFor='text' className='form-label'>Username</label>
                     <input
@@ -52,7 +52,7 @@ const LoginForm = () => {
                         }}
                     />
                 </div>
-                <button id="login-button" type="submit" onClick={login}>login</button>
+                <button id="login-button" type="submit">login</button>
             </form>
         </div >
     )

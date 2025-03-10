@@ -8,14 +8,20 @@ const setToken = newToken => {
   token = `Bearer ${newToken}`
 }
 
-const getAll = () => {
-  const request = axios.get(baseUrl)
+
+const getAll = async () => {
+  const config = {
+    headers: { 
+      Authorization: window.localStorage.getItem('loggedNoteappUser')
+     },
+  }
+  const request = axios.get(baseUrl, config)
   return request.then(response => response.data)
 }
 
 const create = async newObject => {
   const config = {
-    headers: { Authorization: token },
+    headers: { Authorization: user?.token },
   }
   const response = await axios.post(baseUrl, newObject, config)
   return response.data
