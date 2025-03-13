@@ -3,6 +3,7 @@ import Note from "./Note"
 import NoteForm from "./NoteForm"
 import Togglable from "./Togglable"
 import noteContext from "../context/NoteContext"
+import Navbar from "./Navbar"
 
 const Notes = () => {
     const { getNotes, showAll, setShowAll, addNote, notesToShow,
@@ -28,25 +29,26 @@ const Notes = () => {
 
 
     return (
-        <div className="note-container">
-            <h2> Your Notes</h2>
-            <button onClick={() => setShowAll(!showAll)}>
-                show {showAll ? 'important' : 'all'}
-            </button>
-            <ul className="note">
-                {notesToShow.map((note, id) =>
-                    <Note
-                        key={id}
-                        note={note}
-                        toggleImportance={() => toggleImportanceOf(note.id)}
-                        deleteNote={() => deleteNoteOf(note.id)}
-                    />
-                )}
-            </ul>
-            {noteForm()}
+        <div>
+            <Navbar />
+            <div className="note-container">
+                <h2> Your Notes</h2>
+                <button onClick={() => setShowAll(!showAll)}>
+                    show {showAll ? 'important' : 'all'}
+                </button>
+                <ul className="note">
+                    {notesToShow.map((note, id) =>
+                        <Note
+                            key={id}
+                            note={note}
+                            toggleImportance={() => toggleImportanceOf(note.id)}
+                            deleteNote={() => deleteNoteOf(note.id)}
+                        />
+                    )}
+                </ul>
+                {noteForm()}
+            </div>
         </div>
-
-
     )
 }
 

@@ -18,8 +18,9 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
-  color: #535bf2;
+  color: #9599ec;
 }
 
 body {
@@ -29,6 +30,32 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+}
+
+.logo-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: #fff;
+}
+
+.logo-header .logo {
+  margin-top: 32px;
+  height: 32px;
+  width: auto;
+}
+
+.nav-logo {
+  height: 65px;
+  width: auto;
+}
+
 .form-container {
   display: flex;
   flex-direction: column;
@@ -36,7 +63,7 @@ body {
   justify-content: center;
   margin-top: 50px;
   padding-bottom: 302px;
-  padding-top: 150px; 
+  padding-top: 150px;
 }
 
 .note-container {
@@ -44,9 +71,8 @@ body {
   flex-direction: column;
   margin-top: 50px;
   padding-bottom: 302px;
-  padding-top: 10px; 
+  padding-top: 10px;
 }
-
 
 .main-contents {
   text-align: center;
@@ -92,11 +118,13 @@ h1 {
   line-height: 1.1;
   font-style: italic;
 }
-.note{
+
+.note {
   color: grey;
   padding-top: 3px;
   font-size: 15px;
 }
+
 .error {
   color: red;
   background: #F8D7DA;
@@ -106,6 +134,7 @@ h1 {
   padding: 16px;
   margin-bottom: 10px;
 }
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -117,9 +146,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -130,10 +161,31 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
-    color: #747bff;
+    color: #9599ec;
   }
+
   button {
     background-color: #f9f9f9;
+  }
+}
+
+@media (min-width: 450px) {
+  .logo-header {
+    padding-top: 20px;
+  }
+
+  .logo-header .logo {
+    height: 65px;
+  }
+}
+
+@media (min-width: 800px) {
+  .logo-header .logo {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      margin-top: 0;
   }
 }
