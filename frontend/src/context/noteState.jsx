@@ -156,21 +156,11 @@ const NoteState = (props) => {
     // change mode
     const changeMode = () => {
         if (button === 'light') {
-            setStyle({
-                color: "white",
-                backgroundColor: "grey"
-            })
+            document.body.classList.add('dark-mode')
             setButton('dark')
-            document.body.style.backgroundColor = 'black'
-            document.body.style.color = 'white'
         } else {
-            setStyle({
-                color: "black",
-                backgroundColor: "white"
-            })
+            document.body.classList.remove('dark-mode')
             setButton('light')
-            document.body.style.backgroundColor = 'white'
-            document.body.style.color = 'black'
         }
     }
 

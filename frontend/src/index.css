@@ -13,6 +13,31 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.dark-mode {
+  background-color: black;
+  color: white;
+}
+
+.dark-mode .login-button, 
+.dark-mode .cancel-button, 
+.dark-mode .submit-button {
+  background-color: grey;
+  color: white;
+}
+
+.dark-mode .start-button {
+  color: black;
+}
+
+.dark-mode .form-control {
+  background-color: #1a2027;
+  color: white;
+}
+
+.dark-mode .logo-header {
+  background-color: #000;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -42,7 +67,7 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
-  background-color: #fff;
+  color: #242424;
 }
 
 .logo-header .logo {
@@ -156,36 +181,25 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
 
-  a:hover {
-    color: #9599ec;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
-@media (min-width: 450px) {
+@media (min-width: 300px) {
   .logo-header {
-    padding-top: 20px;
+    padding-top: 80px;
   }
-
   .logo-header .logo {
     height: 65px;
+  }
+
+  .form-container {
+    padding-top: 50px;
   }
 }
 
 @media (min-width: 800px) {
   .logo-header .logo {
-      position: fixed;
-      top: 8px;
-      left: 8px;
-      margin-top: 0;
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    margin-top: 0;
   }
 }
