@@ -49,10 +49,12 @@ const LoginForm = () => {
                             onChange={({ target }) => setPassword(target.value)}
                         />
                     </div>
-                    <button id="login-button" type="submit" className="login-button">login</button>
-                    <a href="/">
-                        <button type="button" className="cancel-button" >cancel</button>
-                    </a>
+                    <div className='button-container'>
+                        <button id="login-button" type="submit" className="login-button me-3">login</button>
+                        <a href="/">
+                            <button type="button" className="cancel-button" >cancel</button>
+                        </a>
+                    </div>
                 </form>
             </div >
         </div>

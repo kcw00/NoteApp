@@ -87,16 +87,17 @@ const SignupForm = () => {
                             required
                         />
                     </div>
-
-                    <button type="submit" className="submit-button">
-                        Submit
-                    </button>
-                    <a href="/">
-                        <button type="button" className="cancel-button" >cancel</button>
-                    </a>
+                    <div className='button-container'>
+                        <button type="submit" className="submit-button me-3">
+                            submit
+                        </button>
+                        <a href="/">
+                            <button type="button" className="cancel-button" >cancel</button>
+                        </a>
+                    </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

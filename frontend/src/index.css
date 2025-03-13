@@ -18,15 +18,25 @@
   color: white;
 }
 
-.dark-mode .login-button, 
-.dark-mode .cancel-button, 
+
+.dark-mode .login-button,
+.dark-mode .cancel-button,
 .dark-mode .submit-button {
   background-color: grey;
   color: white;
 }
 
+.login-button, 
+.cancel-button,
+.submit-button {
+  background-color: lightgray;
+  color: black;
+}
+
 .dark-mode .start-button {
   color: black;
+  border: 1px solid #808080;
+  cursor: pointer;
 }
 
 .dark-mode .form-control {
@@ -99,6 +109,13 @@ body {
   padding-top: 10px;
 }
 
+.button-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
 .main-contents {
   text-align: center;
   margin-top: 50px;
@@ -167,7 +184,8 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  color: white;
+  background-color: grey;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -179,6 +197,10 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+.login-button {
+  width: 98.19px;
 }
 
 
