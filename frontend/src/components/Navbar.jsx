@@ -2,7 +2,7 @@ import React from "react"
 import { useContext } from "react"
 import { useEffect } from "react"
 
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import noteContext from "../context/NoteContext"
 
 const Navbar = () => {
@@ -11,20 +11,13 @@ const Navbar = () => {
   const context = useContext(noteContext)
   const { button, changeMode, handleLogout } = context
 
-  const navigate = useNavigate()
-
-  const logout = () => {
-    handleLogout()
-    navigate("/")
-  }
-
 
   return (
     <div>
       <nav className={`navbar navbar-expand-lg navbar-${button} bg-${button}`}>
         <div className="container-fluid">
-          <a className="navbar-brand" href="/">
-            Notes
+          <a className="navbar-brand bold" href="/">
+            NOTES
           </a>
           <button
             className="navbar-toggler"
@@ -61,7 +54,7 @@ const Navbar = () => {
                 </Link>
               </li>
             </ul>
-            <div className="form-check form-switch mx-2">
+            <div className="form-check form-switch mx-1">
               <input
                 className="form-check-input"
                 type="checkbox"
@@ -94,9 +87,13 @@ const Navbar = () => {
                 </Link>
               </form>
             ) : (
-              <button className="button button-primary mx-2" onClick={logout}>
+              <Link 
+                className="button button-primary mx-2"
+                to="/"
+                role="button"
+                onClick={handleLogout}>
                 Sign out
-              </button>
+              </Link>
             )}
           </div>
         </div>

@@ -16,11 +16,11 @@ const LoginForm = () => {
     const login = async (event) => {
         event.preventDefault()
         await handleLogin(event)
-        navigate('/')
+        navigate('/notes')
     }
     return (
-        <div className='container'>
-            <h2>Login</h2>
+        <div className='form-container'>
+            <h2 className='title'>Login</h2>
             <form onSubmit={login}>
                 <div className='mb-3'>
                     <label htmlFor='text' className='form-label'>Username</label>

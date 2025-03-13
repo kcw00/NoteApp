@@ -7,6 +7,7 @@ import NoteState from './context/noteState'
 import Navbar from './components/Navbar'
 import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
+import Home from './components/Home'
 
 
 const App = () => {
@@ -17,7 +18,8 @@ const App = () => {
         <Notification />
         <div className='container'>
           <Routes>
-            <Route path='/' element={<Notes />} />
+            <Route path='/' element={<Home />} />
+            <Route path='/notes' element={<Notes />} />
             <Route path='/about' element={<h1>About</h1>} />
             <Route path='/login' element={<LoginForm />} />
             <Route path='/signup' element={<SignupForm />} />

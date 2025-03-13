@@ -40,7 +40,7 @@ const SignupForm = () => {
     }
 
     return (
-        <div className="container">
+        <div className="form-container">
             <h2>Signup section</h2>
             <form onSubmit={handleRegister}>
                 <div className="mb-3">

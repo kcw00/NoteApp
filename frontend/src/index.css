@@ -1,5 +1,5 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Overpass Mono", monospace;
   line-height: 1.5;
   font-weight: 400;
 
@@ -24,17 +24,72 @@ a:hover {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Overpass Mono", monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+  padding-bottom: 302px;
+  padding-top: 150px; 
+}
+
+.note-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 50px;
+  padding-bottom: 302px;
+  padding-top: 10px; 
+}
+
+
+.main-contents {
+  text-align: center;
+  margin-top: 50px;
+  gap: 200px;
+  padding-bottom: 270px;
+  padding-top: 150px;
+}
+
+.title {
+  font-family: "Overpass Mono", monospace;
+  font-size: 36px;
+  font-weight: bold;
+  padding: 20px;
+}
+
+.subtitle {
+  font-family: "Overpass Mono", monospace;
+  font-size: 20px;
+  margin-top: 10px;
+  padding: 40px;
+}
+
+.start-button {
+  margin-top: 30px;
+  padding: 15px 30px;
+  font-family: "Overpass Mono", monospace;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fafafa;
+  background-color: #7f6bff;
+  border: 1px solid #000;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.start-button:hover {
+  background-color: #6a5acd;
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-  color: green;
   font-style: italic;
 }
 .note{
@@ -44,11 +99,11 @@ h1 {
 }
 .error {
   color: red;
-  background: lightgrey;
+  background: #F8D7DA;
   font-size: 20px;
-  border-style: solid;
-  border-radius: 5px;
-  padding: 10px;
+  border: 1px #EA868F solid;
+  border-radius: 6px;
+  padding: 16px;
   margin-bottom: 10px;
 }
 button {

@@ -21,21 +21,19 @@ const Notes = () => {
     const noteForm = () => {
         return (
             <Togglable buttonLabel='new note' ref={noteFormRef}>
-                <NoteForm createNote={addNote} user={user?.id}/>
+                <NoteForm createNote={addNote} user={user?.id} />
             </Togglable>
         )
     }
 
 
     return (
-
-        <div>
-            <div>
-                <button onClick={() => setShowAll(!showAll)}>
-                    show {showAll ? 'important' : 'all'}
-                </button>
-            </div>
-            <ul>
+        <div className="note-container">
+            <h2> Your Notes</h2>
+            <button onClick={() => setShowAll(!showAll)}>
+                show {showAll ? 'important' : 'all'}
+            </button>
+            <ul className="note">
                 {notesToShow.map((note, id) =>
                     <Note
                         key={id}
