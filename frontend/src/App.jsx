@@ -18,13 +18,13 @@ const App = () => {
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/notes' element={<Notes />} />
+            <Route path='/notes/:id' element={<Notes />} />
             <Route path='/about' element={<h1>About</h1>} />
             <Route path='/login' element={<LoginForm />} />
             <Route path='/signup' element={<SignupForm />} />
           </Routes>
         </div>
       </BrowserRouter>
-      <Footer />
     </NoteState>
   )
 }

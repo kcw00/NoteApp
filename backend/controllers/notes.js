@@ -25,6 +25,7 @@ notesRouter.post('/', async (request, response) => {
   const body = request.body
 
   const note = new Note({
+    title: body.title,
     content: body.content,
     important: body.important === undefined ? false : body.important,
     user: request.user._id
@@ -50,11 +51,11 @@ notesRouter.delete('/:id', async (request, response) => {
 })
 
 notesRouter.put('/:id', async (request, response) => {
-  const { content, important } = request.body
+  const { title, content, important } = request.body
 
   const updatedNote = await Note.findByIdAndUpdate(
     request.params.id,
-    { content, important },
+    { title, content, important },
     { new: true, runValidators: true, context: 'query' }
   )
 
