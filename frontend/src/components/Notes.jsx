@@ -31,7 +31,7 @@ const Notes = () => {
     return (
         <div id="notes-app">
             <Sidebar />
-                <NoteEditor createNote={addNote} user={user?.id} />
+            <NoteEditor createNote={addNote} user={user?.id} />
 
                 
             </div>

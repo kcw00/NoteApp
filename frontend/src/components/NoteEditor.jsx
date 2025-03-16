@@ -1,12 +1,23 @@
 import PropTypes from 'prop-types'
-import { useContext, useState } from "react"
+import { useContext, useState, useEffect } from "react"
 import noteContext from "../context/NoteContext"
 
 const NoteEditor = ({ createNote, user }) => {
 
     const context = useContext(noteContext)
-    const { toggleSidebar, isSidebarOpen, toggleImportanceOf } = context
+    const { toggleSidebar, isSidebarOpen, toggleImportanceOf, sidebarWidth } = context
     const [newNote, setNewNote] = useState({ title: '', content: '' })
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth)
+        }
+        window.addEventListener('resize', handleResize)
+        return () => {
+            window.removeEventListener('resize', handleResize)
+        }
+    }, [])
 
     const handleChange = (event) => {
         setNewNote((prevNote) => {
@@ -31,7 +42,8 @@ const NoteEditor = ({ createNote, user }) => {
         setNewNote({ title: '', content: '' })
     }
     return (
-        <div className="note-container">
+        <div className="note-container"
+            style={{ width: isSidebarOpen ? `${windowWidth - sidebarWidth}px` : "100%" }}>
             <header className="note-header d-flex align-items-center p-3">
                 {!isSidebarOpen ? <button onClick={toggleSidebar}>{">>"}</button> : ""}
                 <button className="ms-auto favorite-button btn btn-secondary" onClick={toggleImportanceOf}>{"★"}</button>

@@ -15,12 +15,14 @@
 #notes-app {
   display: flex;
   background-color: initial;
+  width: 100vw;
   height: 100vh;
   overflow: hidden;
   flex-direction: row-reverse;
 }
 
 .sidebar-container {
+  display: flex;
   order: 1;
   flex-grow: 0;
   flex-shrink: 0;
@@ -42,6 +44,13 @@
 }
 
 .sidebar-container.closed {
+  width: 0;
+  opacity: 0;
+  transform: translateX(-347px) translateY(0px);
+  visibility: hidden;
+}
+
+.sidebar.closed {
   width: 0;
   opacity: 0;
   transform: translateX(-347px) translateY(0px);
@@ -83,10 +92,12 @@
 .note-container {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  flex-grow: 1;
+  width: auto;
   margin-top: 10px;
   padding-bottom: 500px;
   padding-top: 10px;
+  min-width: 0;
 }
 
 

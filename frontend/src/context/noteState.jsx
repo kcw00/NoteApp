@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useCallback } from 'react'
 
 import NoteContext from './NoteContext'
 import noteService from '../services/notes'
@@ -160,6 +160,32 @@ const NoteState = (props) => {
         setIsSidebarOpen(!isSidebarOpen)
     }
 
+    // Sidebar resize
+    const [sidebarWidth, setSidebarWidth] = useState(347); // default width 347px
+    const [isResizing, setIsResizing] = useState(false);
+
+    const resizeSidebar = useCallback((e) => {
+        if (isResizing) {
+          let newWidth = Math.max(300, Math.min(e.clientX, 600)) // Minimum: 300px, Maximum: 600px
+          setSidebarWidth(newWidth)
+        }
+      }, [isResizing])
+    
+      // Function to stop resizing
+      const stopResizing = useCallback(() => {
+        setIsResizing(false)
+        document.removeEventListener("mousemove", resizeSidebar)
+        document.removeEventListener("mouseup", stopResizing)
+      }, [resizeSidebar])
+    
+      // Function to start resizing
+      const startResizing = (e) => {
+        e.preventDefault()
+        setIsResizing(true)
+        document.addEventListener("mousemove", resizeSidebar)
+        document.addEventListener("mouseup", stopResizing)
+      }
+
     return (
         <NoteContext.Provider
          value={{ 
@@ -185,7 +211,12 @@ const NoteState = (props) => {
             // noteFormRef,
             setUser,
             toggleSidebar,
-            isSidebarOpen
+            isSidebarOpen,
+            startResizing,
+            stopResizing,
+            resizeSidebar,
+            sidebarWidth,
+            isResizing
          }}>
             {props.children}
         </NoteContext.Provider>
