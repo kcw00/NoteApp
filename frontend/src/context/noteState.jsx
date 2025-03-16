@@ -6,18 +6,13 @@ import loginService from '../services/login'
 
 const NoteState = (props) => {
     const [notes, setNotes] = useState([])
-    const [showAll, setShowAll] = useState(true)
     const [errorMessage, setErrorMessage] = useState(null)
-    const [name, setName] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const [loginVisible, setLoginVisible] = useState(false)
     const [button, setButton] = useState('light')
-    const [style, setStyle] = useState({
-        color: "black",
-        backgroundColor: "white"
-    })
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
     // get all notes from the server
     const getNotes = () => {
@@ -47,9 +42,9 @@ const NoteState = (props) => {
     }
 
     // Add a note to the server
-    const noteFormRef = useRef()
+    // const noteFormRef = useRef()
+    // noteFormRef.current.toggleVisibility()
     const addNote = (noteObject) => {
-        noteFormRef.current.toggleVisibility()
         noteService
             .create(noteObject) // the obj is sent to the server using axios post method
             .then(returnedNote => {
@@ -69,6 +64,7 @@ const NoteState = (props) => {
                 }, 5000)
             })
     }
+
     // Changes the importance of a note
     const toggleImportanceOf = (id) => {
         const note = notes.find(n => n.id === id)
@@ -148,11 +144,6 @@ const NoteState = (props) => {
         setUser(null)
     }
 
-    // show all notes or only the important ones
-    const notesToShow = showAll
-        ? notes
-        : notes.filter(note => note.important)
-
     // change mode
     const changeMode = () => {
         if (button === 'light') {
@@ -164,18 +155,21 @@ const NoteState = (props) => {
         }
     }
 
+    // Sidebar toggle
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen)
+    }
+
     return (
         <NoteContext.Provider
          value={{ 
             notes,
-            showAll,
             errorMessage,
             username,
             password,
             user,
             loginVisible,
             button,
-            style,
             changeMode,
             setErrorMessage,
             setLoginVisible,
@@ -188,10 +182,10 @@ const NoteState = (props) => {
             deleteNoteOf,
             handleLogin,
             handleLogout,
-            notesToShow,
-            setShowAll,
-            noteFormRef,
-            setUser
+            // noteFormRef,
+            setUser,
+            toggleSidebar,
+            isSidebarOpen
          }}>
             {props.children}
         </NoteContext.Provider>

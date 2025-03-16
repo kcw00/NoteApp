@@ -4,6 +4,7 @@ const Note = ({ note, toggleImportance, deleteNote }) => {
   const label = note.important ? 'make not important' : 'make important'
   return (
     <li className='note'>
+      <span>{note.title}</span>
       <span>{note.content}</span>
       <button onClick={toggleImportance}>{label}</button>
       <button onClick={deleteNote}>delete</button>
@@ -13,6 +14,7 @@ const Note = ({ note, toggleImportance, deleteNote }) => {
 
 Note.propTypes = {
   note: PropTypes.shape({
+    title: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
     important: PropTypes.bool.isRequired,
   }).isRequired,

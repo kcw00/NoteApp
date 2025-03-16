@@ -1,12 +1,12 @@
 import { useContext, useEffect } from "react"
 import Note from "./Note"
-import NoteForm from "./NoteForm"
+import NoteEditor from "./NoteEditor"
 import Togglable from "./Togglable"
 import noteContext from "../context/NoteContext"
-import Navbar from "./Navbar"
+import Sidebar from "./Sidebar"
 
 const Notes = () => {
-    const { getNotes, showAll, setShowAll, addNote, notesToShow,
+    const { getNotes, addNote, notes,
         toggleImportanceOf, deleteNoteOf, getLoggedUser,
         noteFormRef, user } = useContext(noteContext)
 
@@ -19,25 +19,31 @@ const Notes = () => {
             getNotes()
     }, [user])
 
-    const noteForm = () => {
-        return (
-            <Togglable buttonLabel='new note' ref={noteFormRef}>
-                <NoteForm createNote={addNote} user={user?.id} />
-            </Togglable>
-        )
-    }
+    // const noteForm = () => {
+    //     return (
+    //         <Togglable buttonLabel='new note' ref={noteFormRef}>
+    //             <NoteForm createNote={addNote} user={user?.id} />
+    //         </Togglable>
+    //     )
+    // }
 
 
     return (
-        <div>
-            <Navbar />
-            <div className="note-container">
-                <h2> Your Notes</h2>
-                <button onClick={() => setShowAll(!showAll)}>
-                    show {showAll ? 'important' : 'all'}
-                </button>
+        <div id="notes-app">
+            <Sidebar />
+                <NoteEditor createNote={addNote} user={user?.id} />
+
+                
+            </div>
+        
+    )
+}
+
+export default Notes
+
+/*
                 <ul className="note">
-                    {notesToShow.map((note, id) =>
+                    {notes.map((note, id) =>
                         <Note
                             key={id}
                             note={note}
@@ -46,10 +52,4 @@ const Notes = () => {
                         />
                     )}
                 </ul>
-                {noteForm()}
-            </div>
-        </div>
-    )
-}
-
-export default Notes
+*/
