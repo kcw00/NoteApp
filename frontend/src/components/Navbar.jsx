@@ -66,7 +66,7 @@ const Navbar = () => {
                   {button} mode
                 </label>
               </div>
-              <form className="d-flex" role="search">
+              <form className="d-flex">
                 <Link
                   className="button button-primary mx-2"
                   to="/login"

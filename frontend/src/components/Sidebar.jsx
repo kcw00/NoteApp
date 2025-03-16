@@ -42,19 +42,37 @@ const Sidebar = () => {
                 </div>
                 <div className="sidebar-section d-flex flex-column py-3">
                     <h3>Favorites</h3>
-                    {favorites.map(note => (
-                        <button key={note.id} className="note-button">
-                            {note.title}
-                        </button>
-                    ))}
-                </div>
-                <div className="sidebar-section d-flex flex-column py-3">
+                    <div className="sidebar-list">
+                        {favorites.map(note => (
+                            <Link
+                                key={note.id}
+                                role="button"
+                                className="favorites"
+                                to={`/notes/${note.id}`}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sticky" viewBox="0 0 16 16">
+                                    <path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293z" />
+                                </svg>
+                                {" "}{note.title}
+                            </Link>
+                        ))}
+                    </div>
                     <h3>Others</h3>
-                    {others.map(note => (
-                        <button key={note.id} className="note-button">
-                            {note.title}
-                        </button>
-                    ))}
+                    <div className="sidebar-list">
+                        {others.map(note => (
+                            <Link
+                            key={note.id}
+                            role="button"
+                            className="others"
+                            to={`/notes/${note.id}`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sticky" viewBox="0 0 16 16">
+                                <path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293z" />
+                            </svg>
+                            {" "}{note.title}
+                        </Link>
+                        ))}
+                    </div>
                 </div>
                 <div className="sidebar-footer text-end p-3 mt-auto">
                     <Link

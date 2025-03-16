@@ -161,7 +161,7 @@ const NoteState = (props) => {
     }
 
     // Sidebar resize
-    const [sidebarWidth, setSidebarWidth] = useState(347); // default width 347px
+    const [sidebarWidth, setSidebarWidth] = useState(397); // default width 397px
     const [isResizing, setIsResizing] = useState(false);
 
     const resizeSidebar = useCallback((e) => {
