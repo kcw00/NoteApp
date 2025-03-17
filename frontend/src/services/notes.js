@@ -18,6 +18,12 @@ const getAll = async () => {
   return request.then(response => response.data)
 }
 
+// Get a single note
+const getNote = async id => {
+  const request = axios.get(`${baseUrl}/${id}`)
+  return request.then(response => response.data)
+}
+
 // Create a new note
 const create = async newObject => {
   const config = {
@@ -48,4 +54,4 @@ const update = (id, newObject) => {
   return request.then(response => response.data)
 }
 
-export default { getAll, create, update, remove, setToken }
+export default { getAll, getNote, create, update, remove, setToken }

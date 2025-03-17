@@ -1,22 +1,24 @@
-import { useContext } from 'react'
+import { useState } from 'react'
+import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from 'react-router-dom'
-import noteContext from '../context/NoteContext'
+
+import { loginUser } from "../redux/authSlice"
 
 const LoginForm = () => {
-    const {
-        setUsername,
-        setPassword,
-        username,
-        password,
-        handleLogin
-    } = useContext(noteContext)
-
+    const dispatch = useDispatch()
     const navigate = useNavigate()
-    const login = async (event) => {
+
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+
+    const errorMessage = useSelector((state) => state.auth.errorMessage)
+
+    const handleLogin = async (event) => {
         event.preventDefault()
-        await handleLogin(event)
+        dispatch(loginUser({ username, password }))
         navigate('/notes')
     }
+
     return (
         <div className='page-wrapper'>
             <header className="logo-header">
@@ -26,7 +28,8 @@ const LoginForm = () => {
             </header>
             <div className='form-container'>
                 <h2 className='title'>Login</h2>
-                <form onSubmit={login}>
+                <form onSubmit={handleLogin}>
+                    {errorMessage && <div className='alert alert-danger'>{errorMessage}</div>}
                     <div className='mb-3'>
                         <label htmlFor='text' className='form-label'>Username</label>
                         <input
@@ -35,7 +38,7 @@ const LoginForm = () => {
                             name="Username"
                             type="text"
                             className='form-control'
-                            onChange={({ target }) => setUsername(target.value)}
+                            onChange={(e) => setUsername(e.target.value)}
                         />
                     </div>
                     <div className='mb-3'>
@@ -46,7 +49,7 @@ const LoginForm = () => {
                             name="Password"
                             type="current-password"
                             className='form-control'
-                            onChange={({ target }) => setPassword(target.value)}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
                     <div className='button-container'>

@@ -1,12 +1,13 @@
-import React, { useContext, useState } from "react"
+import { useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import noteContext from "../context/NoteContext"
-import signupService from "../services/signup"
+
+import { signUpUser } from "../redux/authSlice"
 
 const SignupForm = () => {
+    const dispatch = useDispatch()
     const navigate = useNavigate()
-    const context = useContext(noteContext)
-    const { setErrorMessage } = context
+
 
     const [newUser, setNewUser] = useState({
         name: "",
@@ -14,30 +15,19 @@ const SignupForm = () => {
         password: "",
     });
 
+    const errorMessage = useSelector((state) => state.auth.errorMessage)
+
     const onChange = (event) => {
-        setNewUser({ ...newUser, [event.target.id]: event.target.value });
+        setNewUser({ ...newUser, [event.target.id]: event.target.value })
     }
 
     // Register event handler
     const handleRegister = async (event) => {
         event.preventDefault()
-        try {
-            const user = await signupService.signup({
-                name: newUser.name,
-                username: newUser.username,
-                password: newUser.password
-            })
-            if (user)
-                window.localStorage.setItem('loggedNoteappUser', user.token)
-            navigate("/login")
-        }
-        catch (error) {
-            setErrorMessage(error.message)
-            setTimeout(() => {
-                setErrorMessage(null)
-            }, 5000)
-        }
+        dispatch(signUpUser(newUser))
+        navigate('/login')
     }
+    
 
     return (
         <div className='page-wrapper'>
@@ -49,6 +39,7 @@ const SignupForm = () => {
             <div className="form-container">
                 <h2 className="title">Signup</h2>
                 <form onSubmit={handleRegister}>
+                    {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
                     <div className="mb-3">
                         <label htmlFor="text" className="form-label">
                             Name

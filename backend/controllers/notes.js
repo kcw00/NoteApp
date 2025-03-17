@@ -2,15 +2,23 @@ const notesRouter = require('express').Router()
 const Note = require('../models/note')
 const User = require('../models/user')
 const { userExtractor } = require('../utils/middleware')
+const { ObjectId } = require('mongodb')
+const { io } = require('../app')
 
 notesRouter.use(userExtractor)
 
-notesRouter.get('/', async (request, response) => {
-  const notes = await Note.find({ user: request.user._id }).populate('user', { username: 1, name: 1 })
+// get all notes for a user
+notesRouter.get('/:userId', async (request, response) => {
+  const { userId } = request.params
+  console.log('userId:', userId)
+  const user = new ObjectId(userId)
+  const notes = await Note.find({ user })
+  console.log('notes:', notes)
   response.json(notes)
 
 })
 
+// get a single note
 notesRouter.get('/:id', async (request, response) => {
   const note = await Note.findById(request.params.id)
 
@@ -32,6 +40,7 @@ notesRouter.post('/', async (request, response) => {
   })
 
   const savedNote = await note.save()
+  io.emit('noteAdded', savedNote)
 
   response.status(201).json(savedNote)
 })
@@ -47,6 +56,7 @@ notesRouter.delete('/:id', async (request, response) => {
   await user.save()
 
   await Note.findByIdAndDelete(request.params.id)
+  io.emit('noteDeleted', request.params.id)
   response.status(204).end()
 })
 

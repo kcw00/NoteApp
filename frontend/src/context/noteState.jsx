@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react'
 
 import NoteContext from './NoteContext'
+import { fetchNotes } from '../redux/notesSlice'
 import noteService from '../services/notes'
-import loginService from '../services/login'
+import loginService from '../services/auth'
+
 
 const NoteState = (props) => {
     const [notes, setNotes] = useState([])
@@ -17,7 +19,7 @@ const NoteState = (props) => {
     // get all notes from the server
     const getNotes = () => {
         noteService
-            .getAll()
+            dispatch(fetchNotes(user?.userId))
             .then(initialNotes => {
                 setNotes(initialNotes)
                 console.log(initialNotes)
@@ -28,14 +30,15 @@ const NoteState = (props) => {
             })
     }
 
+
     // get the logged user from the local storage
     const getLoggedUser = () => {
         const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON)
-            console.log('Retrieved user from localStorage:', user) 
+            console.log('Retrieved user from localStorage:', user)
             setUser(user)
-            noteService.setToken(user.token)
+            setToken(user.token)
         } else {
             console.log('No user found in localStorage')
         }
@@ -51,10 +54,11 @@ const NoteState = (props) => {
                 setNotes(notes.concat(returnedNote))
             })
             .catch(error => {
-                if (error.response){
-                if (error.response.status === 400) {
-                    setErrorMessage(error.response.data.error)
-                }} else if (error.request) {
+                if (error.response) {
+                    if (error.response.status === 400) {
+                        setErrorMessage(error.response.data.error)
+                    }
+                } else if (error.request) {
                     setErrorMessage('Server is not responding')
                 } else {
                     setErrorMessage(error.message)
@@ -166,58 +170,58 @@ const NoteState = (props) => {
 
     const resizeSidebar = useCallback((e) => {
         if (isResizing) {
-          let newWidth = Math.max(300, Math.min(e.clientX, 600)) // Minimum: 300px, Maximum: 600px
-          setSidebarWidth(newWidth)
+            let newWidth = Math.max(300, Math.min(e.clientX, 600)) // Minimum: 300px, Maximum: 600px
+            setSidebarWidth(newWidth)
         }
-      }, [isResizing])
-    
-      // Function to stop resizing
-      const stopResizing = useCallback(() => {
+    }, [isResizing])
+
+    // Function to stop resizing
+    const stopResizing = useCallback(() => {
         setIsResizing(false)
         document.removeEventListener("mousemove", resizeSidebar)
         document.removeEventListener("mouseup", stopResizing)
-      }, [resizeSidebar])
-    
-      // Function to start resizing
-      const startResizing = (e) => {
+    }, [resizeSidebar])
+
+    // Function to start resizing
+    const startResizing = (e) => {
         e.preventDefault()
         setIsResizing(true)
         document.addEventListener("mousemove", resizeSidebar)
         document.addEventListener("mouseup", stopResizing)
-      }
+    }
 
     return (
         <NoteContext.Provider
-         value={{ 
-            notes,
-            errorMessage,
-            username,
-            password,
-            user,
-            loginVisible,
-            button,
-            changeMode,
-            setErrorMessage,
-            setLoginVisible,
-            setUsername,
-            setPassword,
-            getNotes,
-            getLoggedUser,
-            addNote,
-            toggleImportanceOf,
-            deleteNoteOf,
-            handleLogin,
-            handleLogout,
-            // noteFormRef,
-            setUser,
-            toggleSidebar,
-            isSidebarOpen,
-            startResizing,
-            stopResizing,
-            resizeSidebar,
-            sidebarWidth,
-            isResizing
-         }}>
+            value={{
+                notes,
+                errorMessage,
+                username,
+                password,
+                user,
+                loginVisible,
+                button,
+                changeMode,
+                setErrorMessage,
+                setLoginVisible,
+                setUsername,
+                setPassword,
+                getNotes,
+                getLoggedUser,
+                addNote,
+                toggleImportanceOf,
+                deleteNoteOf,
+                handleLogin,
+                handleLogout,
+                // noteFormRef,
+                setUser,
+                toggleSidebar,
+                isSidebarOpen,
+                startResizing,
+                stopResizing,
+                resizeSidebar,
+                sidebarWidth,
+                isResizing
+            }}>
             {props.children}
         </NoteContext.Provider>
     )

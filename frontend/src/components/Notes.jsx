@@ -1,23 +1,32 @@
-import { useContext, useEffect } from "react"
-import Note from "./Note"
+import { useEffect, useMemo } from "react"
+import { useDispatch, useSelector } from "react-redux"
+
+import { fetchNotes } from "../redux/notesSlice"
 import NoteEditor from "./NoteEditor"
-import Togglable from "./Togglable"
 import noteContext from "../context/NoteContext"
 import Sidebar from "./Sidebar"
 
 const Notes = () => {
-    const { getNotes, addNote, notes,
-        toggleImportanceOf, deleteNoteOf, getLoggedUser,
-        noteFormRef, user } = useContext(noteContext)
+
+    const dispatch = useDispatch()
+
+    const notes = useSelector(state => Object.values(state.notes.entities))
+    const favorites = notes.filter(note => note.important)
+    const others = notes.filter(note => !note.important)
+
+    const note = useSelector(state => state.notes.entities)
+    
+
+
+    console.log('favorites:', favorites)
+    console.log('others:', others)
+
 
     useEffect(() => {
-        getLoggedUser()
-    }, [])
 
-    useEffect(() => {
-        if (user)
-            getNotes()
-    }, [user])
+        dispatch(fetchNotes())
+    }, [dispatch])
+
 
     // const noteForm = () => {
     //     return (
@@ -30,12 +39,12 @@ const Notes = () => {
 
     return (
         <div id="notes-app">
-            <Sidebar />
-            <NoteEditor createNote={addNote} user={user?.id} />
+            <Sidebar favorites={favorites} others={others} />
+            <NoteEditor key={note._id} noteId={note._id} note={note} />
 
-                
-            </div>
-        
+
+        </div>
+
     )
 }
 
