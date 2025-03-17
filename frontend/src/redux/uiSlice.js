@@ -5,6 +5,7 @@ const initialState = {
   isResizing: false,
   windowWidth: window.innerWidth, // track initial window width
   isSidebarOpen: true,
+  button: 'light',
 }
 
 const sidebarSlice = createSlice({
@@ -22,10 +23,13 @@ const sidebarSlice = createSlice({
     },
     toggleSidebar: (state) => {
       state.isSidebarOpen = !state.isSidebarOpen
-    }
-  },
+    },
+    setButton: (state, action) => {
+      state.button = action.payload === 'light' ? 'dark' : 'light'
+    },
+  }
 })
 
-export const { setSidebarWidth, setIsResizing, setWindowWidth, toggleSidebar } = sidebarSlice.actions
+export const { setSidebarWidth, setIsResizing, setWindowWidth, toggleSidebar, setButton } = sidebarSlice.actions
 
 export default sidebarSlice.reducer

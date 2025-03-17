@@ -15,7 +15,6 @@ notesRouter.get('/:userId', async (request, response) => {
   const notes = await Note.find({ user })
   console.log('notes:', notes)
   response.json(notes)
-
 })
 
 // get a single note

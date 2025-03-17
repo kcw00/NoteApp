@@ -3,9 +3,9 @@ import notesService from "../services/notes"
 import socket from "./socket"
 
 // Fetch all notes (initial load)
-export const fetchNotes = createAsyncThunk("notes/fetchNotes", async (_, { rejectWithValue }) => {
+export const fetchNotes = createAsyncThunk("notes/fetchNotes", async (userId, { rejectWithValue }) => {
     try {
-        const notes = await notesService.getAll()
+        const notes = await notesService.getAll(userId)
         return notes
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to fetch notes")

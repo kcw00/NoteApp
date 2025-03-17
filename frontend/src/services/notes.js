@@ -10,11 +10,11 @@ const setToken = newToken => {
 }
 
 // Get all notes
-const getAll = async () => {
+const getAll = async userId => {
   const config = {
     headers: { Authorization: token }, 
   }
-  const request = axios.get(baseUrl, config)
+  const request = axios.get(`${baseUrl}/${userId}`, config)
   return request.then(response => response.data)
 }
 

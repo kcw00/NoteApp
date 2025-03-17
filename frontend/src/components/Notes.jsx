@@ -1,9 +1,8 @@
-import { useEffect, useMemo } from "react"
+import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import { fetchNotes } from "../redux/notesSlice"
 import NoteEditor from "./NoteEditor"
-import noteContext from "../context/NoteContext"
 import Sidebar from "./Sidebar"
 
 const Notes = () => {
@@ -15,17 +14,21 @@ const Notes = () => {
     const others = notes.filter(note => !note.important)
 
     const note = useSelector(state => state.notes.entities)
-    
 
+    const user = useSelector(state => (state.auth.user))
 
     console.log('favorites:', favorites)
     console.log('others:', others)
 
+    console.log('user:', user)
+
+
+
 
     useEffect(() => {
-
-        dispatch(fetchNotes())
-    }, [dispatch])
+        // Prevent fetching if user is undefined or if data is already being fetched
+            dispatch(fetchNotes(user?.userId))
+    }, [dispatch, user])  // Dependency array now includes isLoading
 
 
     // const noteForm = () => {

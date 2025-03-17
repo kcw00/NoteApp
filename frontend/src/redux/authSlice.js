@@ -2,11 +2,12 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import authService from "../services/auth"
 import noteService from "../services/notes"
 
+
 export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, { rejectWithValue }) => {
     try {
         const user = await authService.login(credentials)
         window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user))
-        noteService.setToken(user.token)
+        noteService.setToken(user?.token)
         return user
     } catch (error) {
         return rejectWithValue("Invalid credentials")
@@ -41,6 +42,7 @@ const authSlice = createSlice({
         builder
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.user = action.payload
+                noteService.setToken(action.payload.token)
                 state.errorMessage = null
             })
             .addCase(loginUser.rejected, (state, action) => {
