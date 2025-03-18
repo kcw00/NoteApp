@@ -3,7 +3,7 @@ const Note = require('../models/note')
 const User = require('../models/user')
 const { userExtractor } = require('../utils/middleware')
 const { ObjectId } = require('mongodb')
-const { io } = require('../app')
+const { getIo } = require('../socket')
 
 notesRouter.use(userExtractor)
 
@@ -39,7 +39,7 @@ notesRouter.post('/', async (request, response) => {
   })
 
   const savedNote = await note.save()
-  io.emit('noteAdded', savedNote)
+  getIo().emit('noteAdded', savedNote)
 
   response.status(201).json(savedNote)
 })
@@ -55,7 +55,7 @@ notesRouter.delete('/:id', async (request, response) => {
   await user.save()
 
   await Note.findByIdAndDelete(request.params.id)
-  io.emit('noteDeleted', request.params.id)
+  getIo().emit('noteDeleted', request.params.id)
   response.status(204).end()
 })
 
