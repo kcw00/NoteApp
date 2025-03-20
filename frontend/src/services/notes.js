@@ -20,7 +20,10 @@ const getAll = async userId => {
 
 // Get a single note
 const getNote = async id => {
-  const request = axios.get(`${baseUrl}/${id}`)
+  const config = {
+    headers: { Authorization: token }, 
+  }
+  const request = axios.get(`${baseUrl}/${id}`, config)
   return request.then(response => response.data)
 }
 

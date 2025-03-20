@@ -1,7 +1,7 @@
 import { useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector} from "react-redux"
 
-import { fetchNotes } from "../redux/notesSlice"
+import { fetchNotes, setActiveNote } from "../redux/notesSlice"
 import NoteEditor from "./NoteEditor"
 import Sidebar from "./Sidebar"
 
@@ -9,42 +9,47 @@ const Notes = () => {
 
     const dispatch = useDispatch()
 
+
     const notes = useSelector(state => Object.values(state.notes.entities))
     const favorites = notes.filter(note => note.important)
     const others = notes.filter(note => !note.important)
 
-    const note = useSelector(state => state.notes.entities)
+    const activeNoteId = useSelector(state => state.notes.activeNoteId)
+    const note = useSelector(state => state.notes.entities[activeNoteId])
 
-    const user = useSelector(state => (state.auth.user))
+    const user = useSelector(state => state.auth.user)
 
     console.log('favorites:', favorites)
     console.log('others:', others)
 
     console.log('user:', user)
-
-
+    console.log('notes:', notes)
 
 
     useEffect(() => {
-        // Prevent fetching if user is undefined or if data is already being fetched
-            dispatch(fetchNotes(user?.userId))
-    }, [dispatch, user])  // Dependency array now includes isLoading
+        if (user?.userId) {
+            dispatch(fetchNotes(user.userId))
+        }
+    }, [dispatch, user?.userId])
+
+    useEffect(() => {
+        // If no active note is set, default to the last note in the list
+        if (!activeNoteId && notes.length > 0) {
+            dispatch(setActiveNote(notes[notes.length - 1].id))
+        }
+    }, [activeNoteId, notes, dispatch])
 
 
-    // const noteForm = () => {
-    //     return (
-    //         <Togglable buttonLabel='new note' ref={noteFormRef}>
-    //             <NoteForm createNote={addNote} user={user?.id} />
-    //         </Togglable>
-    //     )
-    // }
-
+    
 
     return (
         <div id="notes-app">
-            <Sidebar favorites={favorites} others={others} />
-            <NoteEditor key={note._id} noteId={note._id} note={note} />
-
+            <Sidebar favorites={favorites} others={others} user={user}/>
+            {note ? (
+                <NoteEditor key={note.id} noteId={note.id} note={note} />
+            ) : (
+                <p>No notes available</p>
+            )}
 
         </div>
 
@@ -52,16 +57,3 @@ const Notes = () => {
 }
 
 export default Notes
-
-/*
-                <ul className="note">
-                    {notes.map((note, id) =>
-                        <Note
-                            key={id}
-                            note={note}
-                            toggleImportance={() => toggleImportanceOf(note.id)}
-                            deleteNote={() => deleteNoteOf(note.id)}
-                        />
-                    )}
-                </ul>
-*/

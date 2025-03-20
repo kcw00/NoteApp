@@ -13,6 +13,7 @@ const initializeSocket = (server) => {
     })
 
     io.on("connection", (socket) => {
+        console.log('socket:', socket)
         console.log("User connected:", socket.id)
 
         socket.on("updateNote", async ({ id, note }) => {

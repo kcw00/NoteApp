@@ -15,8 +15,9 @@ const LoginForm = () => {
 
     const handleLogin = async (event) => {
         event.preventDefault()
-        dispatch(loginUser({ username, password }))
-        navigate('/notes')
+        const action = dispatch(loginUser({ username, password }))
+
+ 
     }
 
     return (

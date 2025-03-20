@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import notesService from "../services/notes"
 import socket from "./socket"
 
+
 // Fetch all notes (initial load)
 export const fetchNotes = createAsyncThunk("notes/fetchNotes", async (userId, { rejectWithValue }) => {
     try {
@@ -53,6 +54,7 @@ const notesSlice = createSlice({
         ids: [],
         status: "idle",
         errorMessage: null,
+        activeNoteId: null,
     },
     reducers: {
         // Handle real-time updates from WebSocket
@@ -66,7 +68,13 @@ const notesSlice = createSlice({
         noteDeletedRealtime: (state, action) => {
             delete state.entities[action.payload]
             state.ids = state.ids.filter(id => id !== action.payload)
+            if (state.activeNoteId === action.payload) {
+                state.activeNoteId = null // clear active note if it's deleted
+            }
         },
+        setActiveNote: (state, action) => {
+            state.activeNoteId = action.payload
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -99,19 +107,24 @@ const notesSlice = createSlice({
     },
 })
 
-export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime } = notesSlice.actions
+// Listen for real-time WebSocket updates, only after the socket is connected
+socket.on("connect", () => {
+    console.log("Socket connected")
 
-// Listen for real-time WebSocket updates
-socket.on("noteAdded", (note) => {
-    store.dispatch(noteAddedRealtime(note))
+    socket.on("noteAdded", (note) => {
+        store.dispatch(noteAddedRealtime(note))
+    })
+
+    socket.on("noteUpdated", (note) => {
+        store.dispatch(noteUpdatedRealtime(note))
+    })
+
+    socket.on("noteDeleted", (id) => {
+        store.dispatch(noteDeletedRealtime(id))
+    })
 })
 
-socket.on("noteUpdated", (note) => {
-    store.dispatch(noteUpdatedRealtime(note))
-})
+export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote } = notesSlice.actions
 
-socket.on("noteDeleted", (id) => {
-    store.dispatch(noteDeletedRealtime(id))
-})
 
 export default notesSlice.reducer

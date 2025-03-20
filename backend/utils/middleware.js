@@ -1,6 +1,7 @@
 const logger = require('./logger')
 
 const requestLogger = (request, response, next) => {
+  console.log('requestreceived')
   logger.info('Method:', request.method)
   logger.info('Path:  ', request.path)
   if (request.method === 'GET') {
@@ -18,6 +19,7 @@ const unknownEndpoint = (request, response) => {
 
 const errorHandler = (error, request, response, next) => {
   logger.error(error.message)
+  logger.error(error.stack)
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
@@ -48,15 +50,20 @@ const userExtractor = async (request, response, next) => {
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     const token = authorization.substring(7)
-    const decodedToken = jwt.verify(token, process.env.SECRET)
 
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'Token is missing or invalid' })
+    try {
+      const decodedToken = jwt.verify(token, process.env.SECRET)
+
+      if (!decodedToken.id) {
+        return response.status(401).json({ error: 'Token is missing or invalid' })
+      }
+
+      const user = await User.findById(decodedToken.id)
+      request.user = user // Attach user information to the request object
+      next()
+    } catch (error) {
+      return response.status(401).json({ error: 'Token missing or invalid' })
     }
-
-    const user = await User.findById(decodedToken.id)
-    request.user = user // Attach user information to the request object
-    next()
   } else {
     return response.status(401).json({ error: 'Token missing or invalid' })
   }

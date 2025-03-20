@@ -7,6 +7,7 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, 
     try {
         const user = await authService.login(credentials)
         window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user))
+        console.log('Login succeed:', user)
         noteService.setToken(user?.token)
         return user
     } catch (error) {
