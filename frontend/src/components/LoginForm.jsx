@@ -6,7 +6,6 @@ import { loginUser } from "../redux/authSlice"
 
 const LoginForm = () => {
     const dispatch = useDispatch()
-    const navigate = useNavigate()
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -15,9 +14,7 @@ const LoginForm = () => {
 
     const handleLogin = async (event) => {
         event.preventDefault()
-        const action = dispatch(loginUser({ username, password }))
-
- 
+        dispatch(loginUser({ username, password }))
     }
 
     return (

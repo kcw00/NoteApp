@@ -4,9 +4,11 @@ import Navbar from "./Navbar"
 
 const Home = () => {
     const navigate = useNavigate()
+
     const handleStart = () => {
         navigate("/signup")
     }
+
     return (
         <div>
             <Navbar />

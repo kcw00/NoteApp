@@ -21,6 +21,8 @@
   flex-direction: row-reverse;
 }
 
+/* Sidebar */
+
 .sidebar-container {
   display: flex;
   order: 1;
@@ -95,6 +97,8 @@
 }
 
 
+/* Main content */
+
 .resizer {
   position: absolute;
   top: 0;
@@ -166,12 +170,12 @@
   outline: none;
 }
 
+/* Dark mode */
 
 .dark-mode {
   background-color: #1a2027;
   color: white;
 }
-
 
 .dark-mode .login-button,
 .dark-mode .cancel-button,
@@ -193,13 +197,15 @@
   cursor: pointer;
 }
 
-.dark-mode .form-control {
+.dark-mode .form-control,
+.dark-mode .note-title-wrapper,
+.dark-mode .note-title-wrapper {
   background-color: #1a2027;
   color: white;
 }
 
 .dark-mode .logo-header {
-  background-color: #000;
+  background-color: #1a2027;
 }
 
 .dark-mode .sidebar-container {
@@ -213,13 +219,25 @@
   background-color: #1a2027;
 }
 
-.dark-mode .note-content {
+.dark-mode .note-content,
+.dark-mode .note-title {
   background-color: #1a2027;
+  color:rgb(223, 223, 223);
 }
 
 .dark-mode .sidebar-section h3 {
   color: rgb(152, 152, 152);
 }
+
+.dark-mode .nav-link {
+  color: white !important;
+}
+
+.dark-mode .nav-link:hover {
+  color: #d1d1d4 !important;
+}
+
+/* Responsive design */
 
 a {
   font-weight: 500;

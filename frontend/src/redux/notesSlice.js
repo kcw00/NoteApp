@@ -57,7 +57,7 @@ const notesSlice = createSlice({
         activeNoteId: null,
     },
     reducers: {
-        // Handle real-time updates from WebSocket
+        // real-time updates from WebSocket
         noteAddedRealtime: (state, action) => {
             state.entities[action.payload.id] = action.payload
             state.ids.push(action.payload.id)
