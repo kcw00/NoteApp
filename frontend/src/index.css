@@ -237,6 +237,15 @@
   color: #d1d1d4 !important;
 }
 
+.dark-mode .navbar-toggler {
+  border-color: #d1d1d4 !important; 
+}
+
+
+.dark-mode .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgb(152, 152, 152)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+}
+
 /* Responsive design */
 
 a {
@@ -352,6 +361,8 @@ h1 {
   font-size: 15px;
 }
 
+/* Form */
+
 .error {
   color: red;
   background: #F8D7DA;
@@ -361,6 +372,8 @@ h1 {
   padding: 16px;
   margin-bottom: 10px;
 }
+
+/* Button */
 
 button {
   border-radius: 8px;
