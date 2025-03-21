@@ -96,6 +96,7 @@ const notesSlice = createSlice({
             .addCase(addNote.fulfilled, (state, action) => {
                 state.entities[action.payload.id] = action.payload
                 state.ids.push(action.payload.id)
+                state.activeNoteId = action.payload.id // set the newly added note as active
             })
             .addCase(updateNote.fulfilled, (state, action) => {
                 state.entities[action.payload.id] = action.payload

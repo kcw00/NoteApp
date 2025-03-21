@@ -1,11 +1,13 @@
 import { useEffect } from "react"
 import { useDispatch, useSelector } from 'react-redux'
-import { updateNote, deleteNote } from '../redux/notesSlice'
+import { useNavigate } from "react-router-dom"
+import { updateNote, deleteNote, setActiveNote } from '../redux/notesSlice'
 import { setWindowWidth, toggleSidebar } from '../redux/uiSlice'
 
 
 const NoteEditor = ({ noteId, note }) => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const { sidebarWidth, windowWidth, isSidebarOpen } = useSelector((state) => state.ui)
 
@@ -26,6 +28,16 @@ const NoteEditor = ({ noteId, note }) => {
 
     const handleDelete = () => {
         dispatch(deleteNote(noteId))
+
+        const remainingNotes = Object.values(notes).filter(note => note.id !== noteId)
+        if (remainingNotes.length > 0) {
+            const newActiveNote = remainingNotes[0]
+            dispatch(setActiveNote(newActiveNote.id))
+            navigate(`/notes/${newActiveNote.id}`)
+        } else {
+            dispatch(setActiveNote(null))
+            navigate('/notes')
+        }
     }
 
     const handleImportance = () => {

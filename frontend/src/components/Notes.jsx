@@ -36,6 +36,11 @@ const Notes = () => {
         // If no active note is set, default to the last note in the list
         if (!activeNoteId && notes.length > 0) {
             dispatch(setActiveNote(notes[notes.length - 1].id))
+        } else if (activeNoteId && !notes.find(note => note.id === activeNoteId)) {
+            // If the active note is deleted, default to the first note in the list
+            dispatch(setActiveNote(notes[0].id))
+        } else if (activeNoteId && notes.length === 0) {
+            dispatch(setActiveNote(null))
         }
     }, [activeNoteId, notes, dispatch])
 
@@ -48,7 +53,7 @@ const Notes = () => {
             {note ? (
                 <NoteEditor key={note.id} noteId={note.id} note={note} />
             ) : (
-                <p>No notes available</p>
+                <NoteEditor key="null" noteId="null" note="null" />
             )}
 
         </div>

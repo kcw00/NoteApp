@@ -13,7 +13,7 @@ const Home = () => {
             <div>
                 <main className="main-contents">
                     <h1 className="title">WELCOME TO NOTES</h1>
-                    <p className="subtitle">Simple, Clean, and Fast Note app</p>
+                    <p className="subtitle">------</p>
                     <button className="start-button" onClick={handleStart}>GET STARTED!</button>
                 </main>
             </div>

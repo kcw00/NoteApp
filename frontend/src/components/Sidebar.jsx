@@ -47,12 +47,16 @@ const Sidebar = ({ favorites, others, user }) => {
     }
 
     const handleAddNote = () => {
-        dispatch(addNote({
+        const newNote = {
+            id: Math.floor(Math.random() * 1000000),
             title: "",
             content: "",
-            important: false
-        }))
-        navigate("/notes/new")
+            important: false,
+            user: user.userId
+        }
+        dispatch(addNote(newNote))
+        dispatch(setActiveNote(newNote.id))
+        setTimeout(() => navigate(`/notes/${newNote.id}`), 50) // Slight delay to allow state update
     }
 
     const handleNoteClick = (note) => {
