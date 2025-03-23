@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useDispatch, useSelector} from "react-redux"
 
-import { fetchNotes, setActiveNote } from "../redux/notesSlice"
+import { fetchNotes, addNote, setActiveNote } from "../redux/notesSlice"
 import NoteEditor from "./NoteEditor"
 import Sidebar from "./Sidebar"
 
@@ -10,7 +10,7 @@ const Notes = () => {
     const dispatch = useDispatch()
 
 
-    const notes = useSelector(state => Object.values(state.notes.entities))
+    const notes = useSelector(state => Object.values(state.notes.entities) || [])
     const favorites = notes.filter(note => note.important)
     const others = notes.filter(note => !note.important)
 
@@ -33,19 +33,15 @@ const Notes = () => {
     }, [dispatch, user?.userId])
 
     useEffect(() => {
-        // If no active note is set, default to the last note in the list
-        if (!activeNoteId && notes.length > 0) {
-            dispatch(setActiveNote(notes[notes.length - 1].id))
-        } else if (activeNoteId && !notes.find(note => note.id === activeNoteId)) {
-            // If the active note is deleted, default to the first note in the list
-            dispatch(setActiveNote(notes[0].id))
-        } else if (activeNoteId && notes.length === 0) {
-            dispatch(setActiveNote(null))
+        if (notes.length === 0 && user?.userId) {
+            dispatch(addNote({ title: '', content: '', userId: user.userId })) // New note for new user
+        } else if (!activeNoteId) {
+            dispatch(setActiveNote(notes[notes.length - 1]?.id)) // Default to the last note
+        } else if (!notes.find(note => note?.id === activeNoteId)) {
+            dispatch(setActiveNote(notes[0]?.id)) // Default to the first note if active note is deleted
         }
     }, [activeNoteId, notes, dispatch])
 
-
-    
 
     return (
         <div id="notes-app">

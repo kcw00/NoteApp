@@ -79,11 +79,12 @@ const notesSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchNotes.fulfilled, (state, action) => {
-                state.entities = action.payload.reduce((acc, note) => {
+                const notes = action.payload
+                state.entities = notes.reduce((acc, note) => {
                     acc[note.id] = note
                     return acc
                 }, {})
-                state.ids = action.payload.map(note => note.id)
+                state.ids = notes.map(note => note.id)
                 state.status = "succeeded"
             })
             .addCase(fetchNotes.pending, (state) => {
@@ -94,16 +95,19 @@ const notesSlice = createSlice({
                 state.errorMessage = action.payload
             })
             .addCase(addNote.fulfilled, (state, action) => {
-                state.entities[action.payload.id] = action.payload
-                state.ids.push(action.payload.id)
-                state.activeNoteId = action.payload.id // set the newly added note as active
+                const note = action.payload
+                state.entities[note.id] = note
+                state.ids.push(note.id)
+                state.activeNoteId = note.id // set the newly added note as active
             })
             .addCase(updateNote.fulfilled, (state, action) => {
-                state.entities[action.payload.id] = action.payload
+                const note = action.payload
+                state.entities[note.id] = note
             })
             .addCase(deleteNote.fulfilled, (state, action) => {
-                delete state.entities[action.payload]
-                state.ids = state.ids.filter(id => id !== action.payload)
+                const note = action.payload
+                delete state.entities[note]
+                state.ids = state.ids.filter(id => id !== note)
             })
     },
 })
