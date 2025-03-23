@@ -25,9 +25,12 @@ const SignupForm = () => {
     const handleRegister = async (event) => {
         event.preventDefault()
         dispatch(signUpUser(newUser))
-        navigate('/login')
+        if (!errorMessage)
+            navigate('/login')
+        else
+            console.log('Signup failed:', errorMessage)
     }
-    
+
 
     return (
         <div className='page-wrapper'>

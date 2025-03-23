@@ -1,14 +1,13 @@
 import axios from 'axios'
-const baseUrl = '/api/login'
 
 const login = async credentials => {
-    const response = await axios.post(baseUrl, credentials)
+    const response = await axios.post('/api/login', credentials)
     console.log('Response from login:', response.data) // check if response.data is correct
     return response.data
 }
 
 const signup = async newObject => {
-    const response = await axios.post(baseUrl, newObject)
+    const response = await axios.post('/api/signup', newObject)
     return response.json
 }
 

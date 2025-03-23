@@ -31,10 +31,14 @@ export const signUpUser = createAsyncThunk("auth/signUpUser", async (newUser, { 
     }
 })
 
+const storedUser = window.localStorage.getItem("loggedNoteappUser")
+console.log('Stored user:', storedUser)
+const parsedUser = storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null
+
 const authSlice = createSlice({
     name: "auth",
     initialState: {
-        user: JSON.parse(window.localStorage.getItem("loggedNoteappUser")) || null,
+        user: parsedUser,
         errorMessage: null,
         status: "idle",
     },
