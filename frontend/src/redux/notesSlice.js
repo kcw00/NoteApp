@@ -46,6 +46,10 @@ export const deleteNote = createAsyncThunk("notes/deleteNote", async (id, { reje
     }
 })
 
+export const clearErrorMessage = createAsyncThunk("notes/clearErrorMessage", async () => {
+    return null
+})
+
 // Note slice
 const notesSlice = createSlice({
     name: "notes",
@@ -74,6 +78,9 @@ const notesSlice = createSlice({
         },
         setActiveNote: (state, action) => {
             state.activeNoteId = action.payload
+        },
+        resetErrorMessage: (state) => {
+            state.errorMessage = null
         }
     },
     extraReducers: (builder) => {
@@ -105,9 +112,12 @@ const notesSlice = createSlice({
                 state.entities[note.id] = note
             })
             .addCase(deleteNote.fulfilled, (state, action) => {
-                const note = action.payload
-                delete state.entities[note]
-                state.ids = state.ids.filter(id => id !== note)
+                const deleteNoteId = action.payload
+                delete state.entities[deleteNoteId]
+                state.ids = state.ids.filter(id => id !== deleteNoteId)
+                if (state.activeNoteId === deleteNoteId) {
+                    state.activeNoteId = null // clear active note if it's deleted
+                }
             })
     },
 })
@@ -129,7 +139,7 @@ socket.on("connect", () => {
     })
 })
 
-export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote } = notesSlice.actions
+export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage } = notesSlice.actions
 
 
 export default notesSlice.reducer

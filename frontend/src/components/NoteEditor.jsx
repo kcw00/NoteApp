@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from "react-router-dom"
-import { updateNote, deleteNote, setActiveNote } from '../redux/notesSlice'
+import { updateNote, deleteNote, setActiveNote, resetErrorMessage } from '../redux/notesSlice'
 import { setWindowWidth, toggleSidebar } from '../redux/uiSlice'
 
 
@@ -11,20 +11,30 @@ const NoteEditor = ({ noteId, note, notes }) => {
 
     const { sidebarWidth, windowWidth, isSidebarOpen } = useSelector((state) => state.ui)
 
+    const errorMessage = useSelector((state)=> state.notes.errorMessage)
+
     useEffect(() => {
+        // Handle resize event
         const handleResize = () => {
             dispatch(setWindowWidth(window.innerWidth))
         }
         window.addEventListener('resize', handleResize)
+
+        // Timeout to clear error message after 5 seconds
+        if (errorMessage) {
+            setTimeout(() => {
+                dispatch(resetErrorMessage())
+            }, 5000)
+        }
+
         return () => {
             window.removeEventListener('resize', handleResize)
         }
-    }, [dispatch])
+    }, [dispatch, errorMessage])
 
     const handleToggleSidebar = () => {
         dispatch(toggleSidebar())
     }
-
 
     const handleDelete = () => {
         dispatch(deleteNote(noteId))
@@ -63,10 +73,25 @@ const NoteEditor = ({ noteId, note, notes }) => {
     return (
         <div className="note-container"
             style={{ width: isSidebarOpen ? `${windowWidth - sidebarWidth}px` : "100%" }}>
+            {errorMessage && <div className="alert alert-danger">{JSON.stringify(errorMessage.error)}</div>}
             <header className="note-header d-flex align-items-center p-3">
                 {!isSidebarOpen ? <button onClick={handleToggleSidebar}>{">>"}</button> : ""}
                 <button className="ms-auto favorite-button 30px" onClick={handleImportance}>{icon}</button>
-                <button className="delete-button" onClick={handleDelete}>delete</button>
+                <button className="share-button">share</button>
+                <div className="dropdown">
+                    <button 
+                        className="option-button"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >...
+                    </button>
+                    <ul className="dropdown-menu">
+                        <li><a className="dropdown-item" onClick={handleDelete}>delete</a></li>
+                        <li><a className="dropdown-item">Export</a></li>
+                        <li><a className="dropdown-item">option 3</a></li>
+                    </ul>
+                </div>
             </header>
             <div>
 
