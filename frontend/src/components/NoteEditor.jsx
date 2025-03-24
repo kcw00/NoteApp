@@ -5,7 +5,7 @@ import { updateNote, deleteNote, setActiveNote } from '../redux/notesSlice'
 import { setWindowWidth, toggleSidebar } from '../redux/uiSlice'
 
 
-const NoteEditor = ({ noteId, note }) => {
+const NoteEditor = ({ noteId, note, notes }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -31,7 +31,7 @@ const NoteEditor = ({ noteId, note }) => {
 
         const remainingNotes = Object.values(notes).filter(note => note.id !== noteId)
         if (remainingNotes.length > 0) {
-            const newActiveNote = remainingNotes[0]
+            const newActiveNote = remainingNotes[remainingNotes.length - 1]
             dispatch(setActiveNote(newActiveNote.id))
             navigate(`/notes/${newActiveNote.id}`)
         } else {
