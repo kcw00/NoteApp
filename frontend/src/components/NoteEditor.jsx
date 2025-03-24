@@ -1,8 +1,10 @@
 import { useEffect } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from "react-router-dom"
+import { FiTrash2, FiSun } from "react-icons/fi"
+import { TfiUpload } from "react-icons/tfi"
 import { updateNote, deleteNote, setActiveNote, resetErrorMessage } from '../redux/notesSlice'
-import { setWindowWidth, toggleSidebar } from '../redux/uiSlice'
+import { setWindowWidth, toggleSidebar, toggleTheme } from '../redux/uiSlice'
 
 
 const NoteEditor = ({ noteId, note, notes }) => {
@@ -11,7 +13,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
 
     const { sidebarWidth, windowWidth, isSidebarOpen } = useSelector((state) => state.ui)
 
-    const errorMessage = useSelector((state)=> state.notes.errorMessage)
+    const errorMessage = useSelector((state) => state.notes.errorMessage)
 
     useEffect(() => {
         // Handle resize event
@@ -79,7 +81,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
                 <button className="ms-auto favorite-button 30px" onClick={handleImportance}>{icon}</button>
                 <button className="share-button">share</button>
                 <div className="dropdown">
-                    <button 
+                    <button
                         className="option-button"
                         type="button"
                         data-bs-toggle="dropdown"
@@ -87,9 +89,28 @@ const NoteEditor = ({ noteId, note, notes }) => {
                     >...
                     </button>
                     <ul className="dropdown-menu">
-                        <li><a className="dropdown-item" onClick={handleDelete}>delete</a></li>
-                        <li><a className="dropdown-item">Export</a></li>
-                        <li><a className="dropdown-item">option 3</a></li>
+                        <li><a className="dropdown-item" onClick={() => dispatch(toggleTheme())}>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <FiSun style={{ marginRight: '8px' }} />
+                                <span>theme</span>
+                            </div>
+                        </a>
+                        </li>
+                        <li><a className="dropdown-item">
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <TfiUpload style={{ marginRight: '8px' }} />
+                                <span>export</span>
+                            </div>
+                        </a>
+                        </li>
+                        <li><a className="dropdown-item" onClick={handleDelete}>
+                            <div style={{ display: 'flex', alignItems: 'center', color: 'red' }}>
+                                <FiTrash2 style={{ marginRight: '8px' }} />
+                                <span>delete</span>
+                            </div>
+                        </a>
+                        </li>
+
                     </ul>
                 </div>
             </header>
