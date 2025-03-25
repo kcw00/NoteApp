@@ -67,10 +67,34 @@ const NoteEditor = ({ noteId, note, notes }) => {
 
     const exportToPDF = (note) => {
         // Export note to PDF
-        const doc = new jsPDF()
-        doc.text(note.title, 10, 10)
-        doc.text(note.content, 10, 20)
-        doc.save(`${note.title}.pdf`)
+        const doc = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: [210, 297],
+        }
+        )
+
+        const noteElement = document.getElementById('input-container')
+
+        console.log('noteElement:', noteElement)
+
+        doc.html(noteElement, {
+            callback: function (doc) {
+                doc.save(`${note.title}.pdf`)
+            },
+            margin: [10, 10, 10, 10],
+            x: 5,
+            y: 10,
+            width: 270,
+            windowWidth: 1000,
+            html2canvas: {
+                scale: 0.3,
+                useCORS: true,
+                logging: true,
+            }
+        })
+        console.log('Exported to PDF')
+        
     }
 
     const icon = note.important ? <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-star-fill" viewBox="0 0 16 16">
@@ -124,7 +148,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
             <div>
 
             </div>
-            <div className="input-container">
+            <div id="input-container" className="input-container">
                 <div className="note-form d-flex flex-column align-items-center">
                     <div className="note-title-wrapper">
                         <input
