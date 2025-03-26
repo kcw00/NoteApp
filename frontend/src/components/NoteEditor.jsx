@@ -1,16 +1,21 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from "react-router-dom"
 import jsPDF from 'jspdf'
-import { FiTrash2, FiSun } from "react-icons/fi"
+import { FiTrash2, FiSun, FiMoreHorizontal, FiLink } from "react-icons/fi"
 import { TfiUpload } from "react-icons/tfi"
 import { updateNote, deleteNote, setActiveNote, resetErrorMessage } from '../redux/notesSlice'
 import { setWindowWidth, toggleSidebar, toggleTheme } from '../redux/uiSlice'
+import Alert from './Alert/Alert'
 
 
 const NoteEditor = ({ noteId, note, notes }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    const [shareLink, setShareLink] = useState("")
+    const [showAlert, setShowAlert] = useState(false)
+    const [alertMessage, setAlertMessage] = useState("")
 
     const { sidebarWidth, windowWidth, isSidebarOpen } = useSelector((state) => state.ui)
 
@@ -94,7 +99,29 @@ const NoteEditor = ({ noteId, note, notes }) => {
             }
         })
         console.log('Exported to PDF')
-        
+
+    }
+
+    const handleShareLink = () => {
+        const link = `${window.location.origin}/notes/${noteId}`
+        setShareLink(link)
+    }
+
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(shareLink)
+            .then(() => {
+                setAlertMessage('Copied link to clipboard')
+                setShowAlert(true)
+            })
+            .catch((err) => {
+                console.error('Failed to copy link to clipboard', err)
+                setAlertMessage('Failed to copy link to clipboard')
+                setShowAlert(true)
+            })
+    }
+
+    const handleCloseAlert = () => {
+        setShowAlert(false)
     }
 
     const icon = note.important ? <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-star-fill" viewBox="0 0 16 16">
@@ -110,14 +137,33 @@ const NoteEditor = ({ noteId, note, notes }) => {
             <header className="note-header d-flex align-items-center p-3">
                 {!isSidebarOpen ? <button onClick={handleToggleSidebar}>{">>"}</button> : ""}
                 <button className="ms-auto favorite-button 30px" onClick={handleImportance}>{icon}</button>
-                <button className="share-button">share</button>
-                <div className="dropdown">
+
+                <div className="dropdown_1">
+                    <button
+                        className="share-button"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        onClick={handleShareLink}
+                    >share
+                    </button>
+                    <div className="dropdown-menu">
+                        <a className="dropdown-item" onClick={handleCopyLink}>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <FiLink style={{ marginRight: '8px' }} />
+                                <span>copy link</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div className="dropdown_2">
                     <button
                         className="option-button"
                         type="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
-                    >...
+                    ><FiMoreHorizontal />
                     </button>
                     <ul className="dropdown-menu">
                         <li><a className="dropdown-item" onClick={() => dispatch(toggleTheme())}>
@@ -141,7 +187,6 @@ const NoteEditor = ({ noteId, note, notes }) => {
                             </div>
                         </a>
                         </li>
-
                     </ul>
                 </div>
             </header>
@@ -172,6 +217,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
                     </div>
                 </div>
             </div>
+            {showAlert && <Alert message={alertMessage} onClose={handleCloseAlert} />}
         </div>
     )
 }
