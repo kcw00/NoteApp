@@ -1,19 +1,17 @@
-import PropTypes from 'prop-types'
+import { useContext } from 'react'
+import noteContext from '../context/NoteContext'
 
-const Notification = ({ message }) => {
-  if (message === null) {
+const Notification = () => {
+  const { errorMessage } = useContext(noteContext)
+  if (errorMessage === null) {
     return null
   }
 
   return (
     <div className='error'>
-        {message}
-      </div>
+      {errorMessage}
+    </div>
   )
-}
-
-Notification.propTypes = {
-  message: PropTypes.string
 }
 
 export default Notification
