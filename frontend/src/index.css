@@ -96,19 +96,19 @@
   margin: 10px 0;
 }
 
-
-/* Main content */
-
 .resizer {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 5px;
+  width: 2px;
   cursor: ew-resize;
   z-index: 1;
   background-color: #ccc;
 }
+
+
+/* Main content */
 
 
 .note-container {
