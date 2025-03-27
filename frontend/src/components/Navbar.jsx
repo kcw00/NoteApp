@@ -1,7 +1,8 @@
 import { useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
-import { toggleTheme } from "../redux/uiSlice";
+import { toggleTheme } from "../redux/uiSlice"
+import { FiSun, FiMoon } from "react-icons/fi"
 
 
 const Navbar = () => {
@@ -10,6 +11,8 @@ const Navbar = () => {
 
   const dispatch = useDispatch()
   const theme = useSelector((state) => state.ui.mode)
+
+  const icon = theme === "light" ? <FiSun /> : <FiMoon />
 
 
   return (
@@ -52,21 +55,20 @@ const Navbar = () => {
                 </Link>
               </li>
             </ul>
-            <div className="form-check form-switch mx-1">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="flexSwitchCheckDefault"
+            <div>
+              <Link
+                className="button button-primary mx-2 me-2"
+                role="button"
                 onClick={() => dispatch(toggleTheme())}
-              />
-              <label
-                className="form-check-label"
-                htmlFor="flexSwitchCheckDefault"
-              >
-                {theme === "light" ? "light" : "dark"} mode
-              </label>
+              >{icon}
+                <label
+                  className="theme-label"
+                >
+                  {theme === "light" ? "light" : "dark"} mode
+                </label>
+              </Link>
             </div>
+            
             <form className="d-flex">
               <Link
                 className="button button-primary mx-2"
