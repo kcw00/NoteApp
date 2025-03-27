@@ -66,6 +66,7 @@ const Notes = () => {
     }, [dispatch, user?.token, user?.userId, notesArray, activeNoteId])
 
 
+
     return (
         <div id="notes-app">
             <Sidebar favorites={favorites} others={others} user={user} />

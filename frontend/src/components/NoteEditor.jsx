@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from "react-router-dom"
 import jsPDF from 'jspdf'
@@ -12,6 +12,9 @@ import Alert from './Alert/Alert'
 const NoteEditor = ({ noteId, note, notes }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    const contentRef = useRef(null)
+    const debounceTimeoutRef = useRef(null)
 
     const [shareLink, setShareLink] = useState("")
     const [showAlert, setShowAlert] = useState(false)
@@ -66,8 +69,18 @@ const NoteEditor = ({ noteId, note, notes }) => {
         dispatch(updateNote({ id: noteId, changes: { title: e.target.value } }))
     }
 
-    const handleContentChange = (e) => {
-        dispatch(updateNote({ id: noteId, changes: { content: e.target.value } }))
+    const handleContentChange = () => {
+        const updatedContent = contentRef.current.innerText
+        // Clear the previous debounce timer
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current)
+        }
+
+        // Set a new debounce timer to save the content after the user stops typing
+        // this prevents the cursor jumping to the front of the content while typing
+        debounceTimeoutRef.current = setTimeout(() => {
+            dispatch(updateNote({ id: noteId, changes: { content: updatedContent } }))
+        }, 5000) // 5000ms debounce delay
     }
 
     const exportToPDF = (note) => {
@@ -206,14 +219,18 @@ const NoteEditor = ({ noteId, note, notes }) => {
                         />
                     </div>
                     <div className="note-content-wrapper">
-                        <input
+                        <div
                             name='content'
-                            onChange={handleContentChange}
+                            contentEditable
+                            suppressContentEditableWarning
+                            spellCheck="true"
+                            onInput={handleContentChange}
                             placeholder='write note content here'
                             id='note-input'
+                            ref={contentRef}
                             className='note-content'
-                            value={note.content}
-                        />
+                        >{note.content}
+                        </div>
                     </div>
                 </div>
             </div>
