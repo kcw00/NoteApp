@@ -186,6 +186,7 @@
   padding-block: .2rem;
   border: transparent;
   outline: none;
+  overflow: auto;
 }
 
 .note-content[contenteditable]:empty:after {
