@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import notesService from "../services/notes"
 import socket from "./socket"
-import { set } from "mongoose"
-
 
 // Fetch all notes (initial load)
 export const fetchNotes = createAsyncThunk("notes/fetchNotes", async (userId, { rejectWithValue }) => {
