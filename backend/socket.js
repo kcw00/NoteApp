@@ -1,5 +1,6 @@
 const { Server } = require('socket.io')
 const Note = require('./models/note')
+const User = require('./models/user')
 
 let io
 
@@ -25,6 +26,33 @@ const initializeSocket = (server) => {
             }
         })
 
+        // handle typing event
+        socket.on("typing", ({ userId, noteId }) => {
+            socket.broadcast.emit("typing", { userId, noteId })
+        })
+
+        // handle stop typing event
+        socket.on("stopTyping", ({ userId, noteId }) => {
+            socket.broadcast.emit("stopTyping", { userId, noteId })
+        })
+
+        socket.on('cursorPosition', ({ userId, noteId, position }) => {
+            User.findById(userId)
+                .then(user => {
+                    if (user) {
+                        socket.broadcast.emit('cursorUpdate', {
+                            userId,
+                            noteId,
+                            position,
+                            username: user.username,
+                            userAvatar: user.avatar,
+                        })
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching user:", error)
+                })
+        })
         socket.on("disconnect", () => {
             console.log("User disconnected:", socket.id)
         })
