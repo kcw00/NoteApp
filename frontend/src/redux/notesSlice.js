@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import notesService from "../services/notes"
 import socket from "./socket"
+import { set } from "mongoose"
 
 
 // Fetch all notes (initial load)
@@ -59,6 +60,7 @@ const notesSlice = createSlice({
         status: "idle",
         errorMessage: null,
         activeNoteId: null,
+        activeUsers: [], // track active users
     },
     reducers: {
         // real-time updates from WebSocket
@@ -81,6 +83,9 @@ const notesSlice = createSlice({
         },
         resetErrorMessage: (state) => {
             state.errorMessage = null
+        },
+        setActiveUsers: (state, action) => {
+            state.activeUsers = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -127,19 +132,29 @@ socket.on("connect", () => {
     console.log("Socket connected")
 
     socket.on("noteAdded", (note) => {
-        store.dispatch(noteAddedRealtime(note))
+        if (note.userId === currentUserId) { 
+            store.dispatch(noteAddedRealtime(note)) 
+        }
     })
 
     socket.on("noteUpdated", (note) => {
-        store.dispatch(noteUpdatedRealtime(note))
+        if (note.userId === currentUserId) { 
+            store.dispatch(noteUpdatedRealtime(note)) 
+        }
     })
 
     socket.on("noteDeleted", (id) => {
-        store.dispatch(noteDeletedRealtime(id))
+        if (note.userId === currentUserId) { 
+            store.dispatch(noteDeletedRealtime(note)) 
+        }
+    })
+
+    socket.on("activeUsers", (users) => {
+        store.dispatch(setActiveUsers(users))
     })
 })
 
-export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage } = notesSlice.actions
+export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers } = notesSlice.actions
 
 
 export default notesSlice.reducer
