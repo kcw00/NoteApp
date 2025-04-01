@@ -1,3 +1,4 @@
+import add from 'add'
 import axios from 'axios'
 
 const baseUrl = '/api/notes'
@@ -57,4 +58,14 @@ const update = (id, newObject) => {
   return request.then(response => response.data)
 }
 
-export default { getAll, getNote, create, update, remove, setToken }
+// Add collaborator
+const addCollaborator = async (noteId, collaboratorId, userType) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+  const response = await axios.put(`${baseUrl}/${noteId}/collaborators`, { collaboratorId, userType }, config)
+  return response.data
+}
+
+
+export default { getAll, getNote, create, update, remove, setToken, addCollaborator }

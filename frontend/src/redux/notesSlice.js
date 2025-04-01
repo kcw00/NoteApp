@@ -34,6 +34,17 @@ export const updateNote = createAsyncThunk("notes/updateNote", async ({ id, chan
     }
 })
 
+// Add collaborator
+export const addCollaborator = createAsyncThunk("notes/addCollaborator", async ({ noteId, collaboratorId, userType }, { rejectWithValue }) => {
+    try {
+        const updatedNote = await notesService.addCollaborator(noteId, collaboratorId, userType)
+        socket.emit("collaboratorAdded", updatedNote) // Notify other clients
+        return updatedNote
+    } catch (error) {
+        return rejectWithValue(error.response?.data || "Failed to add collaborator")
+    }
+})
+
 // Delete note
 export const deleteNote = createAsyncThunk("notes/deleteNote", async (id, { rejectWithValue }) => {
     try {
@@ -59,6 +70,7 @@ const notesSlice = createSlice({
         errorMessage: null,
         activeNoteId: null,
         activeUsers: [], // track active users
+        collaborators: [], // track collaborators for each note
     },
     reducers: {
         // real-time updates from WebSocket
@@ -84,6 +96,13 @@ const notesSlice = createSlice({
         },
         setActiveUsers: (state, action) => {
             state.activeUsers = action.payload
+        },
+        addCollaboratorToNote: (state, action) => {
+            const { noteId, collaborator } = action.payload
+            if (!state.collaborators[noteId]) {
+                state.collaborators[noteId] = []
+            }
+            state.collaborators[noteId].push(collaborator)
         }
     },
     extraReducers: (builder) => {
@@ -130,29 +149,29 @@ socket.on("connect", () => {
     console.log("Socket connected")
 
     socket.on("noteAdded", (note) => {
-        if (note.userId === currentUserId) { 
-            store.dispatch(noteAddedRealtime(note)) 
+        if (note.userId === currentUserId) {
+            store.dispatch(noteAddedRealtime(note))
         }
     })
 
     socket.on("noteUpdated", (note) => {
-        if (note.userId === currentUserId) { 
-            store.dispatch(noteUpdatedRealtime(note)) 
+        if (note.userId === currentUserId) {
+            store.dispatch(noteUpdatedRealtime(note))
         }
     })
 
     socket.on("noteDeleted", (id) => {
-        if (note.userId === currentUserId) { 
-            store.dispatch(noteDeletedRealtime(note)) 
-        }
+        store.dispatch(noteDeletedRealtime(id))
+
     })
 
     socket.on("activeUsers", (users) => {
         store.dispatch(setActiveUsers(users))
     })
+
 })
 
-export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers } = notesSlice.actions
+export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers, addCollaboratorToNote } = notesSlice.actions
 
 
 export default notesSlice.reducer
