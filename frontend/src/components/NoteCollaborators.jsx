@@ -11,6 +11,7 @@ function NoteCollaborators({ noteId }) {
     const [newCollaborator, setNewCollaborator] = useState('')
     const [newRole, setNewRole] = useState('viewer')
     const [users, setUsers] = useState([]) // List of users to choose from
+    const [show, setShow] = useState(false)
 
     const dispatch = useDispatch()
     const collaborators = useSelector(state => state.notes.collaborators[noteId] || [])
@@ -54,10 +55,11 @@ function NoteCollaborators({ noteId }) {
 
     return (
         <div>
-            <button onClick={() => document.getElementById('collaboratorModal').style.display = 'block'}>
-                Share
+            <button onClick={() => setShow(true)}>
+                share
             </button>
-            <Modal id="collaboratorModal" show={true} onHide={() => document.getElementById('collaboratorModal').style.display = 'none'} centered>
+
+            <Modal show={show} onHide={() => setShow(false)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Add Collaborator</Modal.Title>
                 </Modal.Header>
