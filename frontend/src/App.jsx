@@ -1,19 +1,16 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import Notes from './components/Notes'
 import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
 import Home from './components/Home'
-import '@mantine/core/styles.css'
-import { MantineProvider } from '@mantine/core'
+
 
 const App = () => {
   const loggedIn = useSelector(state => Boolean(state.auth.user?.userId))
   const theme = useSelector((state) => state.ui.mode)
 
   return (
-    <MantineProvider>
-      <BrowserRouter>
         <div className={theme === "dark" ? "dark-mode" : ""}>
           <Routes>
             {/* Auth Routes (only for logged-out users) */}
@@ -44,8 +41,6 @@ const App = () => {
             />
           </Routes>
         </div>
-      </BrowserRouter>
-    </MantineProvider>
   )
 }
 
