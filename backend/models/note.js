@@ -8,10 +8,22 @@ const noteSchema = new mongoose.Schema({
     type: String,
   },
   important: Boolean,
-  user: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true,
   },
+  collaborators: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    userType: {
+      type: String,
+      enum: ['editor', 'viewer'],
+      default: 'viewer',
+    },
+  }],
   date: {
     type: Date,
     default: Date.now,
