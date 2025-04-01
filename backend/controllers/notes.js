@@ -108,7 +108,7 @@ notesRouter.put('/:noteId/collaborators', async (request, response) => {
   }
 
   // Check if the user is already a collaborator
-  const existingCollaborator = note.collaborators.find(c => c.user.toString() === collaboratorId)
+  const existingCollaborator = note.collaborators.find(c => c.user && c.user.toString() === collaboratorId)
   if (existingCollaborator) {
     return response.status(400).json({ error: 'User is already a collaborator' })
   }
