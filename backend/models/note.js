@@ -14,9 +14,15 @@ const noteSchema = new mongoose.Schema({
     required: true,
   },
   collaborators: [{
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+    },
+    username: {
+      type: String,
+    },
+    name: {
+      type: String,
     },
     userType: {
       type: String,

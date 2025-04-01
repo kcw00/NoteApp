@@ -67,7 +67,7 @@ notesRouter.put('/:noteId', async (request, response) => {
   const userId = request.user.id
 
   const isCreator = await Note.exists({ _id: noteId, creator: userId })
-  const isEditor = await Note.exists({ _id: noteId, 'collaborators.user': userId, 'collaborators.userType': 'editor' })
+  const isEditor = await Note.exists({ _id: noteId, 'collaborators.userId': userId, 'collaborators.userType': 'editor' })
 
   if (!isCreator && !isEditor) {
     return response.status(403).json({ error: 'You do not have permission to edit this note' })
@@ -85,7 +85,7 @@ notesRouter.put('/:noteId', async (request, response) => {
   response.json(updatedNote)
 })
 
-notesRouter.put('/:id/collaborators', async (request, response) => {
+notesRouter.put('/:noteId/collaborators', async (request, response) => {
   const { noteId } = request.params
   const { collaboratorId, userType } = request.body
 
@@ -95,8 +95,14 @@ notesRouter.put('/:id/collaborators', async (request, response) => {
     return response.status(404).json({ error: 'Collaborator not found' })
   }
 
-  // Find the note to add the collaborator
+  // Check if noteId is valid
+  if (!ObjectId.isValid(noteId)) {
+    return response.status(400).json({ error: 'Invalid noteId: ' + noteId })
+  }
+
+
   const note = await Note.findById(noteId)
+  console.log('Found note:', note)
   if (!note) {
     return response.status(404).json({ error: 'Note not found' })
   }
@@ -120,7 +126,12 @@ notesRouter.put('/:id/collaborators', async (request, response) => {
   }
 
   // Add the collaborator
-  note.collaborators.push({ user: collaboratorId, userType })
+  note.collaborators.push({
+    userId: collaboratorId,
+    username: collaborator.username,
+    name: collaborator.name,
+    userType
+  })
   try {
     const updatedNote = await note.save()
     // Notify clients about the collaborator addition
