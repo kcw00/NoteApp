@@ -199,6 +199,7 @@
 }
 
 
+
 /* Dark mode */
 
 .dark-mode {
@@ -213,7 +214,7 @@
   color: white;
 }
 
-.login-button, 
+.login-button,
 .cancel-button,
 .submit-button {
   background-color: lightgray;
@@ -244,6 +245,7 @@
 .dark-mode .sidebar-header {
   background-color: #2f3338;
 }
+
 .dark-mode .note-title {
   background-color: #1a2027;
 }
@@ -251,7 +253,7 @@
 .dark-mode .note-content,
 .dark-mode .note-title {
   background-color: #1a2027;
-  color:rgb(223, 223, 223);
+  color: rgb(223, 223, 223);
 }
 
 .dark-mode .sidebar-section h3 {
@@ -267,7 +269,7 @@
 }
 
 .dark-mode .navbar-toggler {
-  border-color: #d1d1d4 !important; 
+  border-color: #d1d1d4 !important;
 }
 
 .dark-mode .navbar-toggler-icon {
@@ -450,6 +452,7 @@ button:focus-visible {
   .logo-header {
     padding-top: 80px;
   }
+
   .logo-header .logo {
     height: 65px;
   }
