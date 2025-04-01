@@ -48,7 +48,10 @@ const Notes = () => {
                     dispatch(addNote({
                         title: '',
                         content: '',
-                        userId: user.userId
+                        creator: user.userId,
+                        collaborators: [],
+                        important: false,
+                        id: Date.now(), // Use a timestamp as a temporary ID
                     }))
                     console.log('Adding new empty note')
                 }
