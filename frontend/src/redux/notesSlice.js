@@ -102,7 +102,12 @@ const notesSlice = createSlice({
             if (!state.collaborators[noteId]) {
                 state.collaborators[noteId] = []
             }
-            state.collaborators[noteId].push(collaborator)
+            state.collaborators[noteId].push({
+                    userId: collaborator.userId,
+                    username: collaborator.username,
+                    name: collaborator.name,
+                    role: collaborator.role,
+            })
         }
     },
     extraReducers: (builder) => {
@@ -141,6 +146,14 @@ const notesSlice = createSlice({
                     state.activeNoteId = null // clear active note if it's deleted
                 }
             })
+            addCase(addCollaborator.fulfilled, (state, action) => {
+                const { noteId, collaborator } = action.payload
+                if (!state.collaborators[noteId]) {
+                  state.collaborators[noteId] = []
+                }
+                state.collaborators[noteId].push(collaborator)
+              })
+            }
     },
 })
 
