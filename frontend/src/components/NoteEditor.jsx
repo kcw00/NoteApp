@@ -1,14 +1,12 @@
 import { useEffect, useState, useRef } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from "react-router-dom"
-import jsPDF from 'jspdf'
-import { FiTrash2, FiSun, FiMoreHorizontal } from "react-icons/fi"
-import { TfiUpload } from "react-icons/tfi"
-import { updateNote, deleteNote, setActiveNote, resetErrorMessage } from '../redux/notesSlice'
-import { setWindowWidth, toggleSidebar, toggleTheme } from '../redux/uiSlice'
+import { updateNote, resetErrorMessage } from '../redux/notesSlice'
+import { setWindowWidth, toggleSidebar } from '../redux/uiSlice'
 import Alert from './Alert/Alert'
 import socket from "../redux/socket"
-import ShareModal from "./ShareModal" 
+import NoteCollaborators from "./NoteCollaborators"
+import NoteOption from "./NoteOption"
 
 
 const NoteEditor = ({ noteId, note, notes }) => {
@@ -22,10 +20,10 @@ const NoteEditor = ({ noteId, note, notes }) => {
     const [showAlert, setShowAlert] = useState(false)
     const [alertMessage, setAlertMessage] = useState("")
 
-
     const { sidebarWidth, windowWidth, isSidebarOpen } = useSelector((state) => state.ui)
 
     const errorMessage = useSelector((state) => state.notes.errorMessage)
+
 
     useEffect(() => {
         // Handle resize event
@@ -70,23 +68,6 @@ const handleToggleSidebar = () => {
     dispatch(toggleSidebar())
 }
 
-const handleDelete = () => {
-    dispatch(deleteNote(noteId))
-        .then(() => {
-            setAlertMessage('Note deleted')
-            setShowAlert(true)
-        })
-
-    const remainingNotes = Object.values(notes).filter(note => note.id !== noteId)
-    if (remainingNotes.length > 0) {
-        const newActiveNote = remainingNotes[remainingNotes.length - 1]
-        dispatch(setActiveNote(newActiveNote.id))
-        navigate(`/notes/${newActiveNote.id}`)
-    } else {
-        dispatch(setActiveNote(null))
-        navigate('/notes')
-    }
-}
 
 const handleImportance = () => {
     dispatch(updateNote({ id: noteId, changes: { important: !note.important } }))
@@ -142,37 +123,7 @@ useEffect(() => {
     }
 }, [noteId, note.userId])
 
-const exportToPDF = (note) => {
-    // Export note to PDF
-    const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: [210, 297],
-    }
-    )
 
-    const noteElement = document.getElementById('input-container')
-
-    console.log('noteElement:', noteElement)
-
-    doc.html(noteElement, {
-        callback: function (doc) {
-            doc.save(`${note.title}.pdf`)
-        },
-        margin: [10, 10, 10, 10],
-        x: 5,
-        y: 10,
-        width: 270,
-        windowWidth: 1000,
-        html2canvas: {
-            scale: 0.3,
-            useCORS: true,
-            logging: true,
-        }
-    })
-    console.log('Exported to PDF')
-
-}
 
 
 const handleCloseAlert = () => {
@@ -193,40 +144,10 @@ return (
             {!isSidebarOpen ? <button onClick={handleToggleSidebar}>{">>"}</button> : ""}
             <button className="ms-auto favorite-button 30px" onClick={handleImportance}>{icon}</button>
 
-            <ShareModal noteId={noteId} />
+            <NoteCollaborators noteId={noteId} />
 
-            <div className="dropdown_2">
-                <button
-                    className="option-button"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                ><FiMoreHorizontal />
-                </button>
-                <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" onClick={() => dispatch(toggleTheme())}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <FiSun style={{ marginRight: '8px' }} />
-                            <span>theme</span>
-                        </div>
-                    </a>
-                    </li>
-                    <li><a className="dropdown-item" onClick={() => exportToPDF(note)}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <TfiUpload style={{ marginRight: '8px' }} />
-                            <span>export</span>
-                        </div>
-                    </a>
-                    </li>
-                    <li><a className="dropdown-item" onClick={handleDelete}>
-                        <div style={{ display: 'flex', alignItems: 'center', color: 'red' }}>
-                            <FiTrash2 style={{ marginRight: '8px' }} />
-                            <span>delete</span>
-                        </div>
-                    </a>
-                    </li>
-                </ul>
-            </div>
+            <NoteOption noteId={noteId} notes={notes} />
+
         </header>
         <div>
 
