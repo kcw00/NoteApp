@@ -68,17 +68,18 @@ notesRouter.post('/', async (request, response) => {
 })
 
 notesRouter.delete('/:noteId', async (request, response) => {
-  const note = await Note.findById(request.params.id)
+  const { noteId } = request.params
+  const note = await Note.findById(noteId)
   if (!note) {
     return response.status(404).json({ error: 'Note not found' })
   }
 
-  const user = await User.findById(note.user)
-  user.notes = user.notes.filter(n => n.toString() !== note.id.toString()) // remove note from user
-  await user.save()
+  const creator = await User.findById(note.creator)
+  creator.notes = creator.notes.filter(n => n.toString() !== note.id.toString()) // remove note from user
+  await creator.save()
 
-  await Note.findByIdAndDelete(request.params.id)
-  getIo().emit('noteDeleted', request.params.id)
+  await Note.findByIdAndDelete(noteId)
+  getIo().emit('noteDeleted', noteId)
   response.status(204).end()
 })
 
@@ -118,7 +119,7 @@ notesRouter.put('/:noteId/collaborators', async (request, response) => {
   // Check if the collaborator exists
   const collaborator = await User.findById(collaboratorId)
   if (!collaborator) {
-    return response.status(404).json({ error: 'Collaborator not found' })
+    return response.status(404).json({ error: 'Collaborator not found: ' + collaboratorId })
   }
 
   // Check if noteId is valid
