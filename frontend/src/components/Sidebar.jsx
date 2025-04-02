@@ -52,7 +52,8 @@ const Sidebar = ({ favorites, others, user }) => {
             title: "",
             content: "",
             important: false,
-            user: user.userId
+            creator: user.userId,
+            collaborators: {},
         }
         dispatch(addNote(newNote))
         dispatch(setActiveNote(newNote.id))
