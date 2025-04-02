@@ -17,14 +17,27 @@ notesRouter.get('/:userId', async (request, response) => {
   response.json(notes)
 })
 
-// get a single note
+// get a single note with collaborators
 notesRouter.get('/:noteId', async (request, response) => {
-  const note = await Note.findById(request.params.id)
+  const { noteId } = request.params
 
-  if (note) {
+  // Validate noteId
+  if (!ObjectId.isValid(noteId)) {
+    return response.status(400).json({ error: 'Invalid noteId' })
+  }
+
+  // Find the note and populate collaborators
+  try {
+    const note = await Note.findById(noteId).populate('collaborators.user', 'username name') // populate user data
+    if (!note) {
+      return response.status(404).json({ error: 'Note not found' })
+    }
+
+    note.collaborators = Array.isArray(note.collaborators) ? note.collaborators : []
+
     response.json(note)
-  } else {
-    response.status(404).end()
+  } catch (error) {
+    response.status(500).json({ error: 'Server error' })
   }
 })
 
@@ -84,6 +97,9 @@ notesRouter.put('/:noteId', async (request, response) => {
   }
   response.json(updatedNote)
 })
+
+
+// Add collaborator to a note
 
 notesRouter.put('/:noteId/collaborators', async (request, response) => {
   const { noteId } = request.params
