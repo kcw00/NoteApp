@@ -44,16 +44,24 @@ notesRouter.get('/:noteId', async (request, response) => {
 notesRouter.post('/', async (request, response) => {
   const body = request.body
 
+  const creator = await User.findById(body.creator)
+
+  if (!creator) {
+    return response.status(404).json({ error: 'Creator not found' })
+  }
+
   const note = new Note({
     title: body.title,
     content: body.content,
     important: body.important === undefined ? false : body.important,
-    creator: request.user._id,
+    creator: creator,
     collaborators: body.collaborators || [],
     id: body.id
   })
 
   const savedNote = await note.save()
+  creator.notes = creator.notes.concat(savedNote._id) // add note to user
+  await creator.save()
   getIo().emit('noteAdded', savedNote)
 
   response.status(201).json(savedNote)
@@ -74,6 +82,8 @@ notesRouter.delete('/:noteId', async (request, response) => {
   response.status(204).end()
 })
 
+
+// Update a note
 notesRouter.put('/:noteId', async (request, response) => {
   const { noteId } = request.params
   const { title, content, important } = request.body
