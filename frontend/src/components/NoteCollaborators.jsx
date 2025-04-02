@@ -1,99 +1,83 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import axios from 'axios'
-import { addCollaboratorToNote, addCollaborator, fetchNote } from '../redux/notesSlice'
-import socket from '../redux/socket'
+import { setCollaborators, addCollaborator } from '../redux/notesSlice'
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
+import socket from '../redux/socket'
+import axios from 'axios'
 
-function NoteCollaborators({ noteId }) {
-    const [newCollaborator, setNewCollaborator] = useState('')
+function NoteCollaborators() {
+    const [newCollaboratorName, setNewCollaboratorName] = useState('')
     const [newRole, setNewRole] = useState('viewer')
-    const [users, setUsers] = useState([]) // List of users to choose from
     const [show, setShow] = useState(false)
+    const [users, setUsers] = useState([])
 
     const dispatch = useDispatch()
+    const activeNoteId = useSelector(state => state.notes.activeNoteId)
+    const note = useSelector(state => state.notes.entities[activeNoteId])
+    const noteId = note?.id
     const collaborators = useSelector(state => state.notes.collaborators[noteId] || [])
     console.log('NOTE ID: ', noteId)
     console.log('COLLABORATORS: ', collaborators)
 
 
-    if (!Array.isArray(collaborators)) {
-        console.error('Collaborators is not an array:', collaborators);
-        return <div>Loading...</div>;  // or render a fallback message
-    }
 
+    // get users from database
     useEffect(() => {
-        // Fetch the list of users to choose from (for adding as collaborators)
         axios.get('/api/users')
-            .then(response => {
+            .then((response) => {
                 setUsers(response.data)
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error fetching users:', error)
             })
-        // Fetch the note to get the initial list of collaborators
-        dispatch(fetchNote(noteId)).then((result) => {
-            const fetchedNote = result.payload
-            if (fetchedNote) {
-                // Set the initial collaborators from the fetched note
-                console.log('Fetched note:', fetchedNote)
-                console.log('Fetched note collaborators:', fetchedNote.collaborators)
-                dispatch(addCollaboratorToNote({
-                    noteId: fetchedNote.id,
-                    collaborators: fetchedNote.collaborators,
-                }))
-            }
-        })
-
-        // Listen for real-time updates on collaborator additions
-        socket.on("collaboratorAdded", (updatedNote) => {
-            if (updatedNote.id === noteId) {
-                dispatch(addCollaboratorToNote({
-                    noteId: updatedNote.id,
-                    collaborators: updatedNote.collaborators,
-                }))
-
-            }
-        })
-    }, [noteId, dispatch])
+    }, [])
 
 
     const handleAddCollaborator = async () => {
         try {
-            const newCollaboratorId = await users.find(user => user.username === newCollaborator)?.id
-            if (!newCollaboratorId) {
+            // Find collaborator ID from the list of users
+            const newCollaborator = await users.find(user => user.username === newCollaboratorName)
+
+            if (!newCollaborator) {
                 console.error('User not found')
                 return
             }
 
             // Log the collaborator object before dispatching to Redux
             console.log('Collaborator object:', {
-                userId: newCollaboratorId,
+                userId: newCollaborator.id,
                 userType: newRole,
             })
 
 
             // Optimistic update via Redux
-            dispatch(addCollaboratorToNote({
-                noteId, collaborator: {
-                    userId: newCollaboratorId,
-                    username: newCollaborator,
-                    userType: newRole,
-                }
-            }))
+            dispatch(setCollaborators({noteId: noteId, collaborator: newCollaborator}))
 
             // Make an API request to add the collaborator with the selected role
-            await dispatch(addCollaborator(noteId, newCollaboratorId, newRole))
+            dispatch(addCollaborator({noteId: noteId, collaboratorId: newCollaborator.id, userType: newRole}))
+
+            // Listen for real-time updates on collaborator additions
+            socket.on("collaboratorAdded", (updatedNote) => {
+                if (updatedNote.id === noteId) {
+                    dispatch(setCollaborators({
+                        noteId: updatedNote.id,
+                        collaborator: updatedNote.collaborator,
+                    }))
+
+                }
+            })
+
 
             // Reset the input fields
-            setNewCollaborator('')
+            setNewCollaboratorName('')
             setNewRole('viewer')
         } catch (error) {
             console.error('Error adding collaborator:', error)
         }
     }
+
 
 
     return (
@@ -112,8 +96,8 @@ function NoteCollaborators({ noteId }) {
                         <Form.Control
                             type="text"
                             placeholder="Username"
-                            value={newCollaborator}
-                            onChange={(e) => setNewCollaborator(e.target.value)}
+                            value={newCollaboratorName}
+                            onChange={(e) => setNewCollaboratorName(e.target.value)}
                         />
 
                         <select value={newRole} onChange={(e) => setNewRole(e.target.value)}>
@@ -127,7 +111,7 @@ function NoteCollaborators({ noteId }) {
                     </Button>
                     <ul>
                         {collaborators.map(collaborator => (
-                            <li key={collaborator.userId}>
+                            <li key={collaborator.userId || `${collaborator.username}-${collaborator.userType}`}>
                                 {collaborator.username} - {collaborator.userType}
                             </li>
                         ))}

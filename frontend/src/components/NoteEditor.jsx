@@ -144,7 +144,7 @@ return (
             {!isSidebarOpen ? <button onClick={handleToggleSidebar}>{">>"}</button> : ""}
             <button className="ms-auto favorite-button 30px" onClick={handleImportance}>{icon}</button>
 
-            <NoteCollaborators noteId={noteId} />
+            <NoteCollaborators />
 
             <NoteOption noteId={noteId} notes={notes} />
 
