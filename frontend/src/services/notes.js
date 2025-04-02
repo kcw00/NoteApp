@@ -12,7 +12,7 @@ const setToken = newToken => {
 // Get all notes
 const getAll = async userId => {
   const config = {
-    headers: { Authorization: token }, 
+    headers: { Authorization: token },
   }
   const request = axios.get(`${baseUrl}/${userId}`, config)
   return request.then(response => response.data)
@@ -21,7 +21,7 @@ const getAll = async userId => {
 // Get a single note
 const getNote = async id => {
   const config = {
-    headers: { Authorization: token }, 
+    headers: { Authorization: token },
   }
   const request = axios.get(`${baseUrl}/${id}`, config)
   return request.then(response => response.data)
@@ -30,7 +30,7 @@ const getNote = async id => {
 // Create a new note
 const create = async newObject => {
   const config = {
-    headers: { Authorization: token }, 
+    headers: { Authorization: token },
   }
 
   const response = await axios.post(baseUrl, newObject, config)
@@ -42,7 +42,7 @@ const remove = (id) => {
   const config = {
     headers: { Authorization: token },
   }
-  
+
   const request = axios.delete(`${baseUrl}/${id}`, config)
   return request.then(response => response.data)
 }
