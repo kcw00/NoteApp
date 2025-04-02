@@ -54,7 +54,7 @@ export const addCollaborator = createAsyncThunk("notes/addCollaborator", async (
         return rejectWithValue(error.response?.data || "Failed to add collaborator")
     }
 })
-   
+
 
 // Delete note
 export const deleteNote = createAsyncThunk("notes/deleteNote", async (id, { rejectWithValue }) => {
@@ -108,11 +108,11 @@ const notesSlice = createSlice({
         setActiveUsers: (state, action) => {
             state.activeUsers = action.payload
         },
-        addCollaboratorToNote: (state, action) => {
+        setCollaborators: (state, action) => {
             const { noteId, collaborator } = action.payload
 
             // Check if the collaborator information is valid
-            if (!collaborator || !collaborator.userId) {
+            if (!collaborator.id) {
                 console.error("Invalid collaborator information:", collaborator)
                 return
             }
@@ -121,13 +121,7 @@ const notesSlice = createSlice({
             if (!state.collaborators[noteId]) {
                 state.collaborators[noteId] = []
             }
-            state.collaborators[noteId].push(
-                {
-                    userId: collaborator.userId,
-                    username: collaborator.username,
-                    name: collaborator.name,
-                    userType: collaborator.userType,
-                })
+            state.collaborators[noteId].push(collaborator)
         }
     },
     extraReducers: (builder) => {
@@ -225,9 +219,11 @@ socket.on("connect", () => {
         store.dispatch(setActiveUsers(users))
     })
 
+
+
 })
 
-export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers, addCollaboratorToNote } = notesSlice.actions
+export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers, setCollaborators } = notesSlice.actions
 
 
 export default notesSlice.reducer
