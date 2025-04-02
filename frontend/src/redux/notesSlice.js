@@ -34,6 +34,16 @@ export const updateNote = createAsyncThunk("notes/updateNote", async ({ id, chan
     }
 })
 
+// Fetch a single note with collaborators
+export const fetchNote = createAsyncThunk("notes/fetchNote", async (id, { rejectWithValue }) => {
+    try {
+        const note = await notesService.getNote(id)
+        return note
+    } catch (error) {
+        return rejectWithValue(error.response?.data || "Failed to fetch note")
+    }
+})
+
 // Add collaborator
 export const addCollaborator = createAsyncThunk("notes/addCollaborator", async ({ noteId, collaboratorId, userType }, { rejectWithValue }) => {
     try {
@@ -44,6 +54,7 @@ export const addCollaborator = createAsyncThunk("notes/addCollaborator", async (
         return rejectWithValue(error.response?.data || "Failed to add collaborator")
     }
 })
+   
 
 // Delete note
 export const deleteNote = createAsyncThunk("notes/deleteNote", async (id, { rejectWithValue }) => {
@@ -70,7 +81,7 @@ const notesSlice = createSlice({
         errorMessage: null,
         activeNoteId: null,
         activeUsers: [], // track active users
-        collaborators: [], // track collaborators for each note
+        collaborators: {}, // track collaborators for each note
     },
     reducers: {
         // real-time updates from WebSocket
@@ -99,15 +110,24 @@ const notesSlice = createSlice({
         },
         addCollaboratorToNote: (state, action) => {
             const { noteId, collaborator } = action.payload
+
+            // Check if the collaborator information is valid
+            if (!collaborator || !collaborator.userId) {
+                console.error("Invalid collaborator information:", collaborator)
+                return
+            }
+
+            // ensure the collaboratos array exists for the note
             if (!state.collaborators[noteId]) {
                 state.collaborators[noteId] = []
             }
-            state.collaborators[noteId].push({
+            state.collaborators[noteId].push(
+                {
                     userId: collaborator.userId,
                     username: collaborator.username,
                     name: collaborator.name,
-                    role: collaborator.role,
-            })
+                    userType: collaborator.userType,
+                })
         }
     },
     extraReducers: (builder) => {
@@ -116,6 +136,10 @@ const notesSlice = createSlice({
                 const notes = action.payload
                 state.entities = notes.reduce((acc, note) => {
                     acc[note.id] = note
+                    state.collaborators = {
+                        ...state.collaborators, // Preserve existing collaborators
+                        [note.id]: Array.isArray(note.collaborators) ? note.collaborators : [],
+                    }
                     return acc
                 }, {})
                 state.ids = notes.map(note => note.id)
@@ -125,6 +149,26 @@ const notesSlice = createSlice({
                 state.status = "loading"
             })
             .addCase(fetchNotes.rejected, (state, action) => {
+                state.status = "failed"
+                state.errorMessage = action.payload
+            })
+            .addCase(fetchNote.fulfilled, (state, action) => {
+                const note = action.payload;
+                state.entities[note.id] = note;
+
+                // Normalize collaborators for this specific note
+                state.collaborators[note.id] = Array.isArray(note.collaborators)
+                    ? note.collaborators
+                    : [];
+
+                if (!state.ids.includes(note.id)) {
+                    state.ids.push(note.id);
+                }
+            })
+            .addCase(fetchNote.pending, (state) => {
+                state.status = "loading"
+            })
+            .addCase(fetchNote.rejected, (state, action) => {
                 state.status = "failed"
                 state.errorMessage = action.payload
             })
@@ -146,14 +190,13 @@ const notesSlice = createSlice({
                     state.activeNoteId = null // clear active note if it's deleted
                 }
             })
-            addCase(addCollaborator.fulfilled, (state, action) => {
+            .addCase(addCollaborator.fulfilled, (state, action) => {
                 const { noteId, collaborator } = action.payload
                 if (!state.collaborators[noteId]) {
-                  state.collaborators[noteId] = []
+                    state.collaborators[noteId] = []
                 }
                 state.collaborators[noteId].push(collaborator)
-              })
-            }
+            })
     },
 })
 

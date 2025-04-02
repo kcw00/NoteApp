@@ -1,4 +1,3 @@
-import add from 'add'
 import axios from 'axios'
 
 const baseUrl = '/api/notes'
