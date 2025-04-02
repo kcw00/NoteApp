@@ -49,9 +49,8 @@ const Notes = () => {
                         title: '',
                         content: '',
                         creator: user.userId,
-                        collaborators: [],
+                        collaborators: {},
                         important: false,
-                        id: Date.now(), // Use a timestamp as a temporary ID
                     }))
                     console.log('Adding new empty note')
                 }
