@@ -12,11 +12,7 @@ const Notes = () => {
     const notes = useSelector(state => state.notes.entities)
     const notesArray = useMemo(() => Object.values(notes), [notes])
 
-    const [favorites, others] = useMemo(() => {
-        const favs = [], otherNotes = []
-        notesArray.forEach(note => (note.important ? favs.push(note) : otherNotes.push(note)))
-        return [favs, otherNotes]
-    }, [notesArray])
+
 
     const activeNoteId = useSelector(state => state.notes.activeNoteId)
     const note = useSelector(state => state.notes.entities[activeNoteId])
@@ -71,7 +67,7 @@ const Notes = () => {
 
     return (
         <div id="notes-app">
-            <Sidebar favorites={favorites} others={others} user={user} />
+            <Sidebar />
             {note ? (
                 <NoteEditor key={note.id} noteId={note.id} note={note} notes={notesArray} />
             ) : (

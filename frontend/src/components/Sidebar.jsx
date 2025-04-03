@@ -1,15 +1,40 @@
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from "react-router-dom"
 import { addNote, setActiveNote } from "../redux/notesSlice"
 import { logoutUser } from "../redux/authSlice"
 import { setSidebarWidth, setIsResizing, toggleSidebar } from "../redux/uiSlice"
 
-const Sidebar = ({ favorites, others, user }) => {
+const Sidebar = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
     const { sidebarWidth, isResizing, isSidebarOpen } = useSelector((state) => state.ui)
+
+    const notes = useSelector(state => state.notes.entities)
+    const notesArray = useMemo(() => Object.values(notes), [notes])
+    const user = useSelector(state => state.auth.user)
+
+    console.log('user:', user)
+
+    const [favorites, others, shared] = useMemo(() => {
+        const favs = [], otherNotes = [], sharedNotes = []
+        notesArray.forEach(note => {
+            const isShared = note.collaborators.length > 0
+            if (isShared) {
+                sharedNotes.push(note)
+            }
+
+            if (!isShared && note.important) {
+                favs.push(note)
+            } else if (!isShared && !note.important) {
+                otherNotes.push(note)
+            }
+        })
+        return [favs, otherNotes, sharedNotes]
+    }, [notesArray, user])
+
+
 
 
     const resizeSidebar = useCallback((e) => {
@@ -65,6 +90,10 @@ const Sidebar = ({ favorites, others, user }) => {
         navigate(`/notes/${note.id}`)
     }
 
+    const isNoteShared = (note) => {
+        return note.collaborators.some(collaborator => collaborator.userId === user.userId)
+    }
+
     return (
         <nav className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}
             style={{ width: isSidebarOpen ? `${sidebarWidth}px` : "", transition: isResizing ? "none" : "width 0.2s ease" }}>
@@ -109,6 +138,26 @@ const Sidebar = ({ favorites, others, user }) => {
                             </Link>
                         ))}
                     </div>
+                    {shared.length > 0 && (<>
+                        <h3>Shared</h3>
+                        <div className="sidebar-list">
+                            {shared.map(note => (
+                                <Link
+                                    key={note.id}
+                                    role="button"
+                                    className="shared"
+                                    to={`/notes/${note.id}`}
+                                    onClick={() => handleNoteClick(note)}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-sticky" viewBox="0 0 16 16">
+                                        <path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293z" />
+                                    </svg>
+                                    {" "}{note.title}
+                                </Link>
+                            ))}
+                        </div>
+                    </>
+                    )}
                 </div>
                 <div className="sidebar-footer text-end p-3 mt-auto">
                     <Link
