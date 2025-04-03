@@ -55,6 +55,28 @@ export const addCollaborator = createAsyncThunk("notes/addCollaborator", async (
     }
 })
 
+// Remove collaborator
+export const removeCollaborator = createAsyncThunk("notes/removeCollaborator", async ({ noteId, collaboratorId }, { rejectWithValue }) => {
+    try {
+        const updatedNote = await notesService.removeCollaborator(noteId, collaboratorId)
+        socket.emit("collaboratorRemoved", updatedNote) // Notify other clients
+        return updatedNote
+    } catch (error) {
+        return rejectWithValue(error.response?.data || "Failed to remove collaborator")
+    }
+})
+
+// Update collaborator role
+export const updateCollaboratorRole = createAsyncThunk("notes/updateCollaboratorRole", async ({ noteId, collaboratorId, userType }, { rejectWithValue }) => {
+    try {
+        const updatedNote = await notesService.updateCollaboratorRole(noteId, collaboratorId, userType)
+        socket.emit("collaboratorRoleUpdated", updatedNote) // Notify other clients
+        return updatedNote
+    } catch (error) {
+        return rejectWithValue(error.response?.data || "Failed to update collaborator role")
+    }
+})
+
 
 // Delete note
 export const deleteNote = createAsyncThunk("notes/deleteNote", async (id, { rejectWithValue }) => {
@@ -112,7 +134,7 @@ const notesSlice = createSlice({
             const { noteId, collaborator } = action.payload
 
             // Check if the collaborator information is valid
-            if (!collaborator.id) {
+            if (!collaborator.userId) {
                 console.error("Invalid collaborator information:", collaborator)
                 return
             }
@@ -191,6 +213,24 @@ const notesSlice = createSlice({
                 }
                 state.collaborators[noteId].push(collaborator)
             })
+            .addCase(removeCollaborator.fulfilled, (state, action) => {
+                const { noteId, collaboratorId } = action.payload
+                if (state.collaborators[noteId]) {
+                    state.collaborators[noteId] = state.collaborators[noteId].filter(collab => collab.id !== collaboratorId)
+                }
+            })
+            .addCase(updateCollaboratorRole.fulfilled, (state, action) => {
+                const { noteId, collaboratorId, userType } = action.payload
+                if (state.collaborators[noteId]) {
+                    const collaborator = state.collaborators[noteId].find(collab => collab.id === collaboratorId)
+                    if (collaborator) {
+                        collaborator.userType = userType
+                    }
+                }
+            })
+            .addCase(clearErrorMessage.fulfilled, (state) => {
+                state.errorMessage = null
+            })
     },
 })
 
@@ -218,9 +258,16 @@ socket.on("connect", () => {
     socket.on("activeUsers", (users) => {
         store.dispatch(setActiveUsers(users))
     })
+    // Listen for real-time updates on collaborator additions
+    socket.on("collaboratorAdded", (updatedNote) => {
+        if (updatedNote.id === state.activeNoteId) {
+            store.dispatch(setCollaborators({
+                noteId: updatedNote.id,
+                collaborator: updatedNote.collaborator,
+            }))
 
-
-
+        }
+    })
 })
 
 export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers, setCollaborators } = notesSlice.actions

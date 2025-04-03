@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setCollaborators, addCollaborator } from '../redux/notesSlice'
+import { setCollaborators, addCollaborator, removeCollaborator, updateCollaboratorRole } from '../redux/notesSlice'
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
@@ -51,23 +51,17 @@ function NoteCollaborators() {
                 userType: newRole,
             })
 
+            const collaboratorData = {
+                userId: newCollaborator.id,
+                username: newCollaborator.username,
+                userType: newRole,
+            }
 
             // Optimistic update via Redux
-            dispatch(setCollaborators({noteId: noteId, collaborator: newCollaborator}))
+            dispatch(setCollaborators({noteId: noteId, collaborator: collaboratorData}))
 
             // Make an API request to add the collaborator with the selected role
             dispatch(addCollaborator({noteId: noteId, collaboratorId: newCollaborator.id, userType: newRole}))
-
-            // Listen for real-time updates on collaborator additions
-            socket.on("collaboratorAdded", (updatedNote) => {
-                if (updatedNote.id === noteId) {
-                    dispatch(setCollaborators({
-                        noteId: updatedNote.id,
-                        collaborator: updatedNote.collaborator,
-                    }))
-
-                }
-            })
 
 
             // Reset the input fields
@@ -77,6 +71,28 @@ function NoteCollaborators() {
             console.error('Error adding collaborator:', error)
         }
     }
+
+    const handleRemoveCollaborator = async (collaboratorId) => {
+        try {
+            // Optimistic update via Redux
+            dispatch(removeCollaborator({noteId: noteId, collaboratorId: collaboratorId}))
+            
+            // Listen for real-time updates on collaborator removals
+            socket.on("collaboratorRemoved", (updatedNote) => {
+                if (updatedNote.id === noteId) {
+                    dispatch(setCollaborators(prevCollaborators =>
+                        prevCollaborators.filter(collaborator => collaborator.userId !== collaboratorId)
+                    ))
+                }
+            })
+
+            return () => {
+                socket.off("collaboratorRemoved")
+            }
+        } catch (error) {
+            console.error('Error removing collaborator:', error)
+        }
+    }   
 
 
 
@@ -113,6 +129,9 @@ function NoteCollaborators() {
                         {collaborators.map(collaborator => (
                             <li key={collaborator.userId || `${collaborator.username}-${collaborator.userType}`}>
                                 {collaborator.username} - {collaborator.userType}
+                                <button onClick={() => handleRemoveCollaborator(collaborator.userId)}>
+                                    Remove
+                                </button>
                             </li>
                         ))}
                     </ul>
