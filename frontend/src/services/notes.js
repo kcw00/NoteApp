@@ -66,5 +66,23 @@ const addCollaborator = async (noteId, collaboratorId, userType) => {
   return response.data
 }
 
+// Remove collaborator
+const removeCollaborator = async (noteId, collaboratorId) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+  const response = await axios.delete(`${baseUrl}/${noteId}/collaborators/${collaboratorId}`, config)
+  return response.data
+}
 
-export default { getAll, getNote, create, update, remove, setToken, addCollaborator }
+// Update collaborator role
+const updateCollaboratorRole = async (noteId, collaboratorId, userType) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+  const response = await axios.put(`${baseUrl}//${noteId}/collaborators/${collaboratorId}/role`, { userType }, config)
+  return response.data
+}
+
+
+export default { getAll, getNote, create, update, remove, setToken, addCollaborator, removeCollaborator, updateCollaboratorRole }
