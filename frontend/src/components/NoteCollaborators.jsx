@@ -17,7 +17,7 @@ function NoteCollaborators() {
     const activeNoteId = useSelector(state => state.notes.activeNoteId)
     const note = useSelector(state => state.notes.entities[activeNoteId])
     const noteId = note?.id
-    const collaborators = useSelector(state => state.notes.collaborators[noteId] || [])
+    const collaborators = note?.collaborators || []
     console.log('NOTE ID: ', noteId)
     console.log('COLLABORATORS: ', collaborators)
 
@@ -72,29 +72,6 @@ function NoteCollaborators() {
         }
     }
 
-    const handleRemoveCollaborator = async (collaboratorId) => {
-        try {
-            // Optimistic update via Redux
-            dispatch(removeCollaborator({noteId: noteId, collaboratorId: collaboratorId}))
-            
-            // Listen for real-time updates on collaborator removals
-            socket.on("collaboratorRemoved", (updatedNote) => {
-                if (updatedNote.id === noteId) {
-                    dispatch(setCollaborators(prevCollaborators =>
-                        prevCollaborators.filter(collaborator => collaborator.userId !== collaboratorId)
-                    ))
-                }
-            })
-
-            return () => {
-                socket.off("collaboratorRemoved")
-            }
-        } catch (error) {
-            console.error('Error removing collaborator:', error)
-        }
-    }   
-
-
 
     return (
         <div>
@@ -129,7 +106,7 @@ function NoteCollaborators() {
                         {collaborators.map(collaborator => (
                             <li key={collaborator.userId || `${collaborator.username}-${collaborator.userType}`}>
                                 {collaborator.username} - {collaborator.userType}
-                                <button onClick={() => handleRemoveCollaborator(collaborator.userId)}>
+                                <button onClick={() => dispatch(removeCollaborator({noteId: noteId, collaboratorId: collaborator.userId}))}>
                                     Remove
                                 </button>
                             </li>

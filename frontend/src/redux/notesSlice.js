@@ -103,7 +103,6 @@ const notesSlice = createSlice({
         errorMessage: null,
         activeNoteId: null,
         activeUsers: [], // track active users
-        collaborators: {}, // track collaborators for each note
     },
     reducers: {
         // real-time updates from WebSocket
@@ -133,6 +132,8 @@ const notesSlice = createSlice({
         setCollaborators: (state, action) => {
             const { noteId, collaborator } = action.payload
 
+            const note = state.entities[noteId]
+
             // Check if the collaborator information is valid
             if (!collaborator.userId) {
                 console.error("Invalid collaborator information:", collaborator)
@@ -140,10 +141,17 @@ const notesSlice = createSlice({
             }
 
             // ensure the collaboratos array exists for the note
-            if (!state.collaborators[noteId]) {
-                state.collaborators[noteId] = []
+            if (!note?.collaborators) {
+                note.collaborators = []
             }
-            state.collaborators[noteId].push(collaborator)
+            note?.collaborators.push(collaborator)
+        },
+        removeCollaborator: (state, action) => {
+            const { noteId, collaboratorId } = action.payload
+            const note = state.entities[noteId]
+            if (note?.collaborators) {
+                note.collaborators = note.collaborators.filter(collab => collab.userId !== collaboratorId)
+            }
         }
     },
     extraReducers: (builder) => {
@@ -168,26 +176,6 @@ const notesSlice = createSlice({
                 state.status = "failed"
                 state.errorMessage = action.payload
             })
-            .addCase(fetchNote.fulfilled, (state, action) => {
-                const note = action.payload;
-                state.entities[note.id] = note;
-
-                // Normalize collaborators for this specific note
-                state.collaborators[note.id] = Array.isArray(note.collaborators)
-                    ? note.collaborators
-                    : [];
-
-                if (!state.ids.includes(note.id)) {
-                    state.ids.push(note.id);
-                }
-            })
-            .addCase(fetchNote.pending, (state) => {
-                state.status = "loading"
-            })
-            .addCase(fetchNote.rejected, (state, action) => {
-                state.status = "failed"
-                state.errorMessage = action.payload
-            })
             .addCase(addNote.fulfilled, (state, action) => {
                 const note = action.payload
                 state.entities[note.id] = note
@@ -208,21 +196,21 @@ const notesSlice = createSlice({
             })
             .addCase(addCollaborator.fulfilled, (state, action) => {
                 const { noteId, collaborator } = action.payload
-                if (!state.collaborators[noteId]) {
-                    state.collaborators[noteId] = []
-                }
-                state.collaborators[noteId].push(collaborator)
+                const note = state.entities[noteId]
+                note?.collaborators.push(collaborator)
             })
             .addCase(removeCollaborator.fulfilled, (state, action) => {
                 const { noteId, collaboratorId } = action.payload
-                if (state.collaborators[noteId]) {
-                    state.collaborators[noteId] = state.collaborators[noteId].filter(collab => collab.id !== collaboratorId)
+                const note = state.entities[noteId]
+                if (note?.collaborators) {
+                    note.collaborators = note.collaborators.filter(collab => collab.userId !== collaboratorId)
                 }
             })
             .addCase(updateCollaboratorRole.fulfilled, (state, action) => {
                 const { noteId, collaboratorId, userType } = action.payload
-                if (state.collaborators[noteId]) {
-                    const collaborator = state.collaborators[noteId].find(collab => collab.id === collaboratorId)
+                const note = state.entities[noteId]
+                if (note?.collaborators) {
+                    const collaborator = note.collaborators.find(collab => collab.userId === collaboratorId)
                     if (collaborator) {
                         collaborator.userType = userType
                     }
@@ -258,7 +246,7 @@ socket.on("connect", () => {
     socket.on("activeUsers", (users) => {
         store.dispatch(setActiveUsers(users))
     })
-    // Listen for real-time updates on collaborator additions
+ 
     socket.on("collaboratorAdded", (updatedNote) => {
         if (updatedNote.id === state.activeNoteId) {
             store.dispatch(setCollaborators({
@@ -267,6 +255,13 @@ socket.on("connect", () => {
             }))
 
         }
+    })
+
+    socket.on("collaboratorRemoved", (updatedNote) => {
+        dispatch(removeCollaborator({
+            noteId: updatedNote.id,
+            collaboratorId: updatedNote.collaboratorId,
+        }))
     })
 })
 

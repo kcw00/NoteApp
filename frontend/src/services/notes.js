@@ -71,7 +71,12 @@ const removeCollaborator = async (noteId, collaboratorId) => {
   const config = {
     headers: { Authorization: token },
   }
-  const response = await axios.delete(`${baseUrl}/${noteId}/collaborators/${collaboratorId}`, config)
+  const response = await axios.delete(`${baseUrl}/${noteId}/collaborators`,
+    {
+      data: { collaboratorId },  // Use 'data' for DELETE request body
+      headers: config.headers,
+    }
+  )
   return response.data
 }
 

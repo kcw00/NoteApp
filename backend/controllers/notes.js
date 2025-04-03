@@ -135,7 +135,7 @@ notesRouter.put('/:noteId/collaborators', async (request, response) => {
   }
 
   // Check if the user is already a collaborator
-  const existingCollaborator = note.collaborators.find(c => c.user && c.user.toString() === collaboratorId)
+  const existingCollaborator = note.collaborators.find(c => c.userId && c.userId.toString() === collaboratorId)
   if (existingCollaborator) {
     return response.status(400).json({ error: 'User is already a collaborator' })
   }
@@ -170,8 +170,9 @@ notesRouter.put('/:noteId/collaborators', async (request, response) => {
 })
 
 // Remove collaborator from a note
-notesRouter.delete('/:noteId/collaborators/:collaboratorId', async (request, response) => {
-  const { noteId, collaboratorId } = request.params
+notesRouter.delete('/:noteId/collaborators', async (request, response) => {
+  const { noteId } = request.params
+  const { collaboratorId } = request.body
 
   // Check if noteId is valid
   if (!ObjectId.isValid(noteId)) {
@@ -185,12 +186,15 @@ notesRouter.delete('/:noteId/collaborators/:collaboratorId', async (request, res
   }
 
   const isCreator = note.creator.toString() === request.user._id.toString()
+  console.log('isCreator:', isCreator)
   if (!isCreator) {
     return response.status(403).json({ error: 'You do not have permission to remove collaborators' })
   }
 
+  console.log('COLLABORATOR backend: ', note.collaborators)
+
   // Remove the collaborator
-  note.collaborators = note.collaborators.filter(c => c.user && c.user.toString() !== collaboratorId)
+  note.collaborators = note.collaborators.filter(c => c.userId && c.userId.toString() !== collaboratorId)
   try {
     const updatedNote = await note.save()
     // Notify clients about the collaborator removal
