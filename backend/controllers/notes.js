@@ -198,7 +198,10 @@ notesRouter.delete('/:noteId/collaborators', async (request, response) => {
   try {
     const updatedNote = await note.save()
     // Notify clients about the collaborator removal
-    getIo().emit('collaboratorRemoved', { noteId, collaboratorId })
+    getIo().emit('collaboratorRemoved', {
+      noteId: note._id.toString(),
+      collaboratorId: collaboratorId
+    })
     response.status(200).json(updatedNote)
   } catch (error) {
     response.status(400).json({ error: 'Failed to remove collaborator' })

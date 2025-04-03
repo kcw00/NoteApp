@@ -146,7 +146,7 @@ const notesSlice = createSlice({
             }
             note?.collaborators.push(collaborator)
         },
-        removeCollaborator: (state, action) => {
+        collaboratorRemoved: (state, action) => {
             const { noteId, collaboratorId } = action.payload
             const note = state.entities[noteId]
             if (note?.collaborators) {
@@ -246,26 +246,26 @@ socket.on("connect", () => {
     socket.on("activeUsers", (users) => {
         store.dispatch(setActiveUsers(users))
     })
- 
+
     socket.on("collaboratorAdded", (updatedNote) => {
         if (updatedNote.id === state.activeNoteId) {
-            store.dispatch(setCollaborators({
+            dispatch(setCollaborators({
                 noteId: updatedNote.id,
                 collaborator: updatedNote.collaborator,
             }))
-
         }
     })
 
     socket.on("collaboratorRemoved", (updatedNote) => {
-        dispatch(removeCollaborator({
-            noteId: updatedNote.id,
-            collaboratorId: updatedNote.collaboratorId,
-        }))
+        if (updatedNote.id === state.activeNoteId) {
+            dispatch(collaboratorRemoved({
+                noteId: updatedNote.id,
+                collaboratorId: updatedNote.collaboratorId,
+            }))
+        }
     })
 })
-
-export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers, setCollaborators } = notesSlice.actions
+export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers, setCollaborators, collaboratorRemoved } = notesSlice.actions
 
 
 export default notesSlice.reducer

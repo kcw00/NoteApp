@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setCollaborators, addCollaborator, removeCollaborator, updateCollaboratorRole } from '../redux/notesSlice'
+import { setCollaborators, addCollaborator, collaboratorRemoved, removeCollaborator, updateCollaboratorRole } from '../redux/notesSlice'
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
@@ -58,10 +58,10 @@ function NoteCollaborators() {
             }
 
             // Optimistic update via Redux
-            dispatch(setCollaborators({noteId: noteId, collaborator: collaboratorData}))
+            dispatch(setCollaborators({ noteId: noteId, collaborator: collaboratorData }))
 
             // Make an API request to add the collaborator with the selected role
-            dispatch(addCollaborator({noteId: noteId, collaboratorId: newCollaborator.id, userType: newRole}))
+            await dispatch(addCollaborator({ noteId: noteId, collaboratorId: newCollaborator.id, userType: newRole }))
 
 
             // Reset the input fields
@@ -72,6 +72,14 @@ function NoteCollaborators() {
         }
     }
 
+    const handleDeleteCollaborator = async (collaborator) => {
+        dispatch(collaboratorRemoved({ noteId: noteId, collaboratorId: collaborator.userId }))
+        try {
+            await dispatch(removeCollaborator({ noteId: noteId, collaboratorId: collaborator.userId }))
+        } catch (error) {
+            console.error('Error removing collaborator:', error)
+        }
+    }
 
     return (
         <div>
@@ -106,7 +114,7 @@ function NoteCollaborators() {
                         {collaborators.map(collaborator => (
                             <li key={collaborator.userId || `${collaborator.username}-${collaborator.userType}`}>
                                 {collaborator.username} - {collaborator.userType}
-                                <button onClick={() => dispatch(removeCollaborator({noteId: noteId, collaboratorId: collaborator.userId}))}>
+                                <button onClick={() => handleDeleteCollaborator(collaborator)}>
                                     Remove
                                 </button>
                             </li>
