@@ -6,12 +6,14 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import socket from '../redux/socket'
 import axios from 'axios'
+import Notification from './Notification'
 
 function NoteCollaborators() {
     const [newCollaboratorName, setNewCollaboratorName] = useState('')
     const [newRole, setNewRole] = useState('viewer')
     const [show, setShow] = useState(false)
     const [users, setUsers] = useState([])
+    const [errorMessage, setErrorMessage] = useState(null)
 
     const dispatch = useDispatch()
     const activeNoteId = useSelector(state => state.notes.activeNoteId)
@@ -41,7 +43,9 @@ function NoteCollaborators() {
             const newCollaborator = await users.find(user => user.username === newCollaboratorName)
 
             if (!newCollaborator) {
-                console.error('User not found')
+                const errorMessage = 'User not found'
+                setErrorMessage(errorMessage)
+                console.error(errorMessage)
                 return
             }
 
@@ -90,6 +94,7 @@ function NoteCollaborators() {
             <Modal show={show} onHide={() => setShow(false)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Add Collaborator</Modal.Title>
+                    <Notification errorMessage={errorMessage} />
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group controlId="formBasicEmail">
