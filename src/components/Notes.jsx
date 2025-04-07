@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import socket from "../redux/socket"
 
-import { fetchNotes, addNote, setActiveNote, setSharedNotes, fetchSharedNotes } from "../redux/notesSlice"
+import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes } from "../redux/notesSlice"
 import notesService from "../services/notes"
 import NoteEditor from "./NoteEditor"
 import Sidebar from "./Sidebar"
@@ -24,6 +25,8 @@ const Notes = () => {
     console.log('notes length:', notesArray.length)
     console.log('Active Note:', note)
 
+
+
     useEffect(() => {
         // check when useEffect is called
         console.log("useEffect called")
@@ -34,11 +37,16 @@ const Notes = () => {
         console.log('Fetching notes...')
 
 
+
+
         // Only fetch notes if the notes are not already fetched or if notesArray is empty
         if (notesArray.length === 0) {
             notesService.setToken(user.token)
-            const data = dispatch(fetchSharedNotes(user.userId))
-            dispatch(setSharedNotes(data))
+            socket.on('activeUsers', (data) => {
+                console.log('socket')
+                console.log('socket listen ----- Logged user:', data)
+                dispatch(setActiveUsers(data))
+            })
             dispatch(fetchNotes(user.userId)).then((result) => {
                 const fetchedNotes = result.payload
                 if (fetchedNotes.length === 0) {
@@ -63,7 +71,7 @@ const Notes = () => {
             dispatch(setActiveNote(notesArray[notesArray.length - 1]?.id)) // Default to the last note if active note is deleted
         }
 
-    }, [dispatch, user?.token, user?.userId, notesArray, activeNoteId])
+    }, [user?.token, user?.userId, notesArray, activeNoteId])
 
 
 
