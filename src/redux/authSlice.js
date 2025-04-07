@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import authService from "../services/auth"
 import noteService from "../services/notes"
+import socket from "./socket"
 
 
 export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, { rejectWithValue }) => {
@@ -8,6 +9,7 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, 
         const user = await authService.login(credentials)
         window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user))
         console.log('Login succeed:', user)
+        socket.emit('loggedUser', user?.userId)
         noteService.setToken(user?.token)
         return user
     } catch (error) {
@@ -41,7 +43,8 @@ const authSlice = createSlice({
         errorMessage: null,
         status: "idle",
     },
-    reducers: {},
+    reducers: {
+    },
     extraReducers: (builder) => {
         builder
             .addCase(loginUser.fulfilled, (state, action) => {
@@ -64,5 +67,7 @@ const authSlice = createSlice({
             })
     },
 })
+
+
 
 export default authSlice.reducer
