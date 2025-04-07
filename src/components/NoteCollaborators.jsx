@@ -67,7 +67,8 @@ function NoteCollaborators() {
             // Make an API request to add the collaborator with the selected role
             await dispatch(addCollaborator({ noteId: noteId, collaboratorId: newCollaborator.id, userType: newRole }))
 
-
+            // Emit the event to notify other clients
+            socket.emit('collaboratorAdded', { noteId: noteId, collaboratorId: newCollaborator.id })
             // Reset the input fields
             setNewCollaboratorName('')
             setNewRole('viewer')

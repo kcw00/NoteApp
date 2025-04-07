@@ -16,10 +16,6 @@ const Sidebar = () => {
     const notesArray = useMemo(() => Object.values(notes), [notes])
     const user = useSelector(state => state.auth.user)
 
-    const initialsharedNotes = useSelector(state => state.notes.sharedNotes)
-
-    console.log("initialsharedNotes:", initialsharedNotes)
-
     console.log('user:', user)
 
     const [favorites, others, shared] = useMemo(() => {
@@ -39,7 +35,6 @@ const Sidebar = () => {
         return [favs, otherNotes, sharedNotes]
     }, [notesArray, user])
 
-    shared.push(...initialsharedNotes)
 
 
     const resizeSidebar = useCallback((e) => {
