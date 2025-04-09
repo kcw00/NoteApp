@@ -38,26 +38,37 @@ const Notes = () => {
 
 
 
-
         // Only fetch notes if the notes are not already fetched or if notesArray is empty
         if (notesArray.length === 0) {
+
             notesService.setToken(user.token)
+
+            console.log('Logged user:', user)
+    
+    
+            dispatch(fetchSharedNotes(user.userId)).then((result) => {
+                const sharedNotes = result.payload
+                console.log('Shared notes:', sharedNotes)
+                if (sharedNotes.length > 0) {
+                    dispatch(setSharedNotes(sharedNotes))
+                }
+            })
             // Set active users
             socket.on('activeUsers', (data) => {
                 console.log('socket')
                 console.log('socket listen ----- Logged user:', data)
                 dispatch(setActiveUsers(data))
             })
+            // Fetch shared notes
             socket.on('noteShared', (data) => {
                 console.log('socket listen ----- Note shared:', data)
                 dispatch(setSharedNotes(data))
             })
-
             socket.on('sharedNotesFetched', (sharedNotes) => {
                 console.log('socket listen ----- Shared notes fetched:', sharedNotes)
                 dispatch(setSharedNotes(sharedNotes))
             })
-            
+
             dispatch(fetchNotes(user.userId)).then((result) => {
                 const fetchedNotes = result.payload
                 if (fetchedNotes.length === 0) {
