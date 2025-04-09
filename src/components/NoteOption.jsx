@@ -1,16 +1,26 @@
 import jsPDF from 'jspdf'
-import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { FiTrash2, FiSun, FiMoreHorizontal } from "react-icons/fi"
 import { TfiUpload } from "react-icons/tfi"
 import { toggleTheme } from '../redux/uiSlice'
 import { deleteNote } from '../redux/notesSlice'
+import noteService from '../services/notes'
+
 const NoteOption = ({ noteId }) => {
 
+
     const dispatch = useDispatch()
-    const navigate = useNavigate()
+
+    const user = useSelector(state => state.auth.user)
+    const userId = user?.userId
+
+    console.log('userId:', userId)
+
+
+
     const handleDelete = () => {
-        dispatch(deleteNote(noteId))
+        noteService.setToken(user?.token)
+        dispatch(deleteNote({ id: noteId, userId: userId }))
     }
 
     const exportToPDF = (note) => {
