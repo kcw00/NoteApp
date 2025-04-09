@@ -5,7 +5,7 @@ const baseUrl = '/api/notes'
 let token = null
 
 // Set the token
-const setToken = newToken => {
+const setToken = (newToken) => {
   token = `Bearer ${newToken}`
 }
 
@@ -58,11 +58,11 @@ const update = (id, newObject) => {
 }
 
 // Get shared notes
-const getSharedNotes = async (userId) => {
+const getSharedNotes = async userId => {
   const config = {
     headers: { Authorization: token },
   }
-  const request = axios.get(`${baseUrl}/shared`, { userId }, config)
+  const request = axios.get(`${baseUrl}/shared/${userId}`, config)
   return request.then(response => response.data)
 }
 
