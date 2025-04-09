@@ -1,8 +1,6 @@
-import { useContext } from 'react'
-import noteContext from '../context/NoteContext'
 
-const Notification = () => {
-  const { errorMessage } = useContext(noteContext)
+
+const Notification = ({ errorMessage }) => {
   if (errorMessage === null) {
     return null
   }
