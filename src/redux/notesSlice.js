@@ -16,7 +16,6 @@ export const fetchNotes = createAsyncThunk("notes/fetchNotes", async (userId, { 
 export const addNote = createAsyncThunk("notes/addNote", async (note, { rejectWithValue }) => {
     try {
         const newNote = await notesService.create(note)
-        socket.emit("noteAdded", newNote) // Notify other clients
         return newNote
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to add note")
@@ -27,7 +26,7 @@ export const addNote = createAsyncThunk("notes/addNote", async (note, { rejectWi
 export const updateNote = createAsyncThunk("notes/updateNote", async ({ id, changes }, { rejectWithValue }) => {
     try {
         const updatedNote = await notesService.update(id, changes)
-        socket.emit("noteUpdated", updatedNote) // Notify other clients
+        socket.emit("updateNote", updatedNote) // Notify other clients
         return updatedNote
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to update note")
@@ -48,7 +47,7 @@ export const fetchNote = createAsyncThunk("notes/fetchNote", async (id, { reject
 export const addCollaborator = createAsyncThunk("notes/addCollaborator", async ({ noteId, collaboratorId, userType }, { rejectWithValue }) => {
     try {
         const updatedNote = await notesService.addCollaborator(noteId, collaboratorId, userType)
-        socket.emit("collaboratorAdded", updatedNote) // Notify other clients
+        socket.emit("collaboratorAdded", { noteId, collaboratorId }) // Notify other clients
         return updatedNote
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to add collaborator")
@@ -81,7 +80,7 @@ export const updateCollaboratorRole = createAsyncThunk("notes/updateCollaborator
 export const fetchSharedNotes = createAsyncThunk("notes/fetchSharedNotes", async (userId, { rejectWithValue }) => {
     try {
         const sharedNotes = await notesService.getSharedNotes(userId)
-        socket.emit("noteShared", sharedNotes) // Notify other clients
+        socket.emit("sharedNotesFetched", sharedNotes) // Notify other clients
         return sharedNotes
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to fetch shared notes")
@@ -109,25 +108,21 @@ const notesSlice = createSlice({
     name: "notes",
     initialState: {
         entities: {},
-        ids: [],
         status: "idle",
         errorMessage: null,
         activeNoteId: null,
         activeUsers: [], // track active users
-        sharedNotes: [],
     },
     reducers: {
         // real-time updates from WebSocket
         noteAddedRealtime: (state, action) => {
             state.entities[action.payload.id] = action.payload
-            state.ids.push(action.payload.id)
         },
         noteUpdatedRealtime: (state, action) => {
             state.entities[action.payload.id] = action.payload
         },
         noteDeletedRealtime: (state, action) => {
             delete state.entities[action.payload]
-            state.ids = state.ids.filter(id => id !== action.payload)
             if (state.activeNoteId === action.payload) {
                 state.activeNoteId = null // clear active note if it's deleted
             }
@@ -142,22 +137,17 @@ const notesSlice = createSlice({
             state.activeUsers = action.payload
         },
         setCollaborators: (state, action) => {
-            const { noteId, collaborator } = action.payload
+            const { noteId, collaboratorId } = action.payload
 
             const note = state.entities[noteId]
 
             // Check if the collaborator information is valid
-            if (!collaborator.userId) {
-                console.error("Invalid collaborator information:", collaborator)
+            if (!collaboratorId) {
+                console.error("Invalid collaborator information:", collaboratorId)
                 return
             }
 
-            // ensure the collaboratos array exists for the note
-            if (!note?.collaborators) {
-                note.collaborators = []
-            }
-            note?.collaborators.push(collaborator)
-            note?.sharedNotes.push(note)
+            note?.collaborators.push(collaboratorId)
         },
         collaboratorRemoved: (state, action) => {
             const { noteId, collaboratorId } = action.payload
@@ -167,11 +157,10 @@ const notesSlice = createSlice({
             }
         },
         setSharedNotes: (state, action) => {
-            const { noteId, sharedNote } = action.payload
-            const note = state.entities[noteId]
-            if (note?.sharedNotes) {
-                note.sharedNotes.push(sharedNote)
-            }
+            const sharedNotes = action.payload
+            sharedNotes.forEach(note => {
+                state.entities[note.id] = note
+            })
         },
     },
     extraReducers: (builder) => {
@@ -186,7 +175,6 @@ const notesSlice = createSlice({
                     }
                     return acc
                 }, {})
-                state.ids = notes.map(note => note.id)
                 state.status = "succeeded"
             })
             .addCase(fetchNotes.pending, (state) => {
@@ -199,7 +187,6 @@ const notesSlice = createSlice({
             .addCase(addNote.fulfilled, (state, action) => {
                 const note = action.payload
                 state.entities[note.id] = note
-                state.ids.push(note.id)
                 state.activeNoteId = note.id // set the newly added note as active
             })
             .addCase(updateNote.fulfilled, (state, action) => {
@@ -209,7 +196,6 @@ const notesSlice = createSlice({
             .addCase(deleteNote.fulfilled, (state, action) => {
                 const deleteNoteId = action.payload
                 delete state.entities[deleteNoteId]
-                state.ids = state.ids.filter(id => id !== deleteNoteId)
                 if (state.activeNoteId === deleteNoteId) {
                     state.activeNoteId = null // clear active note if it's deleted
                 }
@@ -218,7 +204,6 @@ const notesSlice = createSlice({
                 const { noteId, collaborator } = action.payload
                 const note = state.entities[noteId]
                 note?.collaborators.push(collaborator)
-                note?.sharedNotes.push(note)
             })
             .addCase(removeCollaborator.fulfilled, (state, action) => {
                 const { noteId, collaboratorId } = action.payload
@@ -243,54 +228,6 @@ const notesSlice = createSlice({
     },
 })
 
-// Listen for real-time WebSocket updates, only after the socket is connected
-socket.on("connect", () => {
-    console.log("Socket connected")
-
-    socket.on("noteAdded", (note) => {
-        if (note.userId === currentUserId) {
-            store.dispatch(noteAddedRealtime(note))
-        }
-    })
-
-    socket.on("noteUpdated", (note) => {
-        if (note.userId === currentUserId) {
-            store.dispatch(noteUpdatedRealtime(note))
-        }
-    })
-
-    socket.on("noteDeleted", (id) => {
-        store.dispatch(noteDeletedRealtime(id))
-
-    })
-
-    socket.on("activeUsers", (users) => {
-        store.dispatch(setActiveUsers(users))
-    })
-
-    socket.on("collaboratorAdded", (updatedNote) => {
-        if (updatedNote.id === state.activeNoteId) {
-            dispatch(setCollaborators({
-                noteId: updatedNote.id,
-                collaborator: updatedNote.collaborator,
-            }))
-            dispatch(setSharedNotes({
-                noteId: updatedNote.id,
-                sharedNote: updatedNote.sharedNote,
-            }))
-        }
-    })
-
-    socket.on("collaboratorRemoved", (updatedNote) => {
-        if (updatedNote.id === state.activeNoteId) {
-            dispatch(collaboratorRemoved({
-                noteId: updatedNote.id,
-                collaboratorId: updatedNote.collaboratorId,
-            }))
-        }
-    })
-
-})
 export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers, setCollaborators, collaboratorRemoved, setSharedNotes } = notesSlice.actions
 
 
