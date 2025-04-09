@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import socket from "../redux/socket"
 
-import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes } from "../redux/notesSlice"
+import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes, noteDeletedRealtime, setCollaborators } from "../redux/notesSlice"
 import notesService from "../services/notes"
 import NoteEditor from "./NoteEditor"
 import Sidebar from "./Sidebar"
@@ -26,53 +26,27 @@ const Notes = () => {
     console.log('Active Note:', note)
 
 
-
     useEffect(() => {
-        // check when useEffect is called
         console.log("useEffect called")
-
+    
         // Avoid running the effect if the user is not authenticated
         if (!user?.token || !user?.userId) return
-
+    
         console.log('Fetching notes...')
-
-
-
-        // Only fetch notes if the notes are not already fetched or if notesArray is empty
+    
+        // Only fetch notes if the notesArray is empty
         if (notesArray.length === 0) {
-
             notesService.setToken(user.token)
-
+    
             console.log('Logged user:', user)
     
-    
-            dispatch(fetchSharedNotes(user.userId)).then((result) => {
-                const sharedNotes = result.payload
-                console.log('Shared notes:', sharedNotes)
-                if (sharedNotes.length > 0) {
-                    dispatch(setSharedNotes(sharedNotes))
-                }
-            })
-            // Set active users
-            socket.on('activeUsers', (data) => {
-                console.log('socket')
-                console.log('socket listen ----- Logged user:', data)
-                dispatch(setActiveUsers(data))
-            })
-            // Fetch shared notes
-            socket.on('noteShared', (data) => {
-                console.log('socket listen ----- Note shared:', data)
-                dispatch(setSharedNotes(data))
-            })
-            socket.on('sharedNotesFetched', (sharedNotes) => {
-                console.log('socket listen ----- Shared notes fetched:', sharedNotes)
-                dispatch(setSharedNotes(sharedNotes))
-            })
-
-            dispatch(fetchNotes(user.userId)).then((result) => {
-                const fetchedNotes = result.payload
+            // Fetch shared notes and regular notes concurrently
+            const fetchNotesData = async () => {
+                // Fetch regular notes
+                const fetchedNotesResult = await dispatch(fetchNotes(user.userId))
+                const fetchedNotes = fetchedNotesResult.payload
                 if (fetchedNotes.length === 0) {
-                    // Only add a new empty note if no notes exist
+                    // Add a new empty note if no notes exist
                     dispatch(addNote({
                         title: '',
                         content: '',
@@ -82,20 +56,57 @@ const Notes = () => {
                     }))
                     console.log('Adding new empty note')
                 }
+    
+                // Fetch shared notes
+                const sharedNotesResult = await dispatch(fetchSharedNotes(user.userId))
+                const sharedNotes = sharedNotesResult.payload
+                console.log('Shared notes:', sharedNotes)
+    
+                // Update shared notes only if there are any
+                if (sharedNotes.length > 0) {
+                    dispatch(setSharedNotes(sharedNotes))
+                    console.log('notes after setting shared notes:', notes)
+                }
+    
+                // Set the active note (if none exists)
+                if (!activeNoteId) {
+                    const noteToSet = fetchedNotes[fetchedNotes.length - 1] // Use the last fetched note
+                    if (noteToSet) {
+                        dispatch(setActiveNote(noteToSet.id)) // Set active note
+                        console.log('Setting active note to:', noteToSet)
+                    }
+                }
+            }
+    
+            fetchNotesData()
+    
+            // Set up socket listeners only once
+            socket.on('activeUsers', (data) => {
+                console.log('socket listen ----- Logged user:', data)
+                dispatch(setActiveUsers(data))
             })
-        }
-
-        // Only set the active note if there is no active note or if the active note was deleted
-        if (!activeNoteId && notesArray.length > 0) {
-            dispatch(setActiveNote(notesArray[notesArray.length - 1]?.id)) // Default to the last note
-            console.log('Setting active note')
+    
+            socket.on('noteDeleted', (data) => {
+                console.log('socket listen ----- Note deleted:', data)
+                dispatch(noteDeletedRealtime(data))
+            })
+    
+            socket.on('collaboratorAdded', (data) => {
+                console.log('socket listen ----- Collaborator added:', data)
+                dispatch(setCollaborators(data))
+            })
+    
+            socket.on('noteShared', (data) => {
+                console.log('socket listen ----- Note shared:', data)
+                dispatch(setSharedNotes(data))
+            })
         } else if (activeNoteId && !notesArray.some(note => note?.id === activeNoteId)) {
-            dispatch(setActiveNote(notesArray[notesArray.length - 1]?.id)) // Default to the last note if active note is deleted
+            // If active note is not found, default to the last note
+            dispatch(setActiveNote(notesArray[notesArray.length - 1]?.id))
         }
-
+    
     }, [user?.token, user?.userId, notesArray, activeNoteId])
-
-
+    
 
     return (
         <div id="notes-app">

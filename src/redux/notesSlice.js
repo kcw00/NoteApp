@@ -26,7 +26,7 @@ export const addNote = createAsyncThunk("notes/addNote", async (note, { rejectWi
 export const updateNote = createAsyncThunk("notes/updateNote", async ({ id, changes }, { rejectWithValue }) => {
     try {
         const updatedNote = await notesService.update(id, changes)
-        socket.emit("updateNote", updatedNote) // Notify other clients
+        socket.emit("updateNote", { id, changes }) // Notify other clients
         return updatedNote
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to update note")
@@ -159,14 +159,14 @@ const notesSlice = createSlice({
         },
         setSharedNotes: (state, action) => {
             const sharedNotes = action.payload
-            // Ensure sharedNotes is an array before using forEach
-            if (Array.isArray(sharedNotes)) {
-                sharedNotes.forEach(note => {
-                    state.entities[note.id] = note
-                })
-            } else {
-                console.error('Expected sharedNotes to be an array, but got:', sharedNotes)
-            }
+            state.entities = { ...state.entities, ...sharedNotes.reduce((acc, note) => {
+                acc[note.id] = note
+                state.collaborators = {
+                    ...state.collaborators, // Preserve existing collaborators
+                    [note.id]: Array.isArray(note.collaborators) ? note.collaborators : [],
+                }
+                return acc
+            })}
         },
     },
     extraReducers: (builder) => {
@@ -231,6 +231,7 @@ const notesSlice = createSlice({
             .addCase(clearErrorMessage.fulfilled, (state) => {
                 state.errorMessage = null
             })
+
     },
 })
 
