@@ -47,7 +47,7 @@ export const fetchNote = createAsyncThunk("notes/fetchNote", async (id, { reject
 export const addCollaborator = createAsyncThunk("notes/addCollaborator", async ({ noteId, collaboratorId, userType }, { rejectWithValue }) => {
     try {
         const updatedNote = await notesService.addCollaborator(noteId, collaboratorId, userType)
-        socket.emit("collaboratorAdded", { noteId, collaboratorId }) // Notify other clients
+        socket.emit("addCollaborator", { noteId, collaboratorId }) // Notify other clients
         return updatedNote
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to add collaborator")
@@ -89,10 +89,11 @@ export const fetchSharedNotes = createAsyncThunk("notes/fetchSharedNotes", async
 
 
 // Delete note
-export const deleteNote = createAsyncThunk("notes/deleteNote", async (id, { rejectWithValue }) => {
+export const deleteNote = createAsyncThunk("notes/deleteNote", async ({ id, userId }, { rejectWithValue }) => {
     try {
-        await notesService.remove(id)
-        socket.emit("noteDeleted", id) // Notify other clients
+        await notesService.remove(id, userId)
+        console.log("Note deleted:", id)
+        socket.emit("deleteNote", { id, userId }) // Notify other clients
         return id
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to delete note")
@@ -137,17 +138,17 @@ const notesSlice = createSlice({
             state.activeUsers = action.payload
         },
         setCollaborators: (state, action) => {
-            const { noteId, collaboratorId } = action.payload
+            const { noteId, collaborator } = action.payload
 
             const note = state.entities[noteId]
 
             // Check if the collaborator information is valid
-            if (!collaboratorId) {
-                console.error("Invalid collaborator information:", collaboratorId)
+            if (!collaborator.userId) {
+                console.error("Invalid collaborator information:", collaborator.userId)
                 return
             }
 
-            note?.collaborators.push(collaboratorId)
+            note?.collaborators.push(collaborator)
         },
         collaboratorRemoved: (state, action) => {
             const { noteId, collaboratorId } = action.payload
@@ -158,9 +159,14 @@ const notesSlice = createSlice({
         },
         setSharedNotes: (state, action) => {
             const sharedNotes = action.payload
-            sharedNotes.forEach(note => {
-                state.entities[note.id] = note
-            })
+            // Ensure sharedNotes is an array before using forEach
+            if (Array.isArray(sharedNotes)) {
+                sharedNotes.forEach(note => {
+                    state.entities[note.id] = note
+                })
+            } else {
+                console.error('Expected sharedNotes to be an array, but got:', sharedNotes)
+            }
         },
     },
     extraReducers: (builder) => {

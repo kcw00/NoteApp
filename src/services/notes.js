@@ -38,23 +38,25 @@ const create = async newObject => {
 }
 
 // Remove a note
-const remove = (id) => {
+const remove = async (id, userId) => {
   const config = {
     headers: { Authorization: token },
   }
 
-  const request = axios.delete(`${baseUrl}/${id}`, config)
-  return request.then(response => response.data)
+  const request = axios.delete(`${baseUrl}/${id}/user/${userId}`, config)
+  const response = await request
+  return response.data
 }
 
 // Update a note
-const update = (id, newObject) => {
+const update = async (id, newObject) => {
   const config = {
     headers: { Authorization: token },
   }
 
   const request = axios.put(`${baseUrl}/${id}`, newObject, config)
-  return request.then(response => response.data)
+  const response = await request
+  return response.data
 }
 
 // Get shared notes
