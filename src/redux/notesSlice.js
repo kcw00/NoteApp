@@ -159,14 +159,17 @@ const notesSlice = createSlice({
         },
         setSharedNotes: (state, action) => {
             const sharedNotes = action.payload
-            state.entities = { ...state.entities, ...sharedNotes.reduce((acc, note) => {
-                acc[note.id] = note
+            // Properly merge the shared notes into entities and collaborators
+            sharedNotes.forEach(note => {
+                // Add the note to entities
+                state.entities[note.id] = note;
+
+                // Ensure collaborators are being stored correctly
                 state.collaborators = {
                     ...state.collaborators, // Preserve existing collaborators
                     [note.id]: Array.isArray(note.collaborators) ? note.collaborators : [],
-                }
-                return acc
-            })}
+                };
+            });
         },
     },
     extraReducers: (builder) => {
@@ -231,7 +234,6 @@ const notesSlice = createSlice({
             .addCase(clearErrorMessage.fulfilled, (state) => {
                 state.errorMessage = null
             })
-
     },
 })
 

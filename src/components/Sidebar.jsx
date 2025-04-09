@@ -20,7 +20,7 @@ const Sidebar = () => {
     const [favorites, others, shared] = useMemo(() => {
         const favs = [], otherNotes = [], sharedNotes = []
         notesArray.forEach(note => {
-            const isShared = note.collaborators
+            const isShared = note.collaborators.length > 0
             if (isShared) {
                 sharedNotes.push(note)
             }
