@@ -4,7 +4,7 @@ import { setCollaborators, addCollaborator, collaboratorRemoved, removeCollabora
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
-import socket from '../redux/socket'
+import { socket } from '../redux/socket'
 import axios from 'axios'
 import Notification from './Notification'
 
@@ -61,14 +61,12 @@ function NoteCollaborators() {
                 userType: newRole,
             }
 
-            // Optimistic update via Redux
             dispatch(setCollaborators({ noteId: noteId, collaborator: collaboratorData }))
 
             // Make an API request to add the collaborator with the selected role
             await dispatch(addCollaborator({ noteId: noteId, collaboratorId: newCollaborator.id, userType: newRole }))
 
-            // Emit the event to notify other clients
-            socket.emit('collaboratorAdded', { noteId: noteId, collaboratorId: newCollaborator.id })
+
             // Reset the input fields
             setNewCollaboratorName('')
             setNewRole('viewer')
