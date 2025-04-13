@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import authService from "../services/auth"
 import noteService from "../services/notes"
-import socket from "./socket"
+import { socket } from "./socket"
 
 
 export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, { rejectWithValue }) => {
@@ -17,9 +17,9 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, 
     }
 })
 
-export const logoutUser = createAsyncThunk("auth/logoutUser", async (userId) => {
+export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
     window.localStorage.removeItem("loggedNoteappUser")
-    socket.emit('logoutUser', userId)
+    socket.emit('logoutUser')
     noteService.setToken(null)
     return null
 })

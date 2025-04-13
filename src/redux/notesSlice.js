@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import notesService from "../services/notes"
-import socket from "./socket"
+import { socket } from "./socket"
 
 // Fetch all notes (initial load)
 export const fetchNotes = createAsyncThunk("notes/fetchNotes", async (userId, { rejectWithValue }) => {
@@ -80,7 +80,7 @@ export const updateCollaboratorRole = createAsyncThunk("notes/updateCollaborator
 export const fetchSharedNotes = createAsyncThunk("notes/fetchSharedNotes", async (userId, { rejectWithValue }) => {
     try {
         const sharedNotes = await notesService.getSharedNotes(userId)
-        socket.emit("sharedNotesFetched", sharedNotes) // Notify other clients
+        socket.emit("fetchSharedNotes", sharedNotes) // Notify other clients
         return sharedNotes
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to fetch shared notes")
