@@ -15,7 +15,11 @@ export default defineConfig({
     '/socket.io': {
       target: 'http://localhost:3001',
       ws: true,
-    }
+    },
+    '/y-websocket': {
+      target: 'ws://localhost:3001',
+      ws: true,
+    },
   },
   test: {
     environment: 'jsdom',
