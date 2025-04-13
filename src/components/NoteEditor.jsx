@@ -1,23 +1,16 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from "react-router-dom"
 import { updateNote, resetErrorMessage } from '../redux/notesSlice'
 import { setWindowWidth, toggleSidebar } from '../redux/uiSlice'
 import Alert from './Alert/Alert'
-import socket from "../redux/socket"
 import NoteCollaborators from "./NoteCollaborators"
 import NoteOption from "./NoteOption"
-import { useEditor, EditorContent } from '@tiptap/react'
-import StaterKit from '@tiptap/starter-kit'
+import DefaultEditor from './DefaultEditor'
+import SharedEditor from "./SharedEditor"
 
 
 const NoteEditor = ({ noteId, note, notes }) => {
     const dispatch = useDispatch()
-    const navigate = useNavigate()
-
-    const contentRef = useRef(null)
-    const debounceTimeoutRef = useRef(null)
-    const typingTimeoutRef = useRef(null)
 
     const [showAlert, setShowAlert] = useState(false)
     const [alertMessage, setAlertMessage] = useState("")
@@ -26,16 +19,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
 
     const errorMessage = useSelector((state) => state.notes.errorMessage)
 
-    const editor = useEditor({
-        extensions: [
-            StaterKit,
-        ],
-        content: note.content,
-        onUpdate: ({ editor }) => {
-            const updatedContent = editor.getHTML()
-            handleContentChange(updatedContent)
-        },
-    })     
+    const isShared = note?.collaborators?.length > 0
 
 
     useEffect(() => {
@@ -57,24 +41,6 @@ const NoteEditor = ({ noteId, note, notes }) => {
         }
     }, [dispatch, errorMessage])
 
-    useEffect(() => {
-        socket.on("typing", ({ userId, noteId }) => {
-            if (noteId === noteId) {  // Ensure the typing event is for the current note
-                setTypingUsers((prev) => [...prev, userId])
-            }
-        })
-
-        socket.on("stopTyping", ({ userId, noteId }) => {
-            if (noteId === noteId) {  // Ensure the stop typing event is for the current note
-                setTypingUsers((prev) => prev.filter((id) => id !== userId))
-            }
-        })
-
-        return () => {
-            socket.off("typing")
-            socket.off("stopTyping")
-        }
-    }, [noteId])
 
 
 const handleToggleSidebar = () => {
@@ -89,55 +55,6 @@ const handleImportance = () => {
 const handleTitleChange = (e) => {
     dispatch(updateNote({ id: noteId, changes: { title: e.target.value } }))
 }
-
-const handleContentChange = () => {
-    const updatedContent = contentRef.current.innerText
-    // Clear the previous debounce timer
-    if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current)
-    }
-
-    // Set a new debounce timer to save the content after the user stops typing
-    // this prevents the cursor jumping to the front of the content while typing
-    debounceTimeoutRef.current = setTimeout(() => {
-        dispatch(updateNote({ id: noteId, changes: { content: updatedContent } }))
-        socket.emit("noteUpdated", { id: noteId, changes: { content: updatedContent } })
-    }, 2000) // 5000ms debounce delay
-
-    // emit typing event
-    socket.emit("typing", { noteId, userId: note.userId })
-
-    // stop typing event after 2 seconds
-    clearTimeout(typingTimeoutRef.current)
-    typingTimeoutRef.current = setTimeout(() => {
-        socket.emit("stopTyping", { noteId, userId: note.userId })
-    }, 2000) // 2000ms delay
-}
-
-useEffect(() => {
-    socket.on("noteUpdated", (updatedNote) => {
-        if (updatedNote.id === noteId) {
-            dispatch(updateNote({ id: noteId, changes: { content: updatedNote.content } }))
-        }
-    }
-    )
-    return () => {
-        socket.off("noteUpdated")
-    }
-}, [dispatch, noteId])
-
-
-useEffect(() => {
-    const typingTimeout = setTimeout(() => {
-        socket.emit("stopTyping", { noteId, userId: note.userId })
-    }, 2000) // 2 seconds after the last typing event
-    return () => {
-        clearTimeout(typingTimeout)
-    }
-}, [noteId, note.userId])
-
-
-
 
 const handleCloseAlert = () => {
     setShowAlert(false)
@@ -178,7 +95,7 @@ return (
                     />
                 </div>
                 <div className="note-content-wrapper">
-                    <EditorContent editor={editor} className="note-content" />
+                    {isShared ? <DefaultEditor /> : <SharedEditor />}
                 </div>
             </div>
         </div>
