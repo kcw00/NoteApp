@@ -9,10 +9,11 @@ socket.on("connect", () => {
 })
 
 
-export const ySocket = ({ noteId }) => {
-    const socket = new WebSocket(`ws://localhost:3001/y-websocket/${noteId}`)
-    socket.onopen = () => {
-        console.log("Yjs WebSocket connected")
-    }
-}
+/*
+export const ySocket = new WebSocket('ws://localhost:3001/y-websocket')
 
+ySocket.on = ("connect", () => {
+    console.log("WebSocket connected")
+})
+
+*/

@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEditor, EditorContent } from '@tiptap/react'
-import { StarterKit } from '@tiptap/starter-kit'
-import { Placeholder } from '@tiptap/extension-placeholder'
+import { mainExtensions } from './Extension'
 import { updateNote } from '../redux/notesSlice'
 import { socket } from '../redux/socket'
 import MenuBar from './Menubar'
@@ -14,7 +13,6 @@ const DefaultEditor = () => {
     const noteId = useSelector(state => state.notes.activeNoteId)
     const note = useSelector(state => state.notes.entities[noteId])
 
-    setCurrentUser({ name: 'User', color: getRandomColor() })
 
     // Initialize socket.io connection
     const initializeSocketIo = () => {
@@ -28,13 +26,7 @@ const DefaultEditor = () => {
     }
 
     const editor = useEditor({
-        extensions: [
-            StarterKit.configure({ history: false }),
-            Placeholder.configure({
-                placeholder:
-                    'Write something … \n\n',
-            }),
-        ],
+        extensions: mainExtensions,
         content: note.content,
     })
 
@@ -46,7 +38,7 @@ const DefaultEditor = () => {
                 socket.off('noteUpdated')
             }
         }
-    }, [])
+    }, [noteId])
 
     const handleEditorUpdate = useCallback((content) => {
         dispatch(updateNote({
@@ -64,12 +56,12 @@ const DefaultEditor = () => {
                 editor.off('update', handleEditorUpdate)
             }
         }
-    }, [editor, handleEditorUpdate])
+    }, [editor])
 
     if (!editor) return null
 
     return (
-        <div className="column-half">
+        <div>
             <MenuBar editor={editor} />
             <EditorContent editor={editor} className="main-group" />
         </div>

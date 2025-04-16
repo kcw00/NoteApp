@@ -135,7 +135,11 @@ const notesSlice = createSlice({
             state.errorMessage = null
         },
         setActiveUsers: (state, action) => {
-            state.activeUsers = action.payload
+            if(action.payload === null) {
+                return
+            } else {
+                state.activeUsers = action.payload
+            }
         },
         setCollaborators: (state, action) => {
             const { noteId, collaborator } = action.payload
