@@ -51,7 +51,7 @@ const SharedEditor = () => {
 
 
     const getCollabToken = async () => {
-        const token = await axios.post('api/collab', {
+        const token = await axios.post('/api/collab', {
             noteId: noteId,
             userId: user.userId,
             permissions: (isType === 'viewer') ? 'read' : 'write'
