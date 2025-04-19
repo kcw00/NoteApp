@@ -11,4 +11,9 @@ const signup = async newObject => {
     return response.json
 }
 
-export default { login, signup }
+const collabToken = async collabObj => {
+    const response = await axios.post('/api/collab', collabObj)
+    return response.data
+}
+
+export default { login, signup, collabToken }

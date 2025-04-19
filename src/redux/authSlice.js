@@ -34,6 +34,15 @@ export const signUpUser = createAsyncThunk("auth/signUpUser", async (newUser, { 
     }
 })
 
+export const createCollabToken = createAsyncThunk("auth/createCollabToken", async (collabObj, { rejectWithValue }) => {
+    try {
+        const token = await authService.collabToken(collabObj)
+        return token
+    } catch (error) {
+        return rejectWithValue("Failed to create collaboration token")
+    }
+})
+
 const storedUser = window.localStorage.getItem("loggedNoteappUser")
 const parsedUser = storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null
 
@@ -43,6 +52,7 @@ const authSlice = createSlice({
         user: parsedUser,
         errorMessage: null,
         status: "idle",
+        collabToken: null,
     },
     reducers: {
     },
@@ -64,6 +74,13 @@ const authSlice = createSlice({
                 state.errorMessage = null
             })
             .addCase(signUpUser.rejected, (state, action) => {
+                state.errorMessage = action.payload
+            })
+            .addCase(createCollabToken.fulfilled, (state, action) => {
+                state.collabToken = action.payload.token
+                state.errorMessage = null
+            })
+            .addCase(createCollabToken.rejected, (state, action) => {
                 state.errorMessage = action.payload
             })
     },
