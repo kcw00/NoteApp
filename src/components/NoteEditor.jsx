@@ -5,8 +5,9 @@ import { setWindowWidth, toggleSidebar } from '../redux/uiSlice'
 import Alert from './Alert/Alert'
 import NoteCollaborators from "./NoteCollaborators"
 import NoteOption from "./NoteOption"
-import DefaultEditor from './DefaultEditor'
 import SharedEditor from "./SharedEditor"
+import DefaultEditor from "./DefaultEditor"
+
 
 
 const NoteEditor = ({ noteId, note, notes }) => {
@@ -19,7 +20,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
 
     const errorMessage = useSelector((state) => state.notes.errorMessage)
 
-    const isShared = note?.collaborators?.length > 0
+    const isShared = note?.collaborators && note?.collaborators.length > 0
 
 
     useEffect(() => {
@@ -39,7 +40,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
         return () => {
             window.removeEventListener('resize', handleResize)
         }
-    }, [dispatch, errorMessage])
+    }, [windowWidth, errorMessage])
 
 
 
@@ -95,7 +96,9 @@ const NoteEditor = ({ noteId, note, notes }) => {
                         />
                     </div>
                     <div className="note-content-wrapper">
-                        <SharedEditor />
+                        {isShared ? (<SharedEditor noteId={noteId} note={note} />) : (
+                            <DefaultEditor noteId={noteId} note={note} />
+                        )}
                     </div>
                 </div>
             </div>

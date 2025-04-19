@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { socket } from "../redux/socket"
-
+import { createCollabToken } from "../redux/authSlice"
 import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes, noteDeletedRealtime, setCollaborators } from "../redux/notesSlice"
 import notesService from "../services/notes"
 import NoteEditor from "./NoteEditor"
@@ -21,6 +21,9 @@ const Notes = () => {
     const note = useSelector(state => state.notes.entities[activeNoteId])
     const user = useSelector(state => state.auth.user)
 
+    const isType = note?.collaborators ? note?.collaborators.find(collab => collab?.userId === user?.userId)?.userType : "editor"
+
+
 
 
     console.log("Component re-rendered") // check when component is re-rendered
@@ -28,10 +31,22 @@ const Notes = () => {
     console.log('notes length:', notesArray.length)
     console.log('Active Note:', note)
 
+    useEffect(() => {
+        console.log("active note Id useEffect called")
+        // Set the active note (if none exists)
+        if (!activeNoteId) {
+            const noteToSet = notesArray[notesArray.length - 1] // Use the last fetched note
+            if (noteToSet) {
+                dispatch(setActiveNote(noteToSet?.id)) // Set active note
+                console.log('Setting active note to:', noteToSet?.id)
+            }
+        }
+    }, [notesArray])
+
 
 
     useEffect(() => {
-        console.log("useEffect called")
+        console.log("main useEffect called")
 
         // Avoid running the effect if the user is not authenticated
         if (!user?.token || !user?.userId) return
@@ -46,41 +61,44 @@ const Notes = () => {
 
             // Fetch shared notes and regular notes concurrently
             const fetchNotesData = async () => {
-                // Fetch regular notes
-                const fetchedNotesResult = await dispatch(fetchNotes(user.userId))
-                const fetchedNotes = fetchedNotesResult.payload
-                if (fetchedNotes.length === 0) {
-                    // Add a new empty note if no notes exist
-                    dispatch(addNote({
-                        title: '',
-                        content: '',
-                        creator: user.userId,
-                        collaborators: {},
-                        important: false,
-                    }))
-                    console.log('Adding new empty note')
-                }
-
-                // Fetch shared notes
-                const sharedNotesResult = await dispatch(fetchSharedNotes(user.userId))
-                const sharedNotes = sharedNotesResult.payload
-                console.log('Shared notes:', sharedNotes)
-
-                // Update shared notes only if there are any
-                if (sharedNotes.length > 0) {
-                    dispatch(setSharedNotes(sharedNotes))
-                    console.log('notes after setting shared notes:', notes)
-                }
-
-                // Set the active note (if none exists)
-                if (!activeNoteId) {
-                    const noteToSet = fetchedNotes[fetchedNotes.length - 1] // Use the last fetched note
-                    if (noteToSet) {
-                        dispatch(setActiveNote(noteToSet.id)) // Set active note
-                        console.log('Setting active note to:', noteToSet)
+                try {                // Fetch regular notes
+                    const fetchedNotesResult = await dispatch(fetchNotes(user.userId))
+                    const fetchedNotes = fetchedNotesResult.payload
+                    console.log('Fetched notes:', fetchedNotes)
+                    if (fetchedNotes.length === 0) {
+                        // Add a new empty note if no notes exist
+                        dispatch(addNote({
+                            title: '',
+                            content: '',
+                            creator: user?.userId,
+                            collaborators: {},
+                            important: false,
+                        }))
+                        console.log('Adding new empty note')
                     }
+
+
+                    // Fetch shared notes
+                    const sharedNotesResult = await dispatch(fetchSharedNotes(user?.userId))
+                    const sharedNotes = sharedNotesResult.payload
+                    console.log('Shared notes:', sharedNotes)
+
+                    // Update shared notes only if there are any
+                    if (sharedNotes.length > 0) {
+                        dispatch(setSharedNotes(sharedNotes))
+                        console.log('notes after setting shared notes:', notes)
+                    } else {
+                        console.log('No shared notes found')
+                        dispatch(setSharedNotes([])) // Clear shared notes if none found
+                    }
+                } catch (error) {
+                    console.error('Error fetching notes:', error)
+                } finally {
+                    // Set loading to false after fetching
+                    setLoading(false)
                 }
-                setLoading(false)
+                
+           
             }
 
             fetchNotesData()
@@ -112,7 +130,18 @@ const Notes = () => {
         }
 
 
-    }, [user?.token, user?.userId, notesArray, activeNoteId])
+    }, [notesArray, activeNoteId, user, loading])
+
+    useEffect(() => {
+        console.log('collab useEffect called')
+
+        if (activeNoteId) {// set collab token
+        dispatch(createCollabToken({
+            noteId: activeNoteId,
+            userId: user?.userId,
+            permissions: isType === 'viewer' ? 'read' : 'write',
+        }))}
+    }, [activeNoteId, user?.userId])
 
     if (loading) {
         return <div>Loading...</div> // Display loading state until data is fetched
@@ -123,7 +152,7 @@ const Notes = () => {
         <div id="notes-app">
             <Sidebar />
             {note ? (
-                <NoteEditor key={note.id} noteId={note.id} note={note} notes={notesArray} />
+                <NoteEditor key={activeNoteId} noteId={activeNoteId} note={note} notes={notesArray} />
             ) : (
                 <NoteEditor key="null" noteId="null" note="null" notes="null" />
             )}

@@ -4,13 +4,10 @@ import Notes from './components/Notes'
 import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
 import Home from './components/Home'
-import { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 
 
 
 const App = () => {
-  const dispatch = useDispatch()
   const loggedIn = useSelector(state => Boolean(state.auth.user?.userId))
   const theme = useSelector((state) => state.ui.mode)
 

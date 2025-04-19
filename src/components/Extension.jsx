@@ -19,7 +19,7 @@ export const mainExtensions = [
     }),
 ]
 
-export const collabExtensions = ({provider, user}) => [
+export const collabExtensions = ({ provider, user }) => [
     Collaboration.extend().configure({ document: provider.document }),
     CollaborationCursor.extend().configure({
         provider,

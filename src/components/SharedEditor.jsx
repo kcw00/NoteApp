@@ -1,20 +1,13 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEditor, EditorContent, EditorProvider } from '@tiptap/react'
-
 import * as Y from 'yjs'
-import { WebsocketProvider } from 'y-websocket'
 import { HocuspocusProvider, WebSocketStatus } from '@hocuspocus/provider'
 import { updateNote } from '../redux/notesSlice'
 // import { ySocket } from '../redux/socket'
 import MenuBar from './Menubar'
-import * as awarenessProtocol from 'y-protocols/awareness'
-import { setActiveUsers } from '../redux/notesSlice'
-import { useAtom, atom } from 'jotai'
-import { useLayoutEffect } from 'react'
 import { collabExtensions, mainExtensions } from './Extension'
-import { IndexeddbPersistence } from 'y-indexeddb'
-import axios from 'axios'
+
 
 // Define the colors for cursor display
 const colors = [
@@ -29,15 +22,16 @@ const getRandomElement = list => list[Math.floor(Math.random() * list.length)]
 const getRandomColor = () => getRandomElement(colors)
 
 
-const SharedEditor = () => {
+const SharedEditor = ({ noteId, note }) => {
     const dispatch = useDispatch()
 
-    const noteId = useSelector(state => state.notes.activeNoteId)
-    console.log('NOTE ID from sharedEditor: ', noteId)
-    const note = useSelector(state => state.notes.entities[noteId])
+    // const noteId = useSelector(state => state.notes.activeNoteId)
+    // console.log('NOTE ID from sharedEditor: ', noteId)
+    // const note = useSelector(state => state.notes.entities[noteId])
     const activeUsers = useSelector(state => state.notes.activeUsers)
     const user = useSelector(state => state.auth.user)
-    const isType = note.collaborators.find(collab => collab.userId === user.userId)?.userType
+    const collabToken = useSelector(state => state.auth.collabToken)
+
 
 
     const getRandomName = () => getRandomElement(activeUsers)
@@ -50,106 +44,52 @@ const SharedEditor = () => {
     }
 
 
-    const getCollabToken = async () => {
-        const token = await axios.post('/api/collab', {
-            noteId: noteId,
-            userId: user.userId,
-            permissions: (isType === 'viewer') ? 'read' : 'write'
-        })
-
-        setToken(token.data.token)
-        return token.data.token
-    }
-
-    const [token, setToken] = useState(getCollabToken())
-    console.log('Token: ', token)
-
-    const yjsConnectionStatusAtom = atom('')
-
     const ydoc = useMemo(() => new Y.Doc(), [noteId])
     const [currentUser, setCurrentUser] = useState(getInitialUser)
-    const [isLocalSynced, setLocalSynced] = useState(false)
-    const [isRemoteSynced, setRemoteSynced] = useState(false)
-    const [yjsConnectionStatus, setYjsConnectionStatus] = useAtom(yjsConnectionStatusAtom)
+    const [status, setStatus] = useState('connecting')
+    const [isSynced, setSynced] = useState(false)
     const [isCollabReady, setIsCollabReady] = useState(false)
 
 
-    const localProvider = useMemo(() => {
-        const provider = new IndexeddbPersistence(noteId, ydoc);
-
-        provider.on("synced", () => {
-            setLocalSynced(true);
-        });
-
-        return provider;
-    }, [noteId, ydoc]);
 
 
-    const remoteProvider = useMemo(() => {
-        const provider = new HocuspocusProvider({
-            url: 'ws://localhost:1234',
-            name: noteId,
-            document: ydoc,
-            token: token,
-            awareness: new awarenessProtocol.Awareness(ydoc),
-            connect: false,
-            preserveConnection: false,
-            onStatus: (status) => {
-                if (status.status === 'connected')
-                    setYjsConnectionStatus(status.status)
+    const provider = new HocuspocusProvider({
+        url: 'ws://localhost:1234',
+        name: noteId,
+        document: ydoc,
+        token: collabToken,
+        connect: false,
+        preserveConnection: false,
+        onAuthenticationFailed: (error) => {
+            console.error('Authentication failed:', error)
+        },
+        onStatus: (status) => {
+            if (status === "connected") {
+                console.log('Connected to provider')
+            } else if (status === "connecting") {
+                console.log('Connecting to provider')
             }
-        })
-        provider.on('synced', () => {
-            setRemoteSynced(true)
-        })
-        provider.on('disconnect', () => {
-            setYjsConnectionStatus(WebSocketStatus.Disconnected)
-        })
-
-        return provider
-    }, [noteId, ydoc, token])
-
-    useLayoutEffect(() => {
-        console.log('useLayoutEffect called')
-        remoteProvider.connect()
-
-        return () => {
-            setRemoteSynced(false)
-            setLocalSynced(false)
-            remoteProvider.destroy()
-            localProvider.destroy()
         }
-    }, [remoteProvider, localProvider])
+    })
 
-    /*
-    const awareness = remoteProvider.awareness
-    awareness.setLocalStateField('user', {
-        name: currentUser.name,
-        color: currentUser.color,
+    provider.on('synced', () => {
+        console.log('Synced with remote provider')
+        setSynced(true)
     })
-    awareness.on('update', () => {
-        const states = awareness.getStates()
-        const users = Object.values(states).map((state) => {
-            const user = state.user
-            return {
-                name: user.name,
-                color: user.color,
-            }
-        })
-        dispatch(setActiveUsers(users))
-    })
-        */
+
+    provider.connect()
+
 
     const extensions = useMemo(() => {
         return [
             ...mainExtensions,
             ...collabExtensions({
-                provider: remoteProvider,
+                provider: provider,
                 user: currentUser,
             })
         ]
 
-    }, [ydoc, noteId, remoteProvider, currentUser])
+    }, [ydoc, noteId, provider, currentUser])
 
 
     const editor = useEditor({
@@ -167,24 +107,13 @@ const SharedEditor = () => {
             }
         },
         onUpdate: async ({ editor }) => {
-            if (editor.isEmpty) return;
+            if (editor.isEmpty) return
             const editorContent = editor.getJSON()
             debouncedUpdateContent(editorContent)
         }
     })
 
 
-    useEffect(() => {
-        console.log('useEffect1 called')
-        if (remoteProvider?.status === WebSocketStatus.Connecting) {
-            const timeout = setTimeout(() => {
-                setYjsConnectionStatus(WebSocketStatus.Disconnected);
-            }, 5000);
-            return () => clearTimeout(timeout);
-        }
-    }, [remoteProvider.status]);
-
-    const isSynced = isLocalSynced && isRemoteSynced;
 
     useEffect(() => {
         console.log('useEffect2 called')
@@ -192,33 +121,33 @@ const SharedEditor = () => {
             if (
                 !isCollabReady &&
                 isSynced &&
-                remoteProvider?.status === WebSocketStatus.Connected
+                provider?.status === 'connected' && 'connecting'
             ) {
-                setIsCollabReady(true);
+                setIsCollabReady(true)
             }
-        }, 5000);
-        return () => clearTimeout(collabReadyTimeout);
-    }, [isLocalSynced, isRemoteSynced, remoteProvider?.status, isCollabReady]);
+        }, 500)
+        return () => clearTimeout(collabReadyTimeout)
+    }, [ provider?.status])
 
 
     const debouncedUpdateContent = useCallback((content) => {
-        if (!editor) return;
+        if (!editor) return
 
         // If the content is synced, we proceed with the timeout logic.
         if (isSynced) {
             // Clear any previous timeouts to prevent redundant API calls.
-            clearTimeout(debouncedUpdateContent.timeout);
+            clearTimeout(debouncedUpdateContent.timeout)
 
             // Set a new timeout for saving content (e.g., 3000 ms = 3 seconds).
             debouncedUpdateContent.timeout = setTimeout(() => {
                 dispatch(updateNote({
                     id: noteId,
                     changes: { content }
-                }));
-                console.log('Shared note content saved:', content);
-            }, 3000);  // Timeout set to 3 seconds
+                }))
+                console.log('Shared note content saved:', content)
+            }, 3000)  // Timeout set to 3 seconds
         }
-    }, [editor, isLocalSynced, isRemoteSynced, noteId]);
+    }, [editor, isSynced, noteId])
 
 
     return (
@@ -226,7 +155,8 @@ const SharedEditor = () => {
             <MenuBar editor={editor} />
             <EditorContent editor={editor} className="main-group" />
         </div>) : (<div>
-            <EditorProvider extensions={mainExtensions} content={note?.content} className="main-group"></EditorProvider>
+            <p>loadding...</p>
+            <p>Remote provider status: {provider?.status}</p>
         </div>)
     )
 }
