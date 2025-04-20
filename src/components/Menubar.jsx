@@ -102,12 +102,6 @@ const MenuBar = ({ editor }) => {
                 >
                     Blockquote
                 </button>
-                <button onClick={() => editor.chain().focus().undo().run()}>
-                    Undo
-                </button>
-                <button onClick={() => editor.chain().focus().redo().run()}>
-                    Redo
-                </button>
             </div>
         </div>
     )

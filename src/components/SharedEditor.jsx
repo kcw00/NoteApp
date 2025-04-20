@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEditor, EditorContent, EditorProvider } from '@tiptap/react'
 import * as Y from 'yjs'
-import { HocuspocusProvider, WebSocketStatus } from '@hocuspocus/provider'
+import { HocuspocusProvider } from '@hocuspocus/provider'
 import { updateNote } from '../redux/notesSlice'
 // import { ySocket } from '../redux/socket'
 import MenuBar from './Menubar'
@@ -66,8 +66,6 @@ const SharedEditor = ({ noteId, note }) => {
         onStatus: (status) => {
             if (status === "connected") {
                 console.log('Connected to provider')
-            } else if (status === "connecting") {
-                console.log('Connecting to provider')
             }
         }
     })
@@ -77,7 +75,19 @@ const SharedEditor = ({ noteId, note }) => {
         setSynced(true)
     })
 
-    provider.connect()
+
+    console.log('Provider:', provider)
+
+    useEffect(() => {
+
+        provider.connect()
+        console.log('Provider connected:', provider)
+        return () => {
+            provider.destroy()
+            console.log('Provider disconnected:', provider)
+        }
+    }, [provider, noteId])
+
 
 
     const extensions = useMemo(() => {
@@ -121,7 +131,7 @@ const SharedEditor = ({ noteId, note }) => {
             if (
                 !isCollabReady &&
                 isSynced &&
-                provider?.status === 'connected' && 'connecting'
+                provider?.status === 'connected' || 'connecting'
             ) {
                 setIsCollabReady(true)
             }
@@ -145,7 +155,7 @@ const SharedEditor = ({ noteId, note }) => {
                     changes: { content }
                 }))
                 console.log('Shared note content saved:', content)
-            }, 3000)  // Timeout set to 3 seconds
+            }, 300)  // Timeout set to 3 seconds
         }
     }, [editor, isSynced, noteId])
 
