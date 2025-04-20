@@ -18,7 +18,7 @@ const DefaultEditor = ({ noteId, note }) => {
 
 
     const collabToken = useSelector(state => state.auth.collabToken)
-    
+
 
 
     const ydoc = useMemo(() => new Y.Doc(), [noteId])
@@ -48,8 +48,14 @@ const DefaultEditor = ({ noteId, note }) => {
         setSynced(true)
     })
 
-    provider.connect()
-
+    useEffect(() => {
+        provider.connect()
+        console.log('Provider connected:', provider)
+        return () => {
+            provider.destroy()
+            console.log('Provider disconnected:', provider)
+        }
+    }, [provider, noteId])
 
     const unsharedEditor = useEditor({
         extensions: mainExtensions,
@@ -86,13 +92,13 @@ const DefaultEditor = ({ noteId, note }) => {
                     changes: { content }
                 }))
                 console.log('Shared note content saved:', content)
-            }, 3000)  // Timeout set to 3 seconds
+            }, 300)  // Timeout set to 3 seconds
         }
-    }, [unsharedEditor, noteId])
+    }, [unsharedEditor, noteId, isSynced])
 
 
     return (
-       <div>
+        <div>
             <MenuBar editor={unsharedEditor} />
             <EditorContent editor={unsharedEditor} className="main-group" />
         </div>

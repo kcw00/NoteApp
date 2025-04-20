@@ -30,6 +30,7 @@ function NoteCollaborators() {
         axios.get('/api/users')
             .then((response) => {
                 setUsers(response.data)
+                console.log('Fetched users:', response.data)
             })
             .catch((error) => {
                 console.error('Error fetching users:', error)
