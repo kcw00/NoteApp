@@ -29,12 +29,13 @@ const SharedEditor = ({ noteId, note }) => {
     // console.log('NOTE ID from sharedEditor: ', noteId)
     // const note = useSelector(state => state.notes.entities[noteId])
     const activeUsers = useSelector(state => state.notes.activeUsers)
+    const activeUsersNames = activeUsers.map(user => user.username)
     const user = useSelector(state => state.auth.user)
     const collabToken = useSelector(state => state.auth.collabToken)
 
+    const timeoutRef = useRef(null)
 
-
-    const getRandomName = () => getRandomElement(activeUsers)
+    const getRandomName = () => getRandomElement(activeUsersNames)
 
     const getInitialUser = () => {
         return {
@@ -53,22 +54,26 @@ const SharedEditor = ({ noteId, note }) => {
 
 
 
-    const provider = new HocuspocusProvider({
-        url: 'ws://localhost:1234',
-        name: noteId,
-        document: ydoc,
-        token: collabToken,
-        connect: false,
-        preserveConnection: false,
-        onAuthenticationFailed: (error) => {
-            console.error('Authentication failed:', error)
-        },
-        onStatus: (status) => {
-            if (status === "connected") {
-                console.log('Connected to provider')
-            }
-        }
-    })
+    const provider = useMemo(() => {
+        if (!collabToken) return null
+
+        return new HocuspocusProvider({
+            url: 'ws://localhost:1234',
+            name: noteId,
+            document: ydoc,
+            token: collabToken,
+            connect: false,
+            preserveConnection: false,
+            onAuthenticationFailed: (error) => {
+                console.error('Authentication failed:', error)
+            },
+            onStatus: (status) => {
+                if (status === "connected") {
+                    console.log('Connected to provider')
+                }
+            },
+        })
+    }, [collabToken, noteId, ydoc])
 
     provider.on('synced', () => {
         console.log('Synced with remote provider')
@@ -76,17 +81,15 @@ const SharedEditor = ({ noteId, note }) => {
     })
 
 
-    console.log('Provider:', provider)
-
     useEffect(() => {
-
+        if (!provider || !collabToken) return
         provider.connect()
         console.log('Provider connected:', provider)
         return () => {
             provider.destroy()
             console.log('Provider disconnected:', provider)
         }
-    }, [provider, noteId])
+    }, [provider, collabToken])
 
 
 
@@ -95,11 +98,14 @@ const SharedEditor = ({ noteId, note }) => {
             ...mainExtensions,
             ...collabExtensions({
                 provider: provider,
-                user: currentUser,
+                user: {
+                    name: currentUser.name,
+                    color: currentUser.color,
+                },
             })
         ]
 
-    }, [ydoc, noteId, provider, currentUser])
+    }, [provider, currentUser])
 
 
     const editor = useEditor({
@@ -109,17 +115,21 @@ const SharedEditor = ({ noteId, note }) => {
         },
         immediatelyRender: true,
         shouldRerenderOnTransaction: true,
-        extensions: extensions,
+        extensions,
         onCreate: ({ editor }) => {
-            if (editor) {
-                editor.commands.setContent(note.content)
+            const xml = ydoc.getXmlFragment('default')
+
+            // Don't apply note.content if Yjs document already has synced data
+            if (editor && xml.length === 0) {
+                editor.commands.setContent(note.content.default)
                 editor.storage.noteId = noteId
             }
         },
         onUpdate: async ({ editor }) => {
             if (editor.isEmpty) return
             const editorContent = editor.getJSON()
-            debouncedUpdateContent(editorContent)
+            console.log('Editor content:', editorContent)
+            //debouncedUpdateContent(editorContent)
         }
     })
 
@@ -131,33 +141,34 @@ const SharedEditor = ({ noteId, note }) => {
             if (
                 !isCollabReady &&
                 isSynced &&
-                provider?.status === 'connected' || 'connecting'
+                provider?.status === 'connected' ||
+                provider?.status === 'connecting'
             ) {
                 setIsCollabReady(true)
             }
         }, 500)
         return () => clearTimeout(collabReadyTimeout)
-    }, [ provider?.status])
+    }, [provider?.status])
 
 
-    const debouncedUpdateContent = useCallback((content) => {
-        if (!editor) return
+    // const debouncedUpdateContent = useCallback((content) => {
+    //     if (!editor || !isSynced) return
 
-        // If the content is synced, we proceed with the timeout logic.
-        if (isSynced) {
-            // Clear any previous timeouts to prevent redundant API calls.
-            clearTimeout(debouncedUpdateContent.timeout)
 
-            // Set a new timeout for saving content (e.g., 3000 ms = 3 seconds).
-            debouncedUpdateContent.timeout = setTimeout(() => {
-                dispatch(updateNote({
-                    id: noteId,
-                    changes: { content }
-                }))
-                console.log('Shared note content saved:', content)
-            }, 300)  // Timeout set to 3 seconds
-        }
-    }, [editor, isSynced, noteId])
+    //     // Clear the last timeout if one exists
+    //     if (timeoutRef.current) {
+    //         clearTimeout(timeoutRef.current)
+    //     }
+
+    //     // Set a new timeout
+    //     timeoutRef.current = setTimeout(() => {
+    //         dispatch(updateNote({
+    //             id: noteId,
+    //             changes: { content }
+    //         }))
+    //         console.log('Shared note content saved:', content)
+    //     }, 300)
+    // }, [editor, noteId, ydoc])
 
 
     return (

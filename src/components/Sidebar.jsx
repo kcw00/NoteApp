@@ -73,7 +73,17 @@ const Sidebar = () => {
         const newNote = {
             id: Math.floor(Math.random() * 1000000),
             title: "",
-            content: "",
+            content: {
+                default: {
+                    type: 'doc',
+                    content: [
+                        {
+                            type: 'paragraph',
+                            content: [{ type: 'text', text: 'create your notes' }],
+                        },
+                    ],
+                }
+            },
             important: false,
             creator: user.userId,
             collaborators: {},
@@ -159,7 +169,7 @@ const Sidebar = () => {
                         className="btn btn-outline-danger"
                         to="/"
                         role="button"
-                        onClick={() => dispatch(logoutUser({userId: user.userId}))}>
+                        onClick={() => dispatch(logoutUser({ userId: user.userId }))}>
                         Sign out
                     </Link>
                 </div>

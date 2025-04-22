@@ -53,54 +53,58 @@ const Notes = () => {
 
         console.log('Fetching notes...')
 
-        // Only fetch notes if the notesArray is empty
-        if (notesArray.length === 0) {
-            notesService.setToken(user.token)
 
-            console.log('Logged user:', user)
-
-            // Fetch shared notes and regular notes concurrently
-            const fetchNotesData = async () => {
-                try {                // Fetch regular notes
-                    const fetchedNotesResult = await dispatch(fetchNotes(user.userId))
-                    const fetchedNotes = fetchedNotesResult.payload
-                    console.log('Fetched notes:', fetchedNotes)
-                    if (fetchedNotes.length === 0) {
-                        // Add a new empty note if no notes exist
-                        dispatch(addNote({
-                            title: '',
-                            content: '',
-                            creator: user?.userId,
-                            collaborators: {},
-                            important: false,
-                        }))
-                        console.log('Adding new empty note')
-                    }
-
-
-                    // Fetch shared notes
-                    const sharedNotesResult = await dispatch(fetchSharedNotes(user?.userId))
-                    const sharedNotes = sharedNotesResult.payload
-                    console.log('Shared notes:', sharedNotes)
-
-                    // Update shared notes only if there are any
-                    if (sharedNotes.length > 0) {
-                        dispatch(setSharedNotes(sharedNotes))
-                        console.log('notes after setting shared notes:', notes)
-                    } else {
-                        console.log('No shared notes found')
-                        dispatch(setSharedNotes([])) // Clear shared notes if none found
-                    }
-                } catch (error) {
-                    console.error('Error fetching notes:', error)
-                } finally {
-                    // Set loading to false after fetching
-                    setLoading(false)
+        // Fetch shared notes and regular notes concurrently
+        const fetchNotesData = async () => {
+            try {                // Fetch regular notes
+                notesService.setToken(user.token)
+                const fetchedNotesResult = await dispatch(fetchNotes(user.userId))
+                const fetchedNotes = fetchedNotesResult.payload
+                console.log('Fetched notes:', fetchedNotes)
+                if (fetchedNotes.length === 0) {
+                    // Add a new empty note if no notes exist
+                    await dispatch(addNote({
+                        title: '',
+                        content: {
+                            default: {
+                                type: 'doc',
+                                content: [
+                                    {
+                                        type: 'paragraph',
+                                        content: [{ type: 'text', text: 'create your notes' }],
+                                    },
+                                ],
+                            }
+                        },
+                        creator: user?.userId,
+                        collaborators: [],
+                        important: false,
+                    }))
+                    console.log('Adding new empty note')
                 }
-                
-           
+
+
+                // Fetch shared notes
+                const sharedNotesResult = await dispatch(fetchSharedNotes(user?.userId))
+                const sharedNotes = sharedNotesResult.payload || []
+
+                console.log('Shared notes:', sharedNotes)
+
+
+                dispatch(setSharedNotes(sharedNotes))
+                console.log('notes after setting shared notes:', notes)
+
+
+            } catch (error) {
+                console.error('Error fetching notes:', error)
+            } finally {
+                // Set loading to false after fetching
+                setLoading(false)
             }
 
+
+        }
+        if (user?.token && user?.userId) {
             fetchNotesData()
 
             // Set up socket listeners only once
@@ -124,23 +128,28 @@ const Notes = () => {
                 console.log('socket listen ----- Note shared:', data)
                 dispatch(setSharedNotes(data))
             })
-        } else if (activeNoteId && !notesArray.some(note => note?.id === activeNoteId)) {
-            // If active note is not found, default to the last note
-            dispatch(setActiveNote(notesArray[notesArray.length - 1]?.id))
         }
 
 
-    }, [notesArray, activeNoteId, user, loading])
+    }, [user])
+
+    useEffect(() => {
+        if (activeNoteId && !notesArray.some(note => note?.id === activeNoteId)) {
+            // If active note is not found, default to the last note
+            dispatch(setActiveNote(notesArray[notesArray.length - 1]?.id))
+        }
+    }, [activeNoteId, notesArray])
 
     useEffect(() => {
         console.log('collab useEffect called')
 
         if (activeNoteId) {// set collab token
-        dispatch(createCollabToken({
-            noteId: activeNoteId,
-            userId: user?.userId,
-            permissions: isType === 'viewer' ? 'read' : 'write',
-        }))}
+            dispatch(createCollabToken({
+                noteId: activeNoteId,
+                userId: user?.userId,
+                permissions: isType === 'viewer' ? 'read' : 'write',
+            }))
+        }
     }, [activeNoteId, user?.userId])
 
     if (loading) {
