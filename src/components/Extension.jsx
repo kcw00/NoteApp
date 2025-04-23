@@ -19,13 +19,13 @@ export const mainExtensions = [
     }),
 ]
 
-export const collabExtensions = ({ provider, user }) => [
-    Collaboration.extend().configure({ document: provider.document }),
+export const collabExtensions = ({ hocuspocusProvider, currentUser }) => [
+    Collaboration.extend().configure({ document: hocuspocusProvider.document }),
     CollaborationCursor.extend().configure({
-        provider,
+        provider: hocuspocusProvider,
         user: {
-            name: user.name,
-            color: user.color,
+            name: currentUser.name,
+            color: currentUser.color,
         }
     })
 ]
