@@ -6,7 +6,11 @@ import { HocuspocusProvider } from '@hocuspocus/provider'
 import { updateNote } from '../redux/notesSlice'
 // import { ySocket } from '../redux/socket'
 import MenuBar from './Menubar'
-import { collabExtensions, mainExtensions } from './Extension'
+import { mainExtensions } from './Extension'
+import { Collaboration } from '@tiptap/extension-collaboration'
+import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'
+import { TiptapTransformer } from '@hocuspocus/transformer'
+import { useLayoutEffect } from 'react'
 
 
 // Define the colors for cursor display
@@ -32,32 +36,27 @@ const SharedEditor = ({ noteId, note }) => {
     const activeUsersNames = activeUsers.map(user => user.username)
     const user = useSelector(state => state.auth.user)
     const collabToken = useSelector(state => state.auth.collabToken)
+    // console.log('[SharedEditor]collabToken:', collabToken)
 
     const timeoutRef = useRef(null)
 
-    const getRandomName = () => getRandomElement(activeUsersNames)
-
-    const getInitialUser = () => {
-        return {
-            name: getRandomName(),
-            color: getRandomColor(),
-        }
-    }
+    const currentUser = useMemo(() => ({
+        name: user?.username || "Anonymous",
+        color: getRandomColor()
+    }), [user])
 
 
     const ydoc = useMemo(() => new Y.Doc(), [noteId])
-    const [currentUser, setCurrentUser] = useState(getInitialUser)
-    const [status, setStatus] = useState('connecting')
+
     const [isSynced, setSynced] = useState(false)
     const [isCollabReady, setIsCollabReady] = useState(false)
-
-
+    const [editorInstance, setEditorInstance] = useState(null)
 
 
     const provider = useMemo(() => {
-        if (!collabToken) return null
+        if (!collabToken || !noteId) return
 
-        return new HocuspocusProvider({
+        const p = new HocuspocusProvider({
             url: 'ws://localhost:1234',
             name: noteId,
             document: ydoc,
@@ -69,43 +68,62 @@ const SharedEditor = ({ noteId, note }) => {
             },
             onStatus: (status) => {
                 if (status === "connected") {
-                    console.log('Connected to provider')
+                    console.log('[Hocuspocus] Connected')
                 }
             },
         })
-    }, [collabToken, noteId, ydoc])
 
-    provider.on('synced', () => {
-        console.log('Synced with remote provider')
-        setSynced(true)
-    })
+        p.on('synced', () => {
+            console.log('[Hocuspocus] Synced')
+            setSynced(true)
+            
+            const xml = ydoc.getXmlFragment('default')
+            const isEmpty = xml.toString().trim() === ''
+            if (isEmpty && editorInstance && note?.content?.default) {
+                const hydratedDoc = TiptapTransformer.toYdoc(note.content.default, 'default')
+                const update = Y.encodeStateAsUpdate(hydratedDoc)
+                Y.applyUpdate(ydoc, update)
+                console.log('[SharedEditor] Injected note content into Yjs')
+            }
+            
 
+        })
 
-    useEffect(() => {
-        if (!provider || !collabToken) return
+        return p
+    }, [collabToken, noteId])
+
+    useLayoutEffect(() => {
         provider.connect()
-        console.log('Provider connected:', provider)
+        provider.on('connect', () => {
+            console.log('[SharedProvider] Connected')
+            setSynced(true)
+        })
         return () => {
+            setSynced(false)
             provider.destroy()
-            console.log('Provider disconnected:', provider)
         }
-    }, [provider, collabToken])
-
-
+    }, [provider])
 
     const extensions = useMemo(() => {
+        if (!provider || !isSynced) {
+            console.log(`[SharedEditor] Provider ${provider.status}`, isSynced)
+            console.log('[SharedEditor] provider:', provider)
+            return [...mainExtensions, Collaboration.configure({ document: ydoc })]
+        }
+
         return [
             ...mainExtensions,
-            ...collabExtensions({
-                provider: provider,
+            Collaboration.configure({ document: ydoc }),
+            CollaborationCursor.configure({
+                provider,
                 user: {
                     name: currentUser.name,
                     color: currentUser.color,
                 },
-            })
+            }),
         ]
+    }, [provider, currentUser, ydoc, noteId])
 
-    }, [provider, currentUser])
 
 
     const editor = useEditor({
@@ -116,22 +134,30 @@ const SharedEditor = ({ noteId, note }) => {
         immediatelyRender: true,
         shouldRerenderOnTransaction: true,
         extensions,
+        autofocus: true,
         onCreate: ({ editor }) => {
-            const xml = ydoc.getXmlFragment('default')
-
-            // Don't apply note.content if Yjs document already has synced data
-            if (editor && xml.length === 0) {
-                editor.commands.setContent(note.content.default)
-                editor.storage.noteId = noteId
-            }
+            console.log('[Shared Editor] Created')
+            setEditorInstance(editor)
         },
         onUpdate: async ({ editor }) => {
             if (editor.isEmpty) return
             const editorContent = editor.getJSON()
-            console.log('Editor content:', editorContent)
+            console.log('[Shared Editor] JSON update:', editorContent)
+            console.log('[Shared Editor] is synced:', isSynced)
+            console.log('[Shared Editor] Yjs XML:', ydoc.getXmlFragment('default').toString())
             //debouncedUpdateContent(editorContent)
         }
     })
+
+    useEffect(() => {
+        if (provider) {
+            const interval = setInterval(() => {
+                console.log('[Manual Save] Calling provider.storeDocument()')
+                provider.storeDocument?.()
+            }, 5000)
+            return () => clearInterval(interval)
+        }
+    }, [provider])
 
 
 
@@ -148,27 +174,7 @@ const SharedEditor = ({ noteId, note }) => {
             }
         }, 500)
         return () => clearTimeout(collabReadyTimeout)
-    }, [provider?.status])
-
-
-    // const debouncedUpdateContent = useCallback((content) => {
-    //     if (!editor || !isSynced) return
-
-
-    //     // Clear the last timeout if one exists
-    //     if (timeoutRef.current) {
-    //         clearTimeout(timeoutRef.current)
-    //     }
-
-    //     // Set a new timeout
-    //     timeoutRef.current = setTimeout(() => {
-    //         dispatch(updateNote({
-    //             id: noteId,
-    //             changes: { content }
-    //         }))
-    //         console.log('Shared note content saved:', content)
-    //     }, 300)
-    // }, [editor, noteId, ydoc])
+    }, [provider?.status, provider])
 
 
     return (
