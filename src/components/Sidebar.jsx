@@ -71,7 +71,6 @@ const Sidebar = () => {
 
     const handleAddNote = () => {
         const newNote = {
-            id: Math.floor(Math.random() * 1000000),
             title: "",
             content: {
                 default: {
@@ -86,7 +85,7 @@ const Sidebar = () => {
             },
             important: false,
             creator: user.userId,
-            collaborators: {},
+            collaborators: [],
         }
         dispatch(addNote(newNote))
         dispatch(setActiveNote(newNote.id))
