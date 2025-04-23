@@ -7,6 +7,7 @@ import { updateNote } from '../redux/notesSlice'
 // import { ySocket } from '../redux/socket'
 import MenuBar from './Menubar'
 import { mainExtensions } from './Extension'
+import { Collaboration } from '@tiptap/extension-collaboration'
 
 const DefaultEditor = ({ noteId, note }) => {
     const dispatch = useDispatch()
@@ -22,10 +23,12 @@ const DefaultEditor = ({ noteId, note }) => {
 
 
 
-    const provider = useMemo(() => {
-        if (!collabToken) return null
+    const [provider, setProvider] = useState(null)
 
-        return new HocuspocusProvider({
+    useEffect(() => {
+        if (!collabToken || !noteId) return
+
+        const p = new HocuspocusProvider({
             url: 'ws://localhost:1234',
             name: noteId,
             document: ydoc,
@@ -37,48 +40,56 @@ const DefaultEditor = ({ noteId, note }) => {
             },
             onStatus: (status) => {
                 if (status === "connected") {
-                    console.log('Connected to provider')
+                    console.log('[Hocuspocus] Connected')
                 }
             },
         })
-    }, [collabToken, noteId, ydoc])
 
-    provider.on('synced', () => {
-        console.log('Synced with remote provider')
-        setSynced(true)
-    })
+        p.on('synced', () => {
+            console.log('[Hocuspocus] Synced')
+            setSynced(true)
 
+        })
 
-    useEffect(() => {
-        if (!provider || !collabToken) return
-        provider.connect()
-        console.log('Provider connected:', provider)
+        p.connect()
+        setProvider(p)
+
         return () => {
-            provider.destroy()
-            console.log('Provider disconnected:', provider)
+            p.destroy()
+            setProvider(null)
         }
-    }, [provider, collabToken])
+    }, [collabToken, noteId])
 
     const unsharedEditor = useEditor({
-        extensions: mainExtensions,
+        enableContentCheck: true,
         immediatelyRender: true,
         shouldRerenderOnTransaction: true,
-        onCreate: ({ editor }) => {
-            const xml = ydoc.getXmlFragment('content')
-            console.log('XML Fragment:', xml.toString())
-
-            // Don't apply note.content if Yjs document already has synced data
-            if (editor && xml.length === 0) {
-                editor.commands.setContent(note.content?.default)
-                editor.storage.noteId = noteId
-            }
-        },
+        content: note?.content?.default || '',
+        extensions: [
+            ...mainExtensions,
+            Collaboration.configure({
+                document: ydoc,
+            })
+        ],
+        autofocus: true,
         onUpdate: async ({ editor }) => {
             if (editor.isEmpty) return
             const editorContent = editor.getJSON()
-            console.log('Editor content:', editorContent)
+            console.log('[Editor] JSON update:', editorContent)
+            console.log('[Editor] is synced:', isSynced)
+            console.log('[Editor] Yjs XML:', ydoc.getXmlFragment('default').toString())
         }
     })
+
+    useEffect(() => {
+        if (provider) {
+          const interval = setInterval(() => {
+            console.log('[Manual Save] Calling provider.storeDocument()')
+            provider.storeDocument?.()
+          }, 5000)
+          return () => clearInterval(interval)
+        }
+      }, [provider])
 
 
 
