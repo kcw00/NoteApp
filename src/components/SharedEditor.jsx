@@ -1,3 +1,4 @@
+import "./collab.css"
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEditor, EditorContent, EditorProvider } from '@tiptap/react'
@@ -38,7 +39,7 @@ const SharedEditor = ({ noteId, note }) => {
     const collabToken = useSelector(state => state.auth.collabToken)
     // console.log('[SharedEditor]collabToken:', collabToken)
 
-    const timeoutRef = useRef(null)
+    // const getRandomName = () => getRandomElement(activeUsersNames)
 
     const currentUser = useMemo(() => ({
         name: user?.username || "Anonymous",
@@ -76,7 +77,7 @@ const SharedEditor = ({ noteId, note }) => {
         p.on('synced', () => {
             console.log('[Hocuspocus] Synced')
             setSynced(true)
-            
+
             const xml = ydoc.getXmlFragment('default')
             const isEmpty = xml.toString().trim() === ''
             if (isEmpty && editorInstance && note?.content?.default) {
@@ -85,8 +86,13 @@ const SharedEditor = ({ noteId, note }) => {
                 Y.applyUpdate(ydoc, update)
                 console.log('[SharedEditor] Injected note content into Yjs')
             }
-            
 
+
+        })
+
+        p.awareness.setLocalStateField('user', {
+            name: currentUser.name,
+            color: currentUser.color,
         })
 
         return p
@@ -97,6 +103,9 @@ const SharedEditor = ({ noteId, note }) => {
         provider.on('connect', () => {
             console.log('[SharedProvider] Connected')
             setSynced(true)
+        })
+        provider.awareness.on('update', () => {
+            console.log('[Cursor] Awareness updated:', provider.awareness.getStates())
         })
         return () => {
             setSynced(false)
@@ -119,10 +128,10 @@ const SharedEditor = ({ noteId, note }) => {
                 user: {
                     name: currentUser.name,
                     color: currentUser.color,
-                },
+                }
             }),
         ]
-    }, [provider, currentUser, ydoc, noteId])
+    }, [provider, currentUser, ydoc])
 
 
 
