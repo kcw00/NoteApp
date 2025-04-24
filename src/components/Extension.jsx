@@ -19,9 +19,9 @@ export const mainExtensions = [
     }),
 ]
 
-export const collabExtensions = ({ hocuspocusProvider, currentUser }) => [
-    Collaboration.extend().configure({ document: hocuspocusProvider.document }),
-    CollaborationCursor.extend().configure({
+export const collabExtensions = ({ hocuspocusProvider, currentUser, ydoc }) => [
+    Collaboration.configure({ document: ydoc }),
+    CollaborationCursor.configure({
         provider: hocuspocusProvider,
         user: {
             name: currentUser.name,

@@ -10,20 +10,13 @@ import { mainExtensions } from './Extension'
 import { Collaboration } from '@tiptap/extension-collaboration'
 
 const DefaultEditor = ({ noteId, note }) => {
-    const dispatch = useDispatch()
-
-
     const collabToken = useSelector(state => state.auth.collabToken)
 
-
-
-
     const ydoc = useMemo(() => new Y.Doc(), [noteId])
+
     const [isSynced, setSynced] = useState(false)
-
-
-
     const [provider, setProvider] = useState(null)
+    const [editorInstance, setEditorInstance] = useState(null)
 
     useEffect(() => {
         if (!collabToken || !noteId) return
@@ -49,6 +42,13 @@ const DefaultEditor = ({ noteId, note }) => {
             console.log('[Hocuspocus] Synced')
             setSynced(true)
 
+            const xml = ydoc.getXmlFragment('default')
+            const isEmpty = xml.toString().trim() === ''
+            if (isEmpty && editorInstance && note?.content?.default) {
+                console.log('[DefaultEditor] Setting initial content from DB')
+                editorInstance.commands.setContent(note.content.default)
+            }
+
         })
 
         p.connect()
@@ -64,7 +64,7 @@ const DefaultEditor = ({ noteId, note }) => {
         enableContentCheck: true,
         immediatelyRender: true,
         shouldRerenderOnTransaction: true,
-        content: note?.content?.default || '',
+        // content: note?.content?.default || '',
         extensions: [
             ...mainExtensions,
             Collaboration.configure({
@@ -72,6 +72,10 @@ const DefaultEditor = ({ noteId, note }) => {
             })
         ],
         autofocus: true,
+        onCreate: ({ editor }) => {
+            console.log('[Editor] Created')
+            setEditorInstance(editor)
+        },
         onUpdate: async ({ editor }) => {
             if (editor.isEmpty) return
             const editorContent = editor.getJSON()
@@ -81,6 +85,10 @@ const DefaultEditor = ({ noteId, note }) => {
         }
     })
 
+
+    // this triggers onStoreDocument in backend/hocuspocus server
+    // this is for manual saving
+    // it will be called every 5 seconds
     useEffect(() => {
         if (provider) {
           const interval = setInterval(() => {
@@ -90,28 +98,6 @@ const DefaultEditor = ({ noteId, note }) => {
           return () => clearInterval(interval)
         }
       }, [provider])
-
-
-
-
-    // const debouncedUpdateunSharedContent = useCallback((content) => {
-    //     if (!unsharedEditor) return
-
-    //     // If the content is synced, we proceed with the timeout logic.
-    //     if (isSynced) {
-    //         // Clear any previous timeouts to prevent redundant API calls.
-    //         clearTimeout(debouncedUpdateunSharedContent.timeout)
-
-    //         // Set a new timeout for saving content (e.g., 3000 ms = 3 seconds).
-    //         debouncedUpdateunSharedContent.timeout = setTimeout(() => {
-    //             dispatch(updateNote({
-    //                 id: noteId,
-    //                 changes: { content }
-    //             }))
-    //             console.log('Shared note content saved:', content)
-    //         }, 300)  // Timeout set to 3 seconds
-    //     }
-    // }, [unsharedEditor, noteId, isSynced, ydoc])
 
 
     return (
