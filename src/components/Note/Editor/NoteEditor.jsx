@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
-import { updateNote, resetErrorMessage } from '../redux/notesSlice'
-import { setWindowWidth, toggleSidebar } from '../redux/uiSlice'
-import Alert from './Alert/Alert'
-import NoteCollaborators from "./NoteCollaborators"
-import NoteOption from "./NoteOption"
-import SharedEditor from "./SharedEditor"
-import DefaultEditor from "./DefaultEditor"
+import { useNavigate } from "react-router-dom"
+import { updateNote, resetErrorMessage } from '../../../redux/notesSlice'
+import { setWindowWidth, toggleSidebar } from '../../../redux/uiSlice'
+import Alert from '../../Alert/Alert'
+import NoteCollaborators from "../SharedModal"
+import NoteOption from "../NoteOption"
+// import SharedEditor from "./ContentEditor/SharedEditor"
+import SharedEditor from "./ContentEditor/SharedEditor/SharedEditor"
+import DefaultEditor from "./ContentEditor/DefaultEditor/DefaultEditor"
+import { logoutUser } from "../../../redux/authSlice"
 
 
 
 const NoteEditor = ({ noteId, note, notes }) => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [showAlert, setShowAlert] = useState(false)
     const [alertMessage, setAlertMessage] = useState("")
@@ -23,6 +27,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
     const isShared = note?.collaborators && note?.collaborators.length > 0
 
 
+
     useEffect(() => {
         // Handle resize event
         const handleResize = () => {
@@ -32,6 +37,13 @@ const NoteEditor = ({ noteId, note, notes }) => {
 
         // Timeout to clear error message after 5 seconds
         if (errorMessage) {
+            if (
+                errorMessage?.error === "Token missing or invalid TokenExpiredError: jwt expired"
+            ) {
+                dispatch(logoutUser()).then(() => {
+                    navigate('/login')
+                })
+            }
             setTimeout(() => {
                 dispatch(resetErrorMessage())
             }, 5000)
@@ -41,6 +53,8 @@ const NoteEditor = ({ noteId, note, notes }) => {
             window.removeEventListener('resize', handleResize)
         }
     }, [windowWidth, errorMessage])
+
+
 
 
 
