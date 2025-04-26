@@ -1,17 +1,16 @@
-import "./collab.css"
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useEditor, EditorContent, EditorProvider } from '@tiptap/react'
+import "../../styles/collab.css"
+import { useEffect, useState, useMemo } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { useEditor, EditorContent } from '@tiptap/react'
 import * as Y from 'yjs'
 import { HocuspocusProvider } from '@hocuspocus/provider'
-import { updateNote } from '../redux/notesSlice'
-// import { ySocket } from '../redux/socket'
-import MenuBar from './Menubar'
-import { mainExtensions } from './Extension'
+import MenuBar from '../Menubar'
+import { mainExtensions } from '../Extension'
 import { Collaboration } from '@tiptap/extension-collaboration'
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'
-import { TiptapTransformer } from '@hocuspocus/transformer'
 import { useLayoutEffect } from 'react'
+import EditorWithCursor from "./EditorWithCursor"
 
 
 // Define the colors for cursor display
@@ -28,7 +27,7 @@ const getRandomColor = () => getRandomElement(colors)
 
 
 const SharedEditor = ({ noteId, note }) => {
-    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     // const noteId = useSelector(state => state.notes.activeNoteId)
     // console.log('NOTE ID from sharedEditor: ', noteId)
@@ -52,20 +51,26 @@ const SharedEditor = ({ noteId, note }) => {
     const [isSynced, setSynced] = useState(false)
     const [isCollabReady, setIsCollabReady] = useState(false)
     const [editorInstance, setEditorInstance] = useState(null)
+    const [isCursorReady, setCursorReady] = useState(false)
 
 
     const provider = useMemo(() => {
         if (!collabToken || !noteId) return
 
         const p = new HocuspocusProvider({
-            url: 'ws://localhost:1234',
+            url: `ws://${import.meta.env.VITE_BACKEND_ADDRESS}:1234`,
             name: noteId,
             document: ydoc,
             token: collabToken,
             connect: false,
             preserveConnection: false,
             onAuthenticationFailed: (error) => {
-                console.error('Authentication failed:', error)
+                console.log('[SharedEditor] Authentication failed:', error)
+                if (error === 'Invalid token') {
+                    console.log('[SharedEditor] Invalid token, redirecting to login')
+                    // Redirect to login or show an error message
+                    navigate('/login')
+                }
             },
             onStatus: (status) => {
                 if (status === "connected") {
@@ -77,6 +82,7 @@ const SharedEditor = ({ noteId, note }) => {
         p.on('synced', () => {
             console.log('[Hocuspocus] Synced')
             setSynced(true)
+            setCursorReady(true)
 
             const xml = ydoc.getXmlFragment('default')
             const isEmpty = xml.toString().trim() === ''
@@ -90,11 +96,6 @@ const SharedEditor = ({ noteId, note }) => {
 
         })
 
-        p.awareness.setLocalStateField('user', {
-            name: currentUser.name,
-            color: currentUser.color,
-        })
-
         return p
     }, [collabToken, noteId])
 
@@ -103,9 +104,19 @@ const SharedEditor = ({ noteId, note }) => {
         provider.on('connect', () => {
             console.log('[SharedProvider] Connected')
             setSynced(true)
+            provider.awareness.setLocalStateField('user', {
+                name: currentUser.name,
+                color: currentUser.color,
+            })
         })
         provider.awareness.on('update', () => {
-            console.log('[Cursor] Awareness updated:', provider.awareness.getStates())
+            const states = provider.awareness.getStates()
+            console.log('[Cursor] Awareness updated:', states)
+
+            for (const [clientId, state] of states.entries()) {
+                console.log(`[Cursor] Client ${clientId}:`, state.user)
+            }
+
         })
         return () => {
             setSynced(false)
@@ -113,50 +124,6 @@ const SharedEditor = ({ noteId, note }) => {
         }
     }, [provider])
 
-    const extensions = useMemo(() => {
-        if (!provider || !isSynced) {
-            console.log(`[SharedEditor] Provider ${provider.status}`, isSynced)
-            console.log('[SharedEditor] provider:', provider)
-            return [...mainExtensions, Collaboration.configure({ document: ydoc })]
-        }
-
-        return [
-            ...mainExtensions,
-            Collaboration.configure({ document: ydoc }),
-            CollaborationCursor.configure({
-                provider,
-                user: {
-                    name: currentUser.name,
-                    color: currentUser.color,
-                }
-            }),
-        ]
-    }, [provider, currentUser, ydoc])
-
-
-
-    const editor = useEditor({
-        enableContentCheck: true,
-        onContentError: ({ disableCollaboration }) => {
-            disableCollaboration()
-        },
-        immediatelyRender: true,
-        shouldRerenderOnTransaction: true,
-        extensions,
-        autofocus: true,
-        onCreate: ({ editor }) => {
-            console.log('[Shared Editor] Created')
-            setEditorInstance(editor)
-        },
-        onUpdate: async ({ editor }) => {
-            if (editor.isEmpty) return
-            const editorContent = editor.getJSON()
-            console.log('[Shared Editor] JSON update:', editorContent)
-            console.log('[Shared Editor] is synced:', isSynced)
-            console.log('[Shared Editor] Yjs XML:', ydoc.getXmlFragment('default').toString())
-            //debouncedUpdateContent(editorContent)
-        }
-    })
 
     useEffect(() => {
         if (provider) {
@@ -169,13 +136,13 @@ const SharedEditor = ({ noteId, note }) => {
     }, [provider])
 
 
-
     useEffect(() => {
         console.log('useEffect2 called')
         const collabReadyTimeout = setTimeout(() => {
             if (
                 !isCollabReady &&
                 isSynced &&
+                isCursorReady &&
                 provider?.status === 'connected' ||
                 provider?.status === 'connecting'
             ) {
@@ -186,15 +153,12 @@ const SharedEditor = ({ noteId, note }) => {
     }, [provider?.status, provider])
 
 
-    return (
-        isCollabReady ? (<div>
-            <MenuBar editor={editor} />
-            <EditorContent editor={editor} className="main-group" />
-        </div>) : (<div>
-            <p>loadding...</p>
-            <p>Remote provider status: {provider?.status}</p>
-        </div>)
-    )
+    if (!isCursorReady) {
+        return <p>Loading real-time collaborative editor...</p>
+    }
+
+    // 👇 Now render a separate child once ready
+    return <EditorWithCursor noteId={noteId} note={note} provider={provider} ydoc={ydoc} currentUser={currentUser} />
 }
 
 export default SharedEditor
