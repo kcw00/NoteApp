@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setCollaborators, addCollaborator, collaboratorRemoved, removeCollaborator, updateCollaboratorRole } from '../redux/notesSlice'
+import { setCollaborators, addCollaborator, collaboratorRemoved, removeCollaborator, updateCollaboratorRole } from '../../redux/notesSlice'
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
-import { socket } from '../redux/socket'
+import { socket } from '../../socket'
 import axios from 'axios'
 import Notification from './Notification'
 
-function NoteCollaborators() {
+const SharedModal = () => {
     const [newCollaboratorName, setNewCollaboratorName] = useState('')
     const [newRole, setNewRole] = useState('viewer')
     const [show, setShow] = useState(false)
@@ -137,4 +137,4 @@ function NoteCollaborators() {
     )
 }
 
-export default NoteCollaborators
+export default SharedModal

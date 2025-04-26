@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { socket } from "../redux/socket"
-import { createCollabToken } from "../redux/authSlice"
-import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes, noteDeletedRealtime, setCollaborators } from "../redux/notesSlice"
-import notesService from "../services/notes"
-import NoteEditor from "./NoteEditor"
+import { socket } from "../../socket"
+import { createCollabToken } from "../../redux/authSlice"
+import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes, noteDeletedRealtime, setCollaborators } from "../../redux/notesSlice"
+import notesService from "../../services/notes"
+import NoteEditor from "./Editor/NoteEditor"
 import Sidebar from "./Sidebar"
 
 const Notes = () => {
@@ -84,6 +84,7 @@ const Notes = () => {
                 }
 
 
+
                 // Fetch shared notes
                 const sharedNotesResult = await dispatch(fetchSharedNotes(user?.userId))
                 const sharedNotes = sharedNotesResult.payload || []
@@ -138,6 +139,7 @@ const Notes = () => {
             // If active note is not found, default to the last note
             dispatch(setActiveNote(notesArray[notesArray.length - 1]?.id))
         }
+
     }, [activeNoteId, notesArray])
 
     useEffect(() => {

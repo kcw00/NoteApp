@@ -2,9 +2,9 @@ import jsPDF from 'jspdf'
 import { useDispatch, useSelector } from 'react-redux'
 import { FiTrash2, FiSun, FiMoreHorizontal } from "react-icons/fi"
 import { TfiUpload } from "react-icons/tfi"
-import { toggleTheme } from '../redux/uiSlice'
-import { deleteNote } from '../redux/notesSlice'
-import noteService from '../services/notes'
+import { toggleTheme } from '../../redux/uiSlice'
+import { deleteNote } from '../../redux/notesSlice'
+import noteService from '../../services/notes'
 
 const NoteOption = ({ noteId }) => {
 
