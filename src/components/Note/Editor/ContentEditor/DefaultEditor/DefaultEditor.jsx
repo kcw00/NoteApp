@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useEditor, EditorContent, EditorProvider } from '@tiptap/react'
 import * as Y from 'yjs'
 import { HocuspocusProvider, WebSocketStatus } from '@hocuspocus/provider'
-import { updateNote } from '../redux/notesSlice'
+import { updateNote } from '../../../../../redux/notesSlice'
 // import { ySocket } from '../redux/socket'
-import MenuBar from './Menubar'
-import { mainExtensions } from './Extension'
+import MenuBar from '../Menubar'
+import { mainExtensions } from '../Extension'
 import { Collaboration } from '@tiptap/extension-collaboration'
 
 const DefaultEditor = ({ noteId, note }) => {
@@ -22,7 +22,7 @@ const DefaultEditor = ({ noteId, note }) => {
         if (!collabToken || !noteId) return
 
         const p = new HocuspocusProvider({
-            url: 'ws://localhost:1234',
+            url:`ws://${import.meta.env.VITE_BACKEND_ADDRESS}:1234`,
             name: noteId,
             document: ydoc,
             token: collabToken,
