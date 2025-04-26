@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from "react-router-dom"
-import { addNote, setActiveNote, setSharedNotes } from "../redux/notesSlice"
-import { logoutUser } from "../redux/authSlice"
-import { setSidebarWidth, setIsResizing, toggleSidebar } from "../redux/uiSlice"
-import notesService from "../services/notes"
+import { addNote, setActiveNote, setSharedNotes } from "../../redux/notesSlice"
+import { logoutUser } from "../../redux/authSlice"
+import { setSidebarWidth, setIsResizing, toggleSidebar } from "../../redux/uiSlice"
 
 const Sidebar = () => {
     const dispatch = useDispatch()

@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
-import { toggleTheme } from "../redux/uiSlice"
+import { toggleTheme } from "../../redux/uiSlice"
 import { FiSun, FiMoon } from "react-icons/fi"
 
 

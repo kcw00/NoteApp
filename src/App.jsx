@@ -1,9 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import Notes from './components/Notes'
-import LoginForm from './components/LoginForm'
-import SignupForm from './components/SignupForm'
-import Home from './components/Home'
+import Notes from './components/Note/Notes'
+import LoginForm from './components/Auth/LoginForm'
+import SignupForm from './components/Auth/SignupForm'
+import Home from './components/Home/Home'
 
 
 
@@ -19,7 +19,7 @@ const App = () => {
         {/* Auth Routes (only for logged-out users) */}
         <Route
           path="/login"
-          element={loggedIn ? <Navigate to="/" /> : <LoginForm />}
+          element={<LoginForm />}
         />
         <Route
           path="/signup"

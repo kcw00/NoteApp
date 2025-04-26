@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import authService from "../services/auth"
 import noteService from "../services/notes"
-import { socket } from "./socket"
+import { socket } from "../socket"
 
 
 export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, { rejectWithValue }) => {
@@ -68,6 +68,7 @@ const authSlice = createSlice({
             })
             .addCase(logoutUser.fulfilled, (state) => {
                 state.user = null
+                state.collabToken = null
             })
             .addCase(signUpUser.fulfilled, (state, action) => {
                 state.user = action.payload
