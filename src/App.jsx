@@ -19,7 +19,7 @@ const App = () => {
         {/* Auth Routes (only for logged-out users) */}
         <Route
           path="/login"
-          element={<LoginForm />}
+          element={loggedIn ? <Navigate to="/" /> : <LoginForm />}
         />
         <Route
           path="/signup"
