@@ -16,6 +16,7 @@ const SharedModal = () => {
     const [errorMessage, setErrorMessage] = useState(null)
 
     const dispatch = useDispatch()
+    const theme = useSelector((state) => state.ui.mode)
     const activeNoteId = useSelector(state => state.notes.activeNoteId)
     const note = useSelector(state => state.notes.entities[activeNoteId])
     const noteId = note?.id
@@ -86,12 +87,12 @@ const SharedModal = () => {
     }
 
     return (
-        <div>
+        <div className='shared-modal'>
             <button onClick={() => setShow(true)}>
                 share
             </button>
 
-            <Modal show={show} onHide={() => setShow(false)} centered>
+            <Modal show={show} onHide={() => setShow(false)} centered  dialogClassName={theme === "dark" ? "dark-mode" :""} >
                 <Modal.Header closeButton>
                     <Modal.Title>Add Collaborator</Modal.Title>
                     <Notification errorMessage={errorMessage} />
