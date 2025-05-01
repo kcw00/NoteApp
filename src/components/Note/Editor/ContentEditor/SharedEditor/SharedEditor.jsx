@@ -11,6 +11,7 @@ import { Collaboration } from '@tiptap/extension-collaboration'
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'
 import { useLayoutEffect } from 'react'
 import EditorWithCursor from "./EditorWithCursor"
+import "../../styles/editor.css"
 
 
 // Define the colors for cursor display
