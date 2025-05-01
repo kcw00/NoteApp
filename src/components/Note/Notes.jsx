@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { useNavigate, useParams } from "react-router-dom"
 import { socket } from "../../socket"
 import { createCollabToken } from "../../redux/authSlice"
 import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes, noteDeletedRealtime, setCollaborators } from "../../redux/notesSlice"
@@ -9,6 +10,8 @@ import Sidebar from "./Sidebar"
 
 const Notes = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const { noteId: routeNoteId } = useParams()
 
     const [loading, setLoading] = useState(true) // Track loading state
 
@@ -30,20 +33,6 @@ const Notes = () => {
     console.log('Notes:', notesArray)
     console.log('notes length:', notesArray.length)
     console.log('Active Note:', note)
-
-    useEffect(() => {
-        console.log("active note Id useEffect called")
-        // Set the active note (if none exists)
-        if (!activeNoteId) {
-            const noteToSet = notesArray[notesArray.length - 1] // Use the last fetched note
-            if (noteToSet) {
-                dispatch(setActiveNote(noteToSet?.id)) // Set active note
-                console.log('Setting active note to:', noteToSet?.id)
-            }
-        }
-    }, [notesArray])
-
-
 
     useEffect(() => {
         console.log("main useEffect called")
@@ -134,14 +123,19 @@ const Notes = () => {
 
     }, [user])
 
+    // Redirect if route noteId is not in current notes
     useEffect(() => {
-        if (activeNoteId && !notesArray.some(note => note?.id === activeNoteId)) {
-            // If active note is not found, default to the last note
-            dispatch(setActiveNote(notesArray[notesArray.length - 1]?.id))
+        console.log('Redirect useEffect called')
+        const noteExists = notesArray.some(note => note?.id === routeNoteId)
+
+        if (!noteExists && notesArray.length > 0) {
+            const fallbackNoteId = notesArray[notesArray.length - 1].id
+            dispatch(setActiveNote(fallbackNoteId))
+            navigate(`/notes/${fallbackNoteId}`, { replace: true })
         }
+    }, [routeNoteId, notesArray])
 
-    }, [activeNoteId, notesArray])
-
+    // Set collab token when active note changes
     useEffect(() => {
         console.log('collab useEffect called')
 
