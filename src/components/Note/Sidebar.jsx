@@ -68,7 +68,7 @@ const Sidebar = () => {
         dispatch(toggleSidebar())
     }
 
-    const handleAddNote = () => {
+    const handleAddNote = async () => {
         const newNote = {
             title: "",
             content: {
@@ -77,7 +77,7 @@ const Sidebar = () => {
                     content: [
                         {
                             type: 'paragraph',
-                            content: [{ type: 'text', text: 'create your notes' }],
+                            content: '',
                         },
                     ],
                 }
@@ -86,9 +86,11 @@ const Sidebar = () => {
             creator: user.userId,
             collaborators: [],
         }
-        dispatch(addNote(newNote))
-        dispatch(setActiveNote(newNote.id))
-        setTimeout(() => navigate(`/notes/${newNote.id}`), 50) // Slight delay to allow state update
+        const note = await dispatch(addNote(newNote))
+        console.log('NEW NOTE:', note.payload)
+        console.log('NEW NOTE ID:', note.payload.id)
+        dispatch(setActiveNote(note.payload.id))
+        setTimeout(() => navigate(`/notes/${note.payload.id}`), 50) // Slight delay to allow state update
     }
 
     const handleNoteClick = (note) => {
