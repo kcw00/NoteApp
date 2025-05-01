@@ -7,6 +7,7 @@ import { Collaboration } from '@tiptap/extension-collaboration'
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'
 import { Placeholder } from '@tiptap/extension-placeholder'
 
+
 export const mainExtensions = [
     StarterKit.configure({ history: false }),
     Highlight,
@@ -14,8 +15,16 @@ export const mainExtensions = [
     TaskItem,
     CharacterCount.extend().configure({ limit: 10000 }),
     Placeholder.configure({
-        placeholder:
-            'Write something … \n\n',
+        placeholder: ({ node }) => {
+            if (node.type.name === 'heading') {
+                return 'Heading'
+            }
+            if (node.type.name === 'paragraph') {
+                return 'Write something...'
+            }
+        },
+        includeChildren: true,
+        showOnlyWhenEditable: true,
     }),
 ]
 

@@ -8,6 +8,7 @@ import { updateNote } from '../../../../../redux/notesSlice'
 import MenuBar from '../Menubar'
 import { mainExtensions } from '../Extension'
 import { Collaboration } from '@tiptap/extension-collaboration'
+import "../../styles/editor.css"
 
 const DefaultEditor = ({ noteId, note }) => {
     const collabToken = useSelector(state => state.auth.collabToken)
