@@ -4,10 +4,13 @@ import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'
 import { mainExtensions } from '../Extension'
 import MenuBar from '../Menubar'
 
-const EditorWithCursor = ({ noteId, note, provider, ydoc, currentUser }) => {
+const EditorWithCursor = ({ provider, ydoc, currentUser }) => {
   const extensions = [
     ...mainExtensions,
-    Collaboration.configure({ document: ydoc }),
+    Collaboration.configure({
+      document: ydoc,
+      field: "content"
+    }),
     CollaborationCursor.configure({
       provider,
       user: {
@@ -20,7 +23,7 @@ const EditorWithCursor = ({ noteId, note, provider, ydoc, currentUser }) => {
   const editor = useEditor({
     enableContentCheck: true,
     onContentError: ({ disableCollaboration }) => {
-        disableCollaboration()
+      disableCollaboration()
     },
     immediatelyRender: true,
     shouldRerenderOnTransaction: true,
@@ -31,9 +34,9 @@ const EditorWithCursor = ({ noteId, note, provider, ydoc, currentUser }) => {
       console.log('[Extensions]', editor.extensionManager.extensions.map(ext => ext.name))
     },
     onUpdate: ({ editor }) => {
-        if (editor.isEmpty) return
-        const editorContent = editor.getJSON()
-        console.log('[Shared Editor] JSON update:', editorContent)
+      if (editor.isEmpty) return
+      const editorContent = editor.getJSON()
+      console.log('[Shared Editor] JSON update:', editorContent)
     },
   })
 

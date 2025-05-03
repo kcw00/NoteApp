@@ -72,7 +72,6 @@ const Sidebar = () => {
         const newNote = {
             title: "",
             content: {
-                default: {
                     type: 'doc',
                     content: [
                         {
@@ -80,7 +79,6 @@ const Sidebar = () => {
                             content: '',
                         },
                     ],
-                }
             },
             important: false,
             creator: user.userId,
