@@ -47,6 +47,12 @@ const SharedModal = () => {
             if (!newCollaborator) {
                 const errorMessage = 'User not found'
                 setErrorMessage(errorMessage)
+
+                // Set a timeout to clear the error message after 3 seconds
+                setTimeout(() => {
+                    setErrorMessage(null)
+                }, 3000)
+                
                 console.error(errorMessage)
                 return
             }
@@ -94,12 +100,13 @@ const SharedModal = () => {
 
             <Modal show={show} onHide={() => setShow(false)} centered  dialogClassName={theme === "dark" ? "dark-mode" :""} >
                 <Modal.Header closeButton>
-                    <Modal.Title>Add Collaborator</Modal.Title>
-                    <Notification errorMessage={errorMessage} />
+                    <Modal.Title>Manage Collaborator</Modal.Title>
+                    
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group controlId="formBasicEmail">
                         <Form.Label>Enter Collaborator's Username</Form.Label>
+                        <Notification errorMessage={errorMessage} />
                         <Form.Control
                             type="text"
                             placeholder="Username"
@@ -108,8 +115,8 @@ const SharedModal = () => {
                         />
 
                         <select value={newRole} onChange={(e) => setNewRole(e.target.value)}>
-                            <option value="viewer">Viewer</option>
-                            <option value="editor">Editor</option>
+                            <option value="viewer">View Only</option>
+                            <option value="editor">Can Edit</option>
                         </select>
 
                     </Form.Group>
