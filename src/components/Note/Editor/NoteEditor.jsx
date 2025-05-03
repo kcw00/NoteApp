@@ -10,6 +10,8 @@ import NoteOption from "../NoteOption"
 import SharedEditor from "./ContentEditor/SharedEditor/SharedEditor"
 import DefaultEditor from "./ContentEditor/DefaultEditor/DefaultEditor"
 import { logoutUser } from "../../../redux/authSlice"
+import { socket } from "../../../socket"
+import TitleEditor from "./TitleEditor/TitleEditor"
 
 
 
@@ -26,6 +28,11 @@ const NoteEditor = ({ noteId, note, notes }) => {
 
     const isShared = note?.collaborators && note?.collaborators.length > 0
 
+    socket.on('noteDeleted', (data) => {
+        console.log('socket listen ----- Note deleted:', data)
+        setAlertMessage("Note deleted")
+        setShowAlert(true)
+    })
 
 
     useEffect(() => {
@@ -55,9 +62,6 @@ const NoteEditor = ({ noteId, note, notes }) => {
     }, [windowWidth, errorMessage])
 
 
-
-
-
     const handleToggleSidebar = () => {
         dispatch(toggleSidebar())
     }
@@ -66,10 +70,11 @@ const NoteEditor = ({ noteId, note, notes }) => {
     const handleImportance = () => {
         dispatch(updateNote({ id: noteId, changes: { important: !note.important } }))
     }
-
-    const handleTitleChange = (e) => {
-        dispatch(updateNote({ id: noteId, changes: { title: e.target.value } }))
-    }
+    /*
+        const handleTitleChange = (e) => {
+            dispatch(updateNote({ id: noteId, changes: { title: e.target.value } }))
+        }
+    */
 
     const handleCloseAlert = () => {
         setShowAlert(false)
@@ -91,7 +96,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
 
                 <NoteCollaborators />
 
-                <NoteOption noteId={noteId} notes={notes} />
+                <NoteOption noteId={noteId} note={note} />
 
             </header>
             <div>
@@ -100,14 +105,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
             <div id="input-container" className="input-container">
                 <div className="note-form d-flex flex-column align-items-center">
                     <div className="note-title-wrapper">
-                        <input
-                            name='title'
-                            onChange={handleTitleChange}
-                            placeholder='Untitled'
-                            id='note-input'
-                            className='note-title'
-                            value={note.title}
-                        />
+                        <TitleEditor noteId={noteId} note={note} />
                     </div>
                     <div className="note-content-wrapper">
                         {isShared ? (<SharedEditor noteId={noteId} note={note} />) : (
