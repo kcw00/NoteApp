@@ -135,7 +135,7 @@ const notesSlice = createSlice({
             state.errorMessage = null
         },
         setActiveUsers: (state, action) => {
-            if(action.payload === null) {
+            if (action.payload === null) {
                 return
             } else {
                 state.activeUsers = action.payload
@@ -174,6 +174,12 @@ const notesSlice = createSlice({
                     [note.id]: Array.isArray(note.collaborators) ? note.collaborators : [],
                 };
             });
+        },
+        titleUpdated: (state, action) => {
+            const { noteId, title } = action.payload
+            if (state.entities[noteId]) {
+                state.entities[noteId].title = title
+            }
         },
     },
     extraReducers: (builder) => {
@@ -241,7 +247,7 @@ const notesSlice = createSlice({
     },
 })
 
-export const { noteAddedRealtime, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers, setCollaborators, collaboratorRemoved, setSharedNotes } = notesSlice.actions
+export const { noteAddedRealtime, titleUpdated, noteUpdatedRealtime, noteDeletedRealtime, setActiveNote, resetErrorMessage, setActiveUsers, setCollaborators, collaboratorRemoved, setSharedNotes } = notesSlice.actions
 
 
 export default notesSlice.reducer
