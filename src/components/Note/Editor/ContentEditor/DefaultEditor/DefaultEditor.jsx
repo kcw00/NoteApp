@@ -43,13 +43,6 @@ const DefaultEditor = ({ noteId, note }) => {
             console.log('[Hocuspocus] Synced')
             setSynced(true)
 
-            const xml = ydoc.getXmlFragment('default')
-            const isEmpty = xml.toString().trim() === ''
-            if (isEmpty && editorInstance && note?.content?.default) {
-                console.log('[DefaultEditor] Setting initial content from DB')
-                editorInstance.commands.setContent(note.content.default)
-            }
-
         })
 
         p.connect()
@@ -70,6 +63,7 @@ const DefaultEditor = ({ noteId, note }) => {
             ...mainExtensions,
             Collaboration.configure({
                 document: ydoc,
+                field: "content",
             })
         ],
         autofocus: true,
@@ -82,7 +76,7 @@ const DefaultEditor = ({ noteId, note }) => {
             const editorContent = editor.getJSON()
             console.log('[Editor] JSON update:', editorContent)
             console.log('[Editor] is synced:', isSynced)
-            console.log('[Editor] Yjs XML:', ydoc.getXmlFragment('default').toString())
+            console.log('[Editor] Yjs XML:', ydoc.getXmlFragment('content').toString())
         }
     })
 

@@ -85,10 +85,10 @@ const SharedEditor = ({ noteId, note }) => {
             setSynced(true)
             setCursorReady(true)
 
-            const xml = ydoc.getXmlFragment('default')
+            const xml = ydoc.getXmlFragment('content')
             const isEmpty = xml.toString().trim() === ''
-            if (isEmpty && editorInstance && note?.content?.default) {
-                const hydratedDoc = TiptapTransformer.toYdoc(note.content.default, 'default')
+            if (isEmpty && editorInstance && note?.content) {
+                const hydratedDoc = TiptapTransformer.toYdoc(note.content, 'content')
                 const update = Y.encodeStateAsUpdate(hydratedDoc)
                 Y.applyUpdate(ydoc, update)
                 console.log('[SharedEditor] Injected note content into Yjs')
