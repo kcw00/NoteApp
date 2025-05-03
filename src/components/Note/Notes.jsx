@@ -27,8 +27,6 @@ const Notes = () => {
     const isType = note?.collaborators ? note?.collaborators.find(collab => collab?.userId === user?.userId)?.userType : "editor"
 
 
-
-
     console.log("Component re-rendered") // check when component is re-rendered
     console.log('Notes:', notesArray)
     console.log('notes length:', notesArray.length)
@@ -67,7 +65,12 @@ const Notes = () => {
                         collaborators: [],
                         important: false,
                     }))
+                    dispatch(setActiveNote(fetchedNotes[0]?.id))
                     console.log('Adding new empty note')
+                } else {
+                    // Set the active note to the first fetched note
+                    dispatch(setActiveNote(fetchedNotes[0]?.id))
+                    console.log('Setting active note to:', fetchedNotes[0]?.id)
                 }
 
 
@@ -120,6 +123,7 @@ const Notes = () => {
 
 
     }, [user])
+
 
     // Redirect if routeNoteId is deleted
     useEffect(() => {
