@@ -55,15 +55,13 @@ const Notes = () => {
                     await dispatch(addNote({
                         title: '',
                         content: {
-                            default: {
-                                type: 'doc',
-                                content: [
-                                    {
-                                        type: 'paragraph',
-                                        content: [{ type: 'text', text: 'create your notes' }],
-                                    },
-                                ],
-                            }
+                            type: 'doc',
+                            content: [
+                                {
+                                    type: 'paragraph',
+                                    content: [{ type: 'text', text: 'create your notes' }],
+                                },
+                            ],
                         },
                         creator: user?.userId,
                         collaborators: [],
@@ -123,17 +121,21 @@ const Notes = () => {
 
     }, [user])
 
-    // Redirect if route noteId is not in current notes
+    // Redirect if routeNoteId is deleted
     useEffect(() => {
-        console.log('Redirect useEffect called')
-        const noteExists = notesArray.some(note => note?.id === routeNoteId)
+        if (!routeNoteId) return // No route noteId, do nothing
+        const noteExists = Boolean(notes[routeNoteId])
+        console.log('noteExists:', noteExists)
+        console.log('routeNoteId:', routeNoteId)
 
-        if (!noteExists && notesArray.length > 0) {
-            const fallbackNoteId = notesArray[notesArray.length - 1].id
+ 
+        if (!noteExists && Object.keys(notes).length > 0) {
+            const fallbackNoteId = Object.keys(notes).at(-1) // fallback to most recent
             dispatch(setActiveNote(fallbackNoteId))
             navigate(`/notes/${fallbackNoteId}`, { replace: true })
         }
-    }, [routeNoteId, notesArray])
+    }, [routeNoteId, notes])
+
 
     // Set collab token when active note changes
     useEffect(() => {
