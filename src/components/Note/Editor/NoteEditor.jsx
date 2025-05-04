@@ -28,6 +28,8 @@ const NoteEditor = ({ noteId, note, notes }) => {
 
     const isShared = note?.collaborators && note?.collaborators.length > 0
 
+
+    // show alert when note is deleted
     socket.on('noteDeleted', (data) => {
         console.log('socket listen ----- Note deleted:', data)
         setAlertMessage("Note deleted")
@@ -109,7 +111,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
                     </div>
                     <div className="note-content-wrapper">
                         {isShared ? (<SharedEditor noteId={noteId} note={note} />) : (
-                            <DefaultEditor noteId={noteId} note={note} />
+                            <DefaultEditor noteId={noteId} />
                         )}
                     </div>
                 </div>
