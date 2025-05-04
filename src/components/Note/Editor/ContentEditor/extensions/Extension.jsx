@@ -15,7 +15,7 @@ export const mainExtensions = [
     Placeholder.configure({
         placeholder: ({ node }) => {
             if (node.type.name === 'paragraph') {
-                return 'Write something...'
+                return 'Write, press / for commands...'
             }
         },
         includeChildren: true,

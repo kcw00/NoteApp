@@ -3,15 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useEditor, EditorContent, EditorProvider } from '@tiptap/react'
 import * as Y from 'yjs'
 import { HocuspocusProvider, WebSocketStatus } from '@hocuspocus/provider'
-import { updateNote } from '../../../../../redux/notesSlice'
-// import { ySocket } from '../redux/socket'
-import MenuBar from '../Menubar'
-import { mainExtensions } from '../Extension'
+import { mainExtensions } from '../extensions/Extension'
 import { Collaboration } from '@tiptap/extension-collaboration'
 import "../../styles/editor.css"
+import suggestion from '../extensions/SlashMenu/suggestion'
+import Commands from '../extensions/SlashMenu/commands'
 
-const DefaultEditor = ({ noteId, note }) => {
+const DefaultEditor = ({ noteId }) => {
     const collabToken = useSelector(state => state.auth.collabToken)
+    const theme = useSelector(state => state.ui.theme)
 
     const ydoc = useMemo(() => new Y.Doc(), [noteId])
 
@@ -61,14 +61,24 @@ const DefaultEditor = ({ noteId, note }) => {
         // content: note?.content?.default || '',
         extensions: [
             ...mainExtensions,
+            Commands.configure({
+                suggestion,
+                editor: editorInstance,
+            }),
             Collaboration.configure({
                 document: ydoc,
                 field: "content",
             })
         ],
+        editorProps: {
+            attributes: {
+                class: 'editor',
+            },
+        },
         autofocus: true,
         onCreate: ({ editor }) => {
             console.log('[Editor] Created')
+            editor.storage.theme = theme
             setEditorInstance(editor)
         },
         onUpdate: async ({ editor }) => {
@@ -94,10 +104,8 @@ const DefaultEditor = ({ noteId, note }) => {
         }
       }, [provider])
 
-
     return (
         <div>
-            <MenuBar editor={unsharedEditor} />
             <EditorContent editor={unsharedEditor} className="main-group" />
         </div>
     )

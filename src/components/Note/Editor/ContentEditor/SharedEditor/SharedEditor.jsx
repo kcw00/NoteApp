@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import { useEditor, EditorContent } from '@tiptap/react'
 import * as Y from 'yjs'
 import { HocuspocusProvider } from '@hocuspocus/provider'
-import MenuBar from '../Menubar'
-import { mainExtensions } from '../Extension'
+import MenuBar from '../extensions/Menubar'
+import { mainExtensions } from '../extensions/Extension'
 import { Collaboration } from '@tiptap/extension-collaboration'
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'
 import { useLayoutEffect } from 'react'
@@ -159,7 +159,7 @@ const SharedEditor = ({ noteId, note }) => {
     }
 
     // 👇 Now render a separate child once ready
-    return <EditorWithCursor noteId={noteId} note={note} provider={provider} ydoc={ydoc} currentUser={currentUser} />
+    return <EditorWithCursor provider={provider} ydoc={ydoc} currentUser={currentUser} />
 }
 
 export default SharedEditor
