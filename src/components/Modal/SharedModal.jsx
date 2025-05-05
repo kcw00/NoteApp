@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setCollaborators, addCollaborator, collaboratorRemoved, removeCollaborator, updateCollaboratorRole } from '../../redux/notesSlice'
-import Modal from 'react-bootstrap/Modal'
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
-import { socket } from '../../socket'
+import { Modal, Button, Form } from 'react-bootstrap'
 import axios from 'axios'
-import Notification from './Notification'
+import Notification from '../MainPage/Notification'
+import './styles/modal.css'
 
 const SharedModal = () => {
     const [newCollaboratorName, setNewCollaboratorName] = useState('')
@@ -120,15 +118,15 @@ const SharedModal = () => {
                         </select>
 
                     </Form.Group>
-                    <Button variant="primary" onClick={handleAddCollaborator}>
+                    <button className='add-collaborator-button' onClick={handleAddCollaborator}>
                         Add Collaborator
-                    </Button>
+                    </button>
                     <ul>
                         {collaborators.map(collaborator => (
                             <li key={collaborator.userId || `${collaborator.username}-${collaborator.userType}`}>
                                 {collaborator.username} - {collaborator.userType}
-                                <button onClick={() => handleDeleteCollaborator(collaborator)}>
-                                    Remove
+                                <button className="remove-collaborator-button" onClick={() => handleDeleteCollaborator(collaborator)}>
+                                    remove
                                 </button>
                             </li>
                         ))}
