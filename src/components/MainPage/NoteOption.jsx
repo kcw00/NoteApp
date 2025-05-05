@@ -25,8 +25,8 @@ const NoteOption = ({ noteId }) => {
     const handleDelete = async () => {
         // user must have at least one of unshared notes
         // Check if the user has any unshared notes
-        const hasUnsharedNotes = notesArray.filter(note => note.collaborators.length === 0)
-        if (!hasUnsharedNotes) {
+        const hasUnsharedNotes = notesArray.filter(note => note.id !== noteId && note.collaborators.length === 0)
+        if (!hasUnsharedNotes.length === 0) {
             // If no unshared notes, prevent deletion
             alert("You must have at least one unshared note.")
             return
@@ -35,6 +35,18 @@ const NoteOption = ({ noteId }) => {
         noteService.setToken(user?.token)
         await dispatch(deleteNote({ id: noteId, userId: userId }))
         console.log('DELETED NOTE:', noteId)
+
+        // After deletion, find fallback note
+        const remainingNotes = notesArray.filter(note => note.id !== noteId)
+        if (remainingNotes.length > 0) {
+            const fallbackNoteId = remainingNotes[0].id
+            dispatch(setActiveNote(fallbackNoteId))
+            navigate(`/notes/${fallbackNoteId}`, { replace: true })
+        } else {
+            // No notes left – handle clean slate or navigate to a blank state
+            dispatch(setActiveNote(null))
+            navigate('/notes', { replace: true })
+        }
     }
 
     const exportToPDF = (note) => {
