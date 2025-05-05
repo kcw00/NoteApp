@@ -10,3 +10,8 @@
 .dark-mode .is-empty.is-editor-empty::before {
     color: #777;
 }
+
+.ProseMirror:focus {
+    outline: none;
+    box-shadow: none;
+  }
