@@ -28,13 +28,27 @@
   order: 1;
   flex-grow: 0;
   flex-shrink: 0;
-  height: 100vh;
+  height: 100%;
   pointer-events: none;
   position: relative;
   background: rgb(248, 248, 247);
   box-shadow: rgba(0, 0, 0, 0.024) -1px 0px 0px 0px inset;
   transition: all 0.2s ease 0.2s;
-  z-index: 50;
+  z-index: 10;
+  overflow-y: scroll;
+}
+  
+.sidebar-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-container::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb {
+  background-color: var(--thumb-color, #999);
+  border-radius: 4px;
 }
 
 .sidebar {
@@ -101,9 +115,10 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 2px;
+  width: 1px;
   cursor: ew-resize;
   z-index: 1;
+  height: 100%;
   background-color: #ccc;
 }
 
@@ -121,6 +136,20 @@
   padding-top: 10px;
   min-width: 0;
   overflow: visible;
+  overflow-y: scroll;
+}
+
+.note-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.note-container::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.note-container::-webkit-scrollbar-thumb {
+  background-color: var(--thumb-color, #999);
+  border-radius: 4px;
 }
 
 .input-container {
@@ -281,52 +310,6 @@
   color: white !important;
 }
 
-/* Modal (dark mode) */
-
-/* dialog's background should be transparent in dark-mode as well  */
-.modal-dialog {
-  background-color: transparent !important;
-}
-
-.dark-mode .modal-content {
-  background-color: #292a2b !important;
-  color: white !important;
-}
-
-.dark-mode .modal-header,
-.dark-mode .modal-footer {
-  border-color: #555 !important;
-}
-
-.dark-mode .form-control,
-.dark-mode select {
-  background-color: #3c3f44 !important;
-  color: white !important;
-  border: 1px solid #666 !important;
-}
-
-.dark-mode .form-control::placeholder {
-  color: #ccc !important;
-}
-
-.dark-mode .btn-primary {
-  background-color: #555 !important;
-  border: none;
-}
-
-.dark-mode .btn-primary:hover {
-  background-color: #777 !important;
-}
-
-.dark-mode .btn-secondary {
-  background-color: #444 !important;
-  border: none;
-}
-
-.dark-mode .btn-secondary:hover {
-  background-color: #666 !important;
-}
-
 
 /* Responsive design */
 
@@ -472,7 +455,7 @@ button {
 }
 
 button:hover {
-  border-color: #646cff;
+  border-color: #b8b8c1;
 }
 
 button:focus,
@@ -483,6 +466,7 @@ button:focus-visible {
 .login-button {
   width: 98.19px;
 }
+
 
 @media (min-width: 300px) {
   .logo-header {
