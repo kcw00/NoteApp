@@ -7,21 +7,22 @@ import Notification from '../MainPage/Notification'
 import './styles/modal.css'
 
 const SharedModal = () => {
+    const dispatch = useDispatch()
+
     const [newCollaboratorName, setNewCollaboratorName] = useState('')
     const [newRole, setNewRole] = useState('viewer')
     const [show, setShow] = useState(false)
     const [users, setUsers] = useState([])
     const [errorMessage, setErrorMessage] = useState(null)
 
-    const dispatch = useDispatch()
+    
     const theme = useSelector((state) => state.ui.mode)
     const activeNoteId = useSelector(state => state.notes.activeNoteId)
     const note = useSelector(state => state.notes.entities[activeNoteId])
+    const user = useSelector(state => state.auth.user)
+
     const noteId = note?.id
     const collaborators = note?.collaborators || []
-    console.log('NOTE ID: ', noteId)
-    console.log('COLLABORATORS: ', collaborators)
-
 
 
     // get users from database
@@ -51,6 +52,18 @@ const SharedModal = () => {
                     setErrorMessage(null)
                 }, 3000)
                 
+                console.error(errorMessage)
+                return
+
+            } else if (user.userType === 'viewer') {
+                const errorMessage = 'Viewer cannot add a collaborator'
+                setErrorMessage(errorMessage)
+
+                // Set a timeout to clear the error message after 3 seconds
+                setTimeout(() => {
+                    setErrorMessage(null)
+                }, 3000)
+
                 console.error(errorMessage)
                 return
             }

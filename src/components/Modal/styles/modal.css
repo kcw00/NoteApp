@@ -3,23 +3,27 @@
 }
 
 .add-collaborator-button {
-  background-color: #c1c1d3;
-  color: #646cff !important;
-  border: 1px solid #c1c1d3;
-  padding: 0.4rem 0.6rem;
-  border-radius: 8px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  padding: 0.4em 0.6em;
+  font-size: 1em;
+  color: rgb(255, 255, 255);
+  background-color: grey;
+  cursor: pointer;
+  transition: border-color 0.25s;
 }
 
 .add-collaborator-button:hover {
-  background-color: #a1a6ab;
+  border-color: #b8b8c1;
 }
+
 
 .remove-collaborator-button {
   background-color: #d12727;
   color: #e7e6e6 !important;
   border: 1px solid #d12727;
   padding: 0.4rem 0.6rem;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .remove-collaborator-button:hover {
