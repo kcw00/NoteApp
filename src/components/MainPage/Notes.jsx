@@ -67,10 +67,11 @@ const Notes = () => {
                     }))
                     dispatch(setActiveNote(fetchedNotes[0]?.id))
                     console.log('Adding new empty note')
-                } else {
-                    // Set the active note to the first fetched note
-                    dispatch(setActiveNote(fetchedNotes[0]?.id))
-                    console.log('Setting active note to:', fetchedNotes[0]?.id)
+                } else if (fetchedNotes.length > 0) {
+                    // Set the active note to the first unshared note
+                    const unsharedNotes = fetchedNotes.filter(note => note.collaborators.length === 0)
+                    dispatch(setActiveNote(unsharedNotes[0]?.id))
+                    console.log('Setting active note to:', unsharedNotes[0]?.id)
                 }
 
 
