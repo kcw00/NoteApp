@@ -5,6 +5,7 @@ import { addNote, setActiveNote, setSharedNotes } from "../../redux/notesSlice"
 import { logoutUser } from "../../redux/authSlice"
 import { setSidebarWidth, setIsResizing, toggleSidebar } from "../../redux/uiSlice"
 import LogoutModal from "../Modal/LogoutModal"
+import "./styles/sidebar.css"
 
 const Sidebar = () => {
     const dispatch = useDispatch()
@@ -175,7 +176,7 @@ const Sidebar = () => {
                         to="/"
                         role="button"
                         onClick={() => setShowLogoutModal(true)}>
-                        Sign out
+                        Log out
                     </button>
                 </div>
                 {/* Logout Modal */}
