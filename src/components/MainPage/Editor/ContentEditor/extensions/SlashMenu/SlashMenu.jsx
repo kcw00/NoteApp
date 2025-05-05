@@ -1,8 +1,16 @@
 import React, { useEffect, useState, useImperativeHandle } from 'react'
+import { useSelector } from 'react-redux'
 import '../../../styles/SlashMenu.css'
 
-const SlashMenu = React.forwardRef(({ items = [], command, theme }, ref) => {
+const SlashMenu = React.forwardRef(({ items = [], command }, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [theme, setTheme] = useState('light')
+
+  const themeMode = useSelector((state) => state.ui.mode)
+
+  useEffect(() => {
+    setTheme(themeMode)
+  }, [themeMode])
 
   useEffect(() => {
     setSelectedIndex(0)

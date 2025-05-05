@@ -98,7 +98,6 @@ const suggestion = {
                             component = new ReactRenderer(SlashMenu, {
                                 props: {
                                     ...props,
-                                    theme: props.editor.storage.theme,
                                 },
                                 editor: props.editor,
                                 ref: (instance) => {
