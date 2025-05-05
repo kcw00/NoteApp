@@ -11,7 +11,7 @@ import Sidebar from "./Sidebar"
 const Notes = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const { noteId: routeNoteId } = useParams()
+    const params = useParams()
 
     const [loading, setLoading] = useState(true) // Track loading state
 
@@ -123,26 +123,6 @@ const Notes = () => {
 
 
     }, [user])
-
-
-    // Redirect if routeNoteId is deleted
-    useEffect(() => {
-        if (!routeNoteId) return // No route noteId, do nothing
-        const noteExists = Boolean(notesArray[routeNoteId])
-        console.log('noteExists:', noteExists)
-        console.log('routeNoteId:', routeNoteId)
-
-        socket.on('noteDeleted', (data) => {
-            console.log('socket listen ----- Note deleted:', data)
-        })
-
- 
-        if (!noteExists && notesArray.length > 0) {
-            const fallbackNoteId = notesArray[0] // fallback to most recent
-            dispatch(setActiveNote(fallbackNoteId))
-            navigate(`/notes/${fallbackNoteId}`, { replace: true })
-        }
-    }, [routeNoteId, notesArray])
 
 
     // Set collab token when active note changes
