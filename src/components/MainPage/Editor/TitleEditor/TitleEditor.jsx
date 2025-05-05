@@ -10,8 +10,9 @@ import Text from '@tiptap/extension-text'
 import Collaboration from '@tiptap/extension-collaboration'
 import Placeholder from '@tiptap/extension-placeholder'
 import { titleUpdated } from '../../../../redux/notesSlice'
+import "../styles/editor.css"
 
-const TitleEditor = ({ noteId, note }) => {
+const TitleEditor = ({ noteId }) => {
     const dispatch = useDispatch()
 
     const collabToken = useSelector(state => state.auth.collabToken)

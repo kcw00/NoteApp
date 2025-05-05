@@ -15,7 +15,7 @@ import TitleEditor from "./TitleEditor/TitleEditor"
 
 
 
-const NoteEditor = ({ noteId, note, notes }) => {
+const NoteEditor = ({ noteId, note }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -107,7 +107,7 @@ const NoteEditor = ({ noteId, note, notes }) => {
             <div id="input-container" className="input-container">
                 <div className="note-form d-flex flex-column align-items-center">
                     <div className="note-title-wrapper">
-                        <TitleEditor noteId={noteId} note={note} />
+                        <TitleEditor noteId={noteId} />
                     </div>
                     <div className="note-content-wrapper">
                         {isShared ? (<SharedEditor noteId={noteId} note={note} />) : (
