@@ -44,7 +44,6 @@ const TitleEditor = ({ noteId, note }) => {
         p.on('synced', () => {
             console.log('[Hocuspocus] Synced')
             setSynced(true)
-
         })
 
         p.connect()
@@ -83,28 +82,13 @@ const TitleEditor = ({ noteId, note }) => {
         onUpdate: ({ editor }) => {
             if (editor.isEmpty) return
             const titleJSON = editor.getJSON()
+            const titleText = editor.getText().trim()
             console.log('[TitleEditor] JSON update:', titleJSON)
             console.log('[TitleEditor] is synced:', isSynced)
             console.log('[TitleEditor] Yjs XML:', ydoc.getXmlFragment('title').toString())
-            dispatch(titleUpdated({ noteId, title: editor.getText().trim()}))
+            dispatch(titleUpdated({ noteId, title: titleText }))
         },
     })
-
-    /*
-    // this triggers onStoreDocument in backend/hocuspocus server
-    // this is for manual saving
-    // it will be called every 5 seconds
-    useEffect(() => {
-        if (provider) {
-            const interval = setInterval(() => {
-                console.log('[Manual Save] Calling provider.storeDocument()')
-                provider.storeDocument?.()
-            }, 5000)
-            return () => clearInterval(interval)
-        }
-    }, [provider])
-    */
-
 
     return <EditorContent editor={editor} />
 }

@@ -1,26 +1,40 @@
 import jsPDF from 'jspdf'
+import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { FiTrash2, FiSun, FiMoreHorizontal } from "react-icons/fi"
 import { TfiUpload } from "react-icons/tfi"
 import { toggleTheme } from '../../redux/uiSlice'
-import { deleteNote } from '../../redux/notesSlice'
+import { deleteNote, noteDeletedRealtime, setActiveNote } from '../../redux/notesSlice'
 import noteService from '../../services/notes'
 
 const NoteOption = ({ noteId }) => {
-
-
     const dispatch = useDispatch()
 
+
     const user = useSelector(state => state.auth.user)
+    const notes = useSelector(state => state.notes.entities)
+    const notesArray = useMemo(() => Object.values(notes), [notes])
+    const activeNoteId = useSelector(state => state.notes.activeNoteId)
     const userId = user?.userId
 
     console.log('userId:', userId)
 
 
 
-    const handleDelete = () => {
+
+    const handleDelete = async () => {
+        // user must have at least one of unshared notes
+        // Check if the user has any unshared notes
+        const hasUnsharedNotes = notesArray.filter(note => note.collaborators.length === 0)
+        if (!hasUnsharedNotes) {
+            // If no unshared notes, prevent deletion
+            alert("You must have at least one unshared note.")
+            return
+        }
+        // Proceed with deletion
         noteService.setToken(user?.token)
-        dispatch(deleteNote({ id: noteId, userId: userId }))
+        await dispatch(deleteNote({ id: noteId, userId: userId }))
+        console.log('DELETED NOTE:', noteId)
     }
 
     const exportToPDF = (note) => {

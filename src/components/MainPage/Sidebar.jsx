@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from "react-router-dom"
 import { addNote, setActiveNote, setSharedNotes } from "../../redux/notesSlice"
 import { logoutUser } from "../../redux/authSlice"
 import { setSidebarWidth, setIsResizing, toggleSidebar } from "../../redux/uiSlice"
+import LogoutModal from "../Modal/LogoutModal"
 
 const Sidebar = () => {
     const dispatch = useDispatch()
@@ -66,6 +67,12 @@ const Sidebar = () => {
 
     const handleToggleSidebar = () => {
         dispatch(toggleSidebar())
+    }
+
+    const [showLogoutModal, setShowLogoutModal] = useState(false)
+    const handleLogout = () => {
+        dispatch(logoutUser({ userId: user.userId }))
+        navigate('/')
     }
 
     const handleAddNote = async () => {
@@ -163,14 +170,20 @@ const Sidebar = () => {
                     )}
                 </div>
                 <div className="sidebar-footer text-end p-3 mt-auto">
-                    <Link
+                    <button
                         className="btn btn-outline-danger"
                         to="/"
                         role="button"
-                        onClick={() => dispatch(logoutUser({ userId: user.userId }))}>
+                        onClick={() => setShowLogoutModal(true)}>
                         Sign out
-                    </Link>
+                    </button>
                 </div>
+                {/* Logout Modal */}
+                    <LogoutModal
+                        show={showLogoutModal}
+                        onClose={() => setShowLogoutModal(false)}
+                        onConfirm={handleLogout}
+                    />
                 {/* Resizer Bar (only show when open) */}
                 {isSidebarOpen && (
                     <div
