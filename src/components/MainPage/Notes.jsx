@@ -128,17 +128,21 @@ const Notes = () => {
     // Redirect if routeNoteId is deleted
     useEffect(() => {
         if (!routeNoteId) return // No route noteId, do nothing
-        const noteExists = Boolean(notes[routeNoteId])
+        const noteExists = Boolean(notesArray[routeNoteId])
         console.log('noteExists:', noteExists)
         console.log('routeNoteId:', routeNoteId)
 
+        socket.on('noteDeleted', (data) => {
+            console.log('socket listen ----- Note deleted:', data)
+        })
+
  
-        if (!noteExists && Object.keys(notes).length > 0) {
-            const fallbackNoteId = Object.keys(notes).at(-1) // fallback to most recent
+        if (!noteExists && notesArray.length > 0) {
+            const fallbackNoteId = notesArray[0] // fallback to most recent
             dispatch(setActiveNote(fallbackNoteId))
             navigate(`/notes/${fallbackNoteId}`, { replace: true })
         }
-    }, [routeNoteId, notes])
+    }, [routeNoteId, notesArray])
 
 
     // Set collab token when active note changes

@@ -1,5 +1,3 @@
-
-
 const Notification = ({ errorMessage }) => {
   if (errorMessage === null) {
     return null

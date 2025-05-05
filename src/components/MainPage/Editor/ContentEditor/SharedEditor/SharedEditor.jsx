@@ -5,10 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import { useEditor, EditorContent } from '@tiptap/react'
 import * as Y from 'yjs'
 import { HocuspocusProvider } from '@hocuspocus/provider'
-import MenuBar from '../extensions/Menubar'
-import { mainExtensions } from '../extensions/Extension'
-import { Collaboration } from '@tiptap/extension-collaboration'
-import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'
 import { useLayoutEffect } from 'react'
 import EditorWithCursor from "./EditorWithCursor"
 import "../../styles/editor.css"

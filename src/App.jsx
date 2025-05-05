@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import Notes from './components/Note/Notes'
+import Notes from './components/MainPage/Notes'
 import LoginForm from './components/Auth/LoginForm'
 import SignupForm from './components/Auth/SignupForm'
 import Home from './components/Home/Home'
@@ -10,6 +10,7 @@ import Home from './components/Home/Home'
 const App = () => {
   const loggedIn = useSelector(state => Boolean(state.auth.user?.userId))
   const theme = useSelector((state) => state.ui.mode)
+  const activeNoteId = useSelector(state => state.notes.activeNoteId)
 
 
 

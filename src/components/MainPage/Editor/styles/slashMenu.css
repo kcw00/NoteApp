@@ -45,7 +45,7 @@
     padding: 0.4rem 0.6rem;
     border: none;
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     overflow-y: auto;
   }
 
@@ -66,7 +66,7 @@
     padding: 0.6rem 0.6rem 0.6rem 0.6rem;
     border: none;
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     overflow: hidden;
   }
 
