@@ -6,10 +6,11 @@ import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fet
 import notesService from "../../services/notes"
 import NoteEditor from "./Editor/NoteEditor"
 import Sidebar from "./Sidebar"
+import { useParams } from "react-router-dom"
 
 const Notes = () => {
     const dispatch = useDispatch()
-
+    const params = useParams()
 
     const [loading, setLoading] = useState(true) // Track loading state
 
@@ -28,6 +29,7 @@ const Notes = () => {
     console.log('Notes:', notesArray)
     console.log('notes length:', notesArray.length)
     console.log('Active Note:', note)
+    console.log('noteId from routes', params.id)
 
     useEffect(() => {
         console.log("main useEffect called")
@@ -64,11 +66,17 @@ const Notes = () => {
                     }))
                     dispatch(setActiveNote(fetchedNotes[0]?.id))
                     console.log('Adding new empty note')
-                } else if (fetchedNotes.length > 0) {
-                    // Set the active note to the first unshared note
+                    
+                } else if (fetchedNotes.length > 0 && !params.id) {
+                    // Set the active note to the first unshared note once user logged in
                     const unsharedNotes = fetchedNotes.filter(note => note.collaborators.length === 0)
                     dispatch(setActiveNote(unsharedNotes[0]?.id))
                     console.log('Setting active note to:', unsharedNotes[0]?.id)
+
+                } else if (fetchedNotes.length > 0 && params.id) {
+                    // Keep the current active note after page refresh
+                    dispatch(setActiveNote(params.id))
+                    console.log('active note not changed')
                 }
 
 
@@ -96,7 +104,7 @@ const Notes = () => {
         if (user?.token && user?.userId) {
             fetchNotesData()
 
-            // Set up socket listeners only once
+            // Set up socket listeners
             socket.on('activeUsers', (data) => {
                 console.log('socket listen ----- Logged user:', data)
                 dispatch(setActiveUsers(data))
