@@ -1,5 +1,5 @@
 .slash-menu {
-  background: var(--background-color, #fff);
+  background: var(--background-color, #ffffff);
   border: 1px solid var(--gray-1, #ddd);
   border-radius: 0.2rem;
   box-shadow: var(--shadow, 0 4px 8px rgba(0, 0, 0, 0.1));
@@ -30,7 +30,7 @@
 
 .slash-menu.dark {
   background-color: #292a2b;
-  color: rgb(223, 223, 223);
+  color: #dfdfdf;
   border: 1px solid var(--dark-gray-1, #444);
 }
 
