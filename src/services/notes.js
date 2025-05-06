@@ -91,14 +91,5 @@ const removeCollaborator = async (noteId, collaboratorId) => {
   return response.data
 }
 
-// Update collaborator role
-const updateCollaboratorRole = async (noteId, collaboratorId, userType) => {
-  const config = {
-    headers: { Authorization: token },
-  }
-  const response = await axios.put(`${baseUrl}//${noteId}/collaborators/${collaboratorId}/role`, { userType }, config)
-  return response.data
-}
 
-
-export default { getAll, getNote, create, update, remove, setToken, addCollaborator, removeCollaborator, updateCollaboratorRole, getSharedNotes }
+export default { getAll, getNote, create, update, remove, setToken, addCollaborator, removeCollaborator, getSharedNotes }

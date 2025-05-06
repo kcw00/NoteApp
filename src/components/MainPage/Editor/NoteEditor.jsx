@@ -6,7 +6,6 @@ import { setWindowWidth, toggleSidebar } from '../../../redux/uiSlice'
 import Alert from '../../Alert/Alert'
 import NoteCollaborators from "../../Modal/SharedModal"
 import NoteOption from "../NoteOption"
-// import SharedEditor from "./ContentEditor/SharedEditor"
 import SharedEditor from "./ContentEditor/SharedEditor/SharedEditor"
 import DefaultEditor from "./ContentEditor/DefaultEditor/DefaultEditor"
 import { logoutUser } from "../../../redux/authSlice"

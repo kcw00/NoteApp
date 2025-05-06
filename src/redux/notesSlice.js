@@ -43,6 +43,29 @@ export const fetchNote = createAsyncThunk("notes/fetchNote", async (id, { reject
     }
 })
 
+// Fetch shared notes
+export const fetchSharedNotes = createAsyncThunk("notes/fetchSharedNotes", async (userId, { rejectWithValue }) => {
+    try {
+        const sharedNotes = await notesService.getSharedNotes(userId)
+        socket.emit("fetchSharedNotes", sharedNotes) // Notify other clients
+        return sharedNotes
+    } catch (error) {
+        return rejectWithValue(error.response?.data || "Failed to fetch shared notes")
+    }
+})
+
+// Delete note
+export const deleteNote = createAsyncThunk("notes/deleteNote", async ({ id, userId }, { rejectWithValue }) => {
+    try {
+        await notesService.remove(id, userId)
+        console.log("delete note id:", id)
+        socket.emit("deleteNote", { id, userId }) // Notify other clients
+        return id
+    } catch (error) {
+        return rejectWithValue(error.response?.data || "Failed to delete note")
+    }
+})
+
 // Add collaborator
 export const addCollaborator = createAsyncThunk("notes/addCollaborator", async ({ noteId, collaboratorId, userType }, { rejectWithValue }) => {
     try {
@@ -65,40 +88,6 @@ export const removeCollaborator = createAsyncThunk("notes/removeCollaborator", a
     }
 })
 
-// Update collaborator role
-export const updateCollaboratorRole = createAsyncThunk("notes/updateCollaboratorRole", async ({ noteId, collaboratorId, userType }, { rejectWithValue }) => {
-    try {
-        const updatedNote = await notesService.updateCollaboratorRole(noteId, collaboratorId, userType)
-        socket.emit("collaboratorRoleUpdated", updatedNote) // Notify other clients
-        return updatedNote
-    } catch (error) {
-        return rejectWithValue(error.response?.data || "Failed to update collaborator role")
-    }
-})
-
-// Fetch shared notes
-export const fetchSharedNotes = createAsyncThunk("notes/fetchSharedNotes", async (userId, { rejectWithValue }) => {
-    try {
-        const sharedNotes = await notesService.getSharedNotes(userId)
-        socket.emit("fetchSharedNotes", sharedNotes) // Notify other clients
-        return sharedNotes
-    } catch (error) {
-        return rejectWithValue(error.response?.data || "Failed to fetch shared notes")
-    }
-})
-
-
-// Delete note
-export const deleteNote = createAsyncThunk("notes/deleteNote", async ({ id, userId }, { rejectWithValue }) => {
-    try {
-        await notesService.remove(id, userId)
-        console.log("Note deleted:", id)
-        socket.emit("deleteNote", { id, userId }) // Notify other clients
-        return id
-    } catch (error) {
-        return rejectWithValue(error.response?.data || "Failed to delete note")
-    }
-})
 
 export const clearErrorMessage = createAsyncThunk("notes/clearErrorMessage", async () => {
     return null
@@ -229,16 +218,6 @@ const notesSlice = createSlice({
                 const note = state.entities[noteId]
                 if (note?.collaborators) {
                     note.collaborators = note.collaborators.filter(collab => collab.userId !== collaboratorId)
-                }
-            })
-            .addCase(updateCollaboratorRole.fulfilled, (state, action) => {
-                const { noteId, collaboratorId, userType } = action.payload
-                const note = state.entities[noteId]
-                if (note?.collaborators) {
-                    const collaborator = note.collaborators.find(collab => collab.userId === collaboratorId)
-                    if (collaborator) {
-                        collaborator.userType = userType
-                    }
                 }
             })
             .addCase(clearErrorMessage.fulfilled, (state) => {

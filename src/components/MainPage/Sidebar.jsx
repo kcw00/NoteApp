@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from "react-router-dom"
-import { addNote, setActiveNote, setSharedNotes } from "../../redux/notesSlice"
+import { addNote, setActiveNote } from "../../redux/notesSlice"
 import { logoutUser } from "../../redux/authSlice"
 import { setSidebarWidth, setIsResizing, toggleSidebar } from "../../redux/uiSlice"
 import LogoutModal from "../Modal/LogoutModal"

@@ -1,13 +1,12 @@
-import "../../styles/collab.css"
 import { useEffect, useState, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useEditor, EditorContent } from '@tiptap/react'
 import * as Y from 'yjs'
 import { HocuspocusProvider } from '@hocuspocus/provider'
 import { useLayoutEffect } from 'react'
 import EditorWithCursor from "./EditorWithCursor"
 import "../../styles/editor.css"
+import "../../styles/collab.css"
 
 
 // Define the colors for cursor display
