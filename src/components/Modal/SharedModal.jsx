@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Modal, Button, Form } from 'react-bootstrap'
 import axios from 'axios'
 import { setCollaborators, addCollaborator, collaboratorRemoved, removeCollaborator } from '../../redux/notesSlice'
+import { createCollabToken } from '../../redux/authSlice'
 import Notification from '../MainPage/Notification'
 import './styles/modal.css'
 
@@ -83,10 +84,17 @@ const SharedModal = () => {
             dispatch(setCollaborators({ noteId: noteId, collaborator: collaboratorData }))
 
             // Make an API request to add the collaborator with the selected role
-            dispatch(addCollaborator({ 
-                noteId: noteId, 
-                collaboratorId: newCollaborator.id, 
-                userType: newRole 
+            dispatch(addCollaborator({
+                noteId: noteId,
+                collaboratorId: newCollaborator.id,
+                userType: newRole
+            }))
+            
+            // Generate a new collaboration token for creator or editor 
+            dispatch(createCollabToken({
+                noteId: activeNoteId,
+                userId: user?.userId,
+                permissions: 'write', // adding a collaborator can only be done by creator or editor
             }))
 
             // Reset the input fields
