@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setCollaborators, addCollaborator, collaboratorRemoved, removeCollaborator, updateCollaboratorRole } from '../../redux/notesSlice'
 import { Modal, Button, Form } from 'react-bootstrap'
 import axios from 'axios'
+import { setCollaborators, addCollaborator, collaboratorRemoved, removeCollaborator } from '../../redux/notesSlice'
 import Notification from '../MainPage/Notification'
 import './styles/modal.css'
 
@@ -15,7 +15,7 @@ const SharedModal = () => {
     const [users, setUsers] = useState([])
     const [errorMessage, setErrorMessage] = useState(null)
 
-    
+
     const theme = useSelector((state) => state.ui.mode)
     const activeNoteId = useSelector(state => state.notes.activeNoteId)
     const note = useSelector(state => state.notes.entities[activeNoteId])
@@ -51,7 +51,7 @@ const SharedModal = () => {
                 setTimeout(() => {
                     setErrorMessage(null)
                 }, 3000)
-                
+
                 console.error(errorMessage)
                 return
 
@@ -83,8 +83,11 @@ const SharedModal = () => {
             dispatch(setCollaborators({ noteId: noteId, collaborator: collaboratorData }))
 
             // Make an API request to add the collaborator with the selected role
-            await dispatch(addCollaborator({ noteId: noteId, collaboratorId: newCollaborator.id, userType: newRole }))
-
+            dispatch(addCollaborator({ 
+                noteId: noteId, 
+                collaboratorId: newCollaborator.id, 
+                userType: newRole 
+            }))
 
             // Reset the input fields
             setNewCollaboratorName('')
@@ -109,32 +112,41 @@ const SharedModal = () => {
                 share
             </button>
 
-            <Modal show={show} onHide={() => setShow(false)} centered  dialogClassName={theme === "dark" ? "dark-mode" :""} >
+            <Modal show={show} onHide={() => setShow(false)} centered dialogClassName={theme === "dark" ? "dark-mode" : ""} >
                 <Modal.Header closeButton>
                     <Modal.Title>Manage Collaborator</Modal.Title>
-                    
+
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Group controlId="formBasicEmail">
+                    <Form.Group>
                         <Form.Label>Enter Collaborator's Username</Form.Label>
                         <Notification errorMessage={errorMessage} />
-                        <Form.Control
-                            type="text"
-                            placeholder="Username"
-                            value={newCollaboratorName}
-                            onChange={(e) => setNewCollaboratorName(e.target.value)}
-                        />
 
-                        <select value={newRole} onChange={(e) => setNewRole(e.target.value)}>
-                            <option value="viewer">View Only</option>
-                            <option value="editor">Can Edit</option>
-                        </select>
+                        <div className="collaborator-input-group">
+                            <Form.Control
+                                type="text"
+                                placeholder="Username"
+                                value={newCollaboratorName}
+                                onChange={(e) => setNewCollaboratorName(e.target.value)}
+                                className="username-input"
+                            />
 
+                            <Form.Select
+                                value={newRole}
+                                onChange={(e) => setNewRole(e.target.value)}
+                                className="role-select"
+                            >
+                                <option value="viewer">View Only</option>
+                                <option value="editor">Can Edit</option>
+                            </Form.Select>
+
+
+                            <Button className='invite-button' onClick={handleAddCollaborator}>
+                                invite
+                            </Button>
+                        </div>
                     </Form.Group>
-                    <button className='add-collaborator-button' onClick={handleAddCollaborator}>
-                        Add Collaborator
-                    </button>
-                    <ul>
+                    <ul className='collaborator-list'>
                         {collaborators.map(collaborator => (
                             <li key={collaborator.userId || `${collaborator.username}-${collaborator.userType}`}>
                                 {collaborator.username} - {collaborator.userType}
@@ -152,7 +164,7 @@ const SharedModal = () => {
                 </Modal.Footer>
             </Modal>
 
-        </div>
+        </div >
     )
 }
 
