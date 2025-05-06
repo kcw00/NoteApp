@@ -26,7 +26,7 @@ const SharedModal = () => {
     const collaborators = note?.collaborators || []
 
 
-    // get users from database
+    // Get users from database
     useEffect(() => {
         axios.get('/api/users')
             .then((response) => {
