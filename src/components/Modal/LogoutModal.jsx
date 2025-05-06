@@ -1,7 +1,7 @@
-// components/modals/LogoutModal.jsx
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Modal, Button } from 'react-bootstrap'
+import './styles/modal.css'
 
 const LogoutModal = ({ show, onConfirm, onClose }) => {
 
@@ -20,7 +20,7 @@ const LogoutModal = ({ show, onConfirm, onClose }) => {
           Cancel
         </Button>
         <Button variant="danger" onClick={onConfirm}>
-          Log Out
+          Log out
         </Button>
       </Modal.Footer>
     </Modal>

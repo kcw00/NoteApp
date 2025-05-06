@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useEditor, EditorContent, EditorProvider } from '@tiptap/react'
+import { useEffect, useState, useMemo } from 'react'
+import { useSelector } from 'react-redux'
+import { useEditor, EditorContent } from '@tiptap/react'
 import * as Y from 'yjs'
-import { HocuspocusProvider, WebSocketStatus } from '@hocuspocus/provider'
+import { HocuspocusProvider } from '@hocuspocus/provider'
 import { mainExtensions } from '../extensions/Extension'
 import { Collaboration } from '@tiptap/extension-collaboration'
 import "../../styles/editor.css"

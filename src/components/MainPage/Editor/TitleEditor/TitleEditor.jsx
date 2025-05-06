@@ -1,4 +1,3 @@
-// TitleEditor.jsx
 import { useEditor, EditorContent } from '@tiptap/react'
 import { useMemo, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'

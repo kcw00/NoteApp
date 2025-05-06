@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useNavigate, useParams } from "react-router-dom"
 import { socket } from "../../socket"
 import { createCollabToken } from "../../redux/authSlice"
 import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes, noteDeletedRealtime, setCollaborators } from "../../redux/notesSlice"
@@ -10,14 +9,12 @@ import Sidebar from "./Sidebar"
 
 const Notes = () => {
     const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const params = useParams()
+
 
     const [loading, setLoading] = useState(true) // Track loading state
 
     const notes = useSelector(state => state.notes.entities)
     const notesArray = useMemo(() => Object.values(notes), [notes])
-
 
 
     const activeNoteId = useSelector(state => state.notes.activeNoteId)
