@@ -48,6 +48,18 @@ const suggestion = {
                             },
                         },
                         {
+                            title: 'Bullet List',
+                            command: ({ editor, range }) => {
+                                editor.chain().focus().deleteRange(range).toggleBulletList().run()
+                            },
+                        },
+                        {
+                            title: 'Ordered List',
+                            command: ({ editor, range }) => {
+                                editor.chain().focus().deleteRange(range).toggleOrderedList().run()
+                            },
+                        },
+                        {
                             title: 'Inline Code',
                             description: 'Toggle inline code',
                             command: ({ editor, range }) => {
@@ -72,18 +84,6 @@ const suggestion = {
                             title: 'Code Block',
                             command: ({ editor, range }) => {
                                 editor.chain().focus().deleteRange(range).toggleCodeBlock().run()
-                            },
-                        },
-                        {
-                            title: 'Bullet List',
-                            command: ({ editor, range }) => {
-                                editor.chain().focus().deleteRange(range).toggleBulletList().run()
-                            },
-                        },
-                        {
-                            title: 'Ordered List',
-                            command: ({ editor, range }) => {
-                                editor.chain().focus().deleteRange(range).toggleOrderedList().run()
                             },
                         },
                     ].filter(item => item.title.toLowerCase().includes(query.toLowerCase()))
