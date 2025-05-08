@@ -7,12 +7,15 @@ import notesService from "../../services/notes"
 import NoteEditor from "./Editor/NoteEditor"
 import Sidebar from "./Sidebar"
 import { useParams } from "react-router-dom"
+import Alert from "../Alert/Alert"
 
 const Notes = () => {
     const dispatch = useDispatch()
     const params = useParams()
 
     const [loading, setLoading] = useState(true) // Track loading state
+    const [showAlert, setShowAlert] = useState(false)
+    const [alertMessage, setAlertMessage] = useState("")
 
     const notes = useSelector(state => state.notes.entities)
     const notesArray = useMemo(() => Object.values(notes), [notes])
@@ -66,7 +69,7 @@ const Notes = () => {
                     }))
                     dispatch(setActiveNote(fetchedNotes[0]?.id))
                     console.log('Adding new empty note')
-                    
+
                 } else if (fetchedNotes.length > 0 && !params.id) {
                     // Set the active note to the first unshared note once user logged in
                     const unsharedNotes = fetchedNotes.filter(note => note.collaborators.length === 0)
@@ -111,38 +114,64 @@ const Notes = () => {
             })
 
 
-            socket.on('noteDeleted', (data) => {
-                console.log('socket listen ----- Note deleted:', data)
-                dispatch(noteDeletedRealtime(data))
-            })
-
             socket.on('collaboratorAdded', (data) => {
                 console.log('socket listen ----- Collaborator added:', data)
-                dispatch(setCollaborators(data))
+                // dispatch(setCollaborators({ noteId: data.noteId, collaborator: data.collaboratorSchema }))
             })
 
             socket.on('noteShared', (data) => {
                 console.log('socket listen ----- Note shared:', data)
                 dispatch(setSharedNotes(data))
             })
+
+            socket.on('collaboratorRemoved', (data) => {
+                console.log('socket listen ----- Collaborator removed:', data)
+                // dispatch(setCollaborators(data))
+            })
+
         }
 
 
     }, [user])
 
-
     // Set collab token when active note changes
     useEffect(() => {
         console.log('collab useEffect called')
+        if (!user?.userId || !note) return
 
-        if (activeNoteId) {// set collab token
-            dispatch(createCollabToken({
-                noteId: activeNoteId,
-                userId: user?.userId,
-                permissions: isType === 'viewer' ? 'read' : 'write',
-            }))
+        const fetchCollabToken = async () => {
+            try {
+                await dispatch(createCollabToken({
+                    noteId: activeNoteId,
+                    userId: user?.userId,
+                    permissions: isType === 'viewer' ? 'read' : 'write',
+                }))
+            }
+            catch (error) {
+                console.error('Error fetching collab token:', error)
+            }
         }
-    }, [activeNoteId, user?.userId])
+        fetchCollabToken()
+    }, [activeNoteId, user?.userId, params.id])
+
+
+    // show alert when note is deleted
+    useEffect(() => {
+        socket.on('noteDeleted', (data) => {
+            console.log('socket listen ----- Note deleted:', data.id)
+            setAlertMessage("Note deleted")
+            setShowAlert(true)
+
+            setTimeout(() => {
+                setShowAlert(false)
+            }, 3000)
+        })
+
+        return () => {
+            socket.off('noteDeleted')
+        }
+    }, [])
+
 
     if (loading) {
         return <div>Loading...</div> // Display loading state until data is fetched
@@ -153,11 +182,11 @@ const Notes = () => {
         <div id="notes-app">
             <Sidebar />
             {note ? (
-                <NoteEditor key={activeNoteId} noteId={activeNoteId} note={note} notes={notesArray} />
+                <NoteEditor key={activeNoteId} noteId={activeNoteId} note={note} />
             ) : (
-                <NoteEditor key="null" noteId="null" note="null" notes="null" />
+                <NoteEditor key="null" noteId="null" note="null" />
             )}
-
+            {showAlert && <Alert message={alertMessage} onClose={() => setShowAlert(false)} />}
         </div>
 
     )
