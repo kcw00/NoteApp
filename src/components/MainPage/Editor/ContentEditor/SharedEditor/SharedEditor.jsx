@@ -37,16 +37,21 @@ const SharedEditor = ({ noteId, note }) => {
     // const getRandomName = () => getRandomElement(activeUsersNames)
 
     const currentUser = useMemo(() => ({
-        name: user?.username || "Anonymous",
+        name: user?.username,
         color: getRandomColor()
     }), [user])
+
+    const userRole = useMemo(() => {
+        if (!note || !user) return null
+        if (note.creator === user.userId) return 'creator'
+        const match = note.collaborators.find(c => c.userId === user.userId)
+        return match?.userType || null
+    }, [note, user])
 
 
     const ydoc = useMemo(() => new Y.Doc(), [noteId])
 
     const [isSynced, setSynced] = useState(false)
-    const [isCollabReady, setIsCollabReady] = useState(false)
-    const [editorInstance, setEditorInstance] = useState(null)
     const [isCursorReady, setCursorReady] = useState(false)
 
 
@@ -82,13 +87,12 @@ const SharedEditor = ({ noteId, note }) => {
 
             const xml = ydoc.getXmlFragment('content')
             const isEmpty = xml.toString().trim() === ''
-            if (isEmpty && editorInstance && note?.content) {
+            if (isEmpty && note?.content) {
                 const hydratedDoc = TiptapTransformer.toYdoc(note.content, 'content')
                 const update = Y.encodeStateAsUpdate(hydratedDoc)
                 Y.applyUpdate(ydoc, update)
                 console.log('[SharedEditor] Injected note content into Yjs')
             }
-
 
         })
 
@@ -96,6 +100,8 @@ const SharedEditor = ({ noteId, note }) => {
     }, [collabToken, noteId])
 
     useLayoutEffect(() => {
+        if (!provider) return
+
         provider.connect()
         provider.on('connect', () => {
             console.log('[SharedProvider] Connected')
@@ -132,29 +138,29 @@ const SharedEditor = ({ noteId, note }) => {
     }, [provider])
 
 
-    useEffect(() => {
-        console.log('useEffect2 called')
-        const collabReadyTimeout = setTimeout(() => {
-            if (
-                !isCollabReady &&
-                isSynced &&
-                isCursorReady &&
-                provider?.status === 'connected' ||
-                provider?.status === 'connecting'
-            ) {
-                setIsCollabReady(true)
-            }
-        }, 500)
-        return () => clearTimeout(collabReadyTimeout)
-    }, [provider?.status, provider])
 
 
     if (!isCursorReady) {
         return <p>Loading real-time collaborative editor...</p>
     }
 
-    // 👇 Now render a separate child once ready
-    return <EditorWithCursor provider={provider} ydoc={ydoc} currentUser={currentUser} />
+
+    return (
+        <EditorWithCursor
+            provider={provider}
+            ydoc={ydoc}
+            currentUser={currentUser}
+            readOnly={userRole === 'viewer' ? "viewer" : ""}
+            onEditAttempt={() => {
+                if (userRole === 'viewer') {
+                    console.log('[SharedEditor] Edit attempt by viewer')
+                    alert('You are a viewer and cannot edit this note.')
+                }
+            }}
+        />
+    )
+
+
 }
 
 export default SharedEditor
