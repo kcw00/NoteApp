@@ -29,7 +29,6 @@ const SharedEditor = ({ noteId, note }) => {
     // console.log('NOTE ID from sharedEditor: ', noteId)
     // const note = useSelector(state => state.notes.entities[noteId])
     const activeUsers = useSelector(state => state.notes.activeUsers)
-    const activeUsersNames = activeUsers.map(user => user.username)
     const user = useSelector(state => state.auth.user)
     const collabToken = useSelector(state => state.auth.collabToken)
     // console.log('[SharedEditor]collabToken:', collabToken)
@@ -151,12 +150,6 @@ const SharedEditor = ({ noteId, note }) => {
             ydoc={ydoc}
             currentUser={currentUser}
             readOnly={userRole === 'viewer' ? "viewer" : ""}
-            onEditAttempt={() => {
-                if (userRole === 'viewer') {
-                    console.log('[SharedEditor] Edit attempt by viewer')
-                    alert('You are a viewer and cannot edit this note.')
-                }
-            }}
         />
     )
 
