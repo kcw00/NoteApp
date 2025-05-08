@@ -6,7 +6,7 @@ import { mainExtensions } from '../extensions/Extension'
 import suggestion from '../extensions/SlashMenu/suggestion'
 import Commands from '../extensions/SlashMenu/commands'
 
-const EditorWithCursor = ({ provider, ydoc, currentUser }) => {
+const EditorWithCursor = ({ provider, ydoc, currentUser, onEditAttempt, readOnly }) => {
 
   const [editorInstance, setEditorInstance] = useState(null)
 
@@ -36,6 +36,7 @@ const EditorWithCursor = ({ provider, ydoc, currentUser }) => {
     },
     immediatelyRender: true,
     shouldRerenderOnTransaction: true,
+    editable: readOnly ? false : true,
     extensions,
     autofocus: true,
     onCreate: ({ editor }) => {
@@ -48,10 +49,33 @@ const EditorWithCursor = ({ provider, ydoc, currentUser }) => {
       const editorContent = editor.getJSON()
       console.log('[Shared Editor] JSON update:', editorContent)
     },
+    editorProps: {
+      attributes: {
+        class: 'editor',
+      },
+      handleDOMEvents: {
+        beforeinput: (view, event) => {
+          if (readOnly) {
+            onEditAttempt?.()
+            event.preventDefault()
+            return true
+          }
+          return false
+        },
+        keydown: (view, event) => {
+          if (readOnly) {
+            onEditAttempt?.()
+            event.preventDefault()
+            return true
+          }
+          return false
+        },
+      },
+    },
   })
 
   return (
-    <div>
+    <div className="editor-container">
       <EditorContent editor={editor} />
     </div>
   )
