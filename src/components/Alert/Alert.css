@@ -22,7 +22,7 @@
     max-width: 250px;
     width: 25%;
     transform: translateY(30%);
-    animation: slideUp 0.5s ease-out forwards;
+    animation: slideUp 1s ease-out forwards;
 }
 
 .custom-alert p {
