@@ -106,9 +106,9 @@ const Sidebar = () => {
 
 
     return (
-        <nav className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}
-            style={{ width: isSidebarOpen ? `${sidebarWidth}px` : "", transition: isResizing ? "none" : "width 0.2s ease" }}>
-            <div className="sidebar" style={{ width: `${sidebarWidth}px` }}>
+        <aside className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}
+            style={{ width: isSidebarOpen ? `${sidebarWidth}px` : "", transition: isResizing ? "none" : "all 0.4s ease" }}>
+            <div className="sidebar" style={{ width: `${sidebarWidth}px`, transition: isResizing ? "none" : "all 0.4s ease" }}>
                 <div className="sidebar-header">
                     <p> {user?.username}'s Notes</p>
                     <button className="fav-button ms-auto" onClick={handleToggleSidebar}>{isSidebarOpen ? "<<" : ""}</button>
@@ -193,7 +193,7 @@ const Sidebar = () => {
                     ></div>
                 )}
             </div>
-        </nav>
+        </aside>
     )
 
 }

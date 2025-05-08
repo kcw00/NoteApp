@@ -10,10 +10,12 @@
     position: relative;
     background: rgb(248, 248, 247);
     box-shadow: rgba(0, 0, 0, 0.024) -1px 0px 0px 0px inset;
-    transition: all 0.2s ease 0.2s;
     z-index: 10;
     overflow-y: scroll;
-    overflow-x: hidden;
+    overflow-x: hidden;  
+    transition: transform 0.3s ease, width 0.3s ease;
+    transform: translateX(0);
+    will-change: transform;
 }
 
 .sidebar-container::-webkit-scrollbar {
@@ -36,20 +38,19 @@
     position: relative;
     pointer-events: auto;
     padding-top: 0px;
+    transition: width 0.3s ease;
 }
 
 .sidebar-container.closed {
     width: 0;
     opacity: 0;
     transform: translateX(-347px) translateY(0px);
-    visibility: hidden;
 }
 
 .sidebar.closed {
     width: 0;
     opacity: 0;
     transform: translateX(-347px) translateY(0px);
-    visibility: hidden;
 }
 
 .sidebar-header {
