@@ -81,7 +81,7 @@ export const addCollaborator = createAsyncThunk("notes/addCollaborator", async (
 export const removeCollaborator = createAsyncThunk("notes/removeCollaborator", async ({ noteId, collaboratorId }, { rejectWithValue }) => {
     try {
         const updatedNote = await notesService.removeCollaborator(noteId, collaboratorId)
-        socket.emit("collaboratorRemoved", updatedNote) // Notify other clients
+        socket.emit("removeCollaborator", { noteId, collaboratorId }) // Notify other clients
         return updatedNote
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to remove collaborator")
