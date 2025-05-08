@@ -86,7 +86,7 @@ const NoteEditor = ({ noteId, note }) => {
             <div id="input-container" className="input-container">
                 <div className="note-form d-flex flex-column align-items-center">
                     <div className="note-title-wrapper">
-                        <TitleEditor noteId={noteId} />
+                        <TitleEditor noteId={noteId} note={note} />
                     </div>
                     <div className="note-content-wrapper">
                         {isShared ? (<SharedEditor noteId={noteId} note={note} />) : (

@@ -11,15 +11,22 @@ import Placeholder from '@tiptap/extension-placeholder'
 import { titleUpdated } from '../../../../redux/notesSlice'
 import "../styles/editor.css"
 
-const TitleEditor = ({ noteId }) => {
+const TitleEditor = ({ noteId, note }) => {
     const dispatch = useDispatch()
 
     const collabToken = useSelector(state => state.auth.collabToken)
+    const user = useSelector(state => state.auth.user)
 
     const ydoc = useMemo(() => new Y.Doc(), [noteId])
-    const [provider, setProvider] = useState(null)
+
     const [isSynced, setSynced] = useState(false)
-    const [titleEditor, setTitleEditor] = useState(null)
+
+    const userRole = useMemo(() => {
+        if (!note || !user) return null
+        if (note.creator === user.userId) return 'creator'
+        const match = note.collaborators.find(c => c.userId === user.userId)
+        return match?.userType || null
+    }, [note, user])
 
     useEffect(() => {
         if (!noteId || !collabToken) return
@@ -47,17 +54,16 @@ const TitleEditor = ({ noteId }) => {
         })
 
         p.connect()
-        setProvider(p)
 
         return () => {
             p.destroy()
-            setProvider(null)
         }
     }, [noteId, collabToken])
 
     const editor = useEditor({
         immediatelyRender: true,
         shouldRerenderOnTransaction: false,
+        editable: userRole === 'viewer' ? false : true,
         extensions: [
             Document.extend({
                 content: 'heading',
@@ -75,8 +81,7 @@ const TitleEditor = ({ noteId }) => {
                 field: 'title', // add title field
             }),
         ],
-        onCreate: ({ editor }) => {
-            setTitleEditor(editor)
+        onCreate: () => {
             console.log('[TitleEditor] Created')
         },
         onUpdate: ({ editor }) => {
@@ -88,6 +93,11 @@ const TitleEditor = ({ noteId }) => {
             console.log('[TitleEditor] Yjs XML:', ydoc.getXmlFragment('title').toString())
             dispatch(titleUpdated({ noteId, title: titleText }))
         },
+        editorProps: {
+            attributes: {
+              class: 'content-editor',
+            },
+          },
     })
 
     return <EditorContent editor={editor} />

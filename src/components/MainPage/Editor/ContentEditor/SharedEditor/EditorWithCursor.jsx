@@ -6,7 +6,7 @@ import { mainExtensions } from '../extensions/Extension'
 import suggestion from '../extensions/SlashMenu/suggestion'
 import Commands from '../extensions/SlashMenu/commands'
 
-const EditorWithCursor = ({ provider, ydoc, currentUser, onEditAttempt, readOnly }) => {
+const EditorWithCursor = ({ provider, ydoc, currentUser, readOnly }) => {
 
   const [editorInstance, setEditorInstance] = useState(null)
 
@@ -51,25 +51,7 @@ const EditorWithCursor = ({ provider, ydoc, currentUser, onEditAttempt, readOnly
     },
     editorProps: {
       attributes: {
-        class: 'editor',
-      },
-      handleDOMEvents: {
-        beforeinput: (view, event) => {
-          if (readOnly) {
-            onEditAttempt?.()
-            event.preventDefault()
-            return true
-          }
-          return false
-        },
-        keydown: (view, event) => {
-          if (readOnly) {
-            onEditAttempt?.()
-            event.preventDefault()
-            return true
-          }
-          return false
-        },
+        class: 'content-editor',
       },
     },
   })
