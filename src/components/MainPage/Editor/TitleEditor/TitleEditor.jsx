@@ -24,8 +24,10 @@ const TitleEditor = ({ noteId, note }) => {
     const userRole = useMemo(() => {
         if (!note || !user) return null
         if (note.creator === user.userId) return 'creator'
-        const match = note.collaborators.find(c => c.userId === user.userId)
-        return match?.userType || null
+        if (note.collaborators) {
+            const match = note.collaborators.find(c => c.userId === user.userId)
+            return match?.userType || null
+        }
     }, [note, user])
 
     useEffect(() => {
@@ -95,9 +97,9 @@ const TitleEditor = ({ noteId, note }) => {
         },
         editorProps: {
             attributes: {
-              class: 'content-editor',
+                class: 'content-editor',
             },
-          },
+        },
     })
 
     return <EditorContent editor={editor} />
