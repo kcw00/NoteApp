@@ -1,0 +1,83 @@
+.slash-menu {
+  background: var(--background-color, #ffffff);
+  border: 1px solid var(--gray-1, #ddd);
+  border-radius: 0.2rem;
+  box-shadow: var(--shadow, 0 4px 8px rgba(0, 0, 0, 0.1));
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  overflow: auto;
+  padding: 0.4rem;
+  position: relative;
+  max-height: 250px;
+  z-index: 1000;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.slash-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.slash-menu::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.slash-menu::-webkit-scrollbar-thumb {
+  background-color: var(--thumb-color, #999);
+  border-radius: 4px;
+}
+
+.slash-menu.dark {
+  background-color: #292a2b;
+  color: #dfdfdf;
+  border: 1px solid var(--dark-gray-1, #444);
+}
+
+.slash-menu button {
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  display: flex;
+  gap: 0.25rem;
+  text-align: left;
+  width: 100%;
+  padding: 0.6rem 0.6rem 0.6rem 0.6rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  overflow: hidden;
+}
+
+.slash-menu button:hover,
+.slash-menu button.is-selected {
+  background-color: var(--gray-2, #f0f0f0);
+}
+
+.slash-menu button.dark {
+  align-items: center;
+  justify-content: center;
+  background-color: #292a2b;
+  color: rgb(223, 223, 223);
+  display: flex;
+  gap: 0.25rem;
+  text-align: left;
+  width: 100%;
+  padding: 0.6rem 0.6rem 0.6rem 0.6rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  overflow: hidden;
+}
+
+.slash-menu button.dark:hover,
+.slash-menu button.dark.is-selected {
+  background-color: #3e4044;
+}
+
+
+.slash-menu .item {
+  padding: 0.4rem 0.6rem;
+  color: #000000;
+  font-size: 0.9rem;
+}

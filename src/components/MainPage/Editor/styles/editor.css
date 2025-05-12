@@ -1,0 +1,27 @@
+.is-empty.is-editor-empty::before {
+    content: attr(data-placeholder);
+    color: #888888;
+    pointer-events: none;
+    height: 0;
+    font-style: bold;
+    position: absolute;
+}
+
+.dark-mode .is-empty.is-editor-empty::before {
+    color: #777;
+}
+
+.ProseMirror:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.content-editor[contenteditable="false"] {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.title-editor[contenteditable="false"] {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
