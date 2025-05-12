@@ -81,7 +81,7 @@ const SharedModal = () => {
                 userType: newRole,
             }
 
-            dispatch(setCollaborators({ noteId: noteId, collaborator: collaboratorData }))
+            // dispatch(setCollaborators({ noteId: noteId, collaborator: collaboratorData }))
 
             // Make an API request to add the collaborator with the selected role
             dispatch(addCollaborator({

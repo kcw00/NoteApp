@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import authService from "../services/auth"
 import noteService from "../services/notes"
-import { socket } from "../socket"
+import { socket } from "../socket/socket"
 
 
 export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, { rejectWithValue }) => {

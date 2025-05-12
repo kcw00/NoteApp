@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import notesService from "../services/notes"
-import { socket } from "../socket"
+import { socket } from "../socket/socket"
 
 // Fetch all notes (initial load)
 export const fetchNotes = createAsyncThunk("notes/fetchNotes", async (userId, { rejectWithValue }) => {
@@ -26,7 +26,7 @@ export const addNote = createAsyncThunk("notes/addNote", async (note, { rejectWi
 export const updateNote = createAsyncThunk("notes/updateNote", async ({ id, changes }, { rejectWithValue }) => {
     try {
         const updatedNote = await notesService.update(id, changes)
-        socket.emit("updateNote", { id, changes }) // Notify other clients
+        // socket.emit("updateNote", { id, changes }) // Notify other clients
         return updatedNote
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to update note")
@@ -58,7 +58,7 @@ export const fetchSharedNotes = createAsyncThunk("notes/fetchSharedNotes", async
 export const deleteNote = createAsyncThunk("notes/deleteNote", async ({ id, userId }, { rejectWithValue }) => {
     try {
         await notesService.remove(id, userId)
-        console.log("delete note id:", id)
+        // console.log("delete note id:", id)
         socket.emit("deleteNote", { id, userId }) // Notify other clients
         return id
     } catch (error) {
@@ -132,15 +132,7 @@ const notesSlice = createSlice({
         },
         setCollaborators: (state, action) => {
             const { noteId, collaborator } = action.payload
-
             const note = state.entities[noteId]
-
-            // Check if the collaborator information is valid
-            if (!collaborator.userId) {
-                console.error("Invalid collaborator information:", collaborator.userId)
-                return
-            }
-
             note?.collaborators.push(collaborator)
         },
         collaboratorRemoved: (state, action) => {
