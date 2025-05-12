@@ -22,7 +22,7 @@ A full-stack real-time note-taking application built with **React**, **Redux**, 
 - 🔒 JWT-based **authentication**
 - 🧠 **Rich-text formatting**: headings, lists, bold/italic/code, etc.
 - 🧵 **Slash command menu** (type `/` for inline actions)
-- 🧼 Clean, responsive UI with custom styles and Bootstrap modals
+- 🧼 Clean, responsive UI with custom styles and **Bootstrap** modals
 
 ---
 
