@@ -4,6 +4,7 @@ import Notes from './components/MainPage/Notes'
 import LoginForm from './components/Auth/LoginForm'
 import SignupForm from './components/Auth/SignupForm'
 import Home from './components/Home/Home'
+import { useSocketListeners } from './socket/SocketListeners'
 
 
 
@@ -12,7 +13,7 @@ const App = () => {
   const theme = useSelector((state) => state.ui.mode)
   const activeNoteId = useSelector(state => state.notes.activeNoteId)
 
-
+  useSocketListeners()
 
   return (
     <div className={theme === "dark" ? "dark-mode" : ""}>
