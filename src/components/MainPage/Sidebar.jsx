@@ -14,19 +14,23 @@ const Sidebar = () => {
     const { sidebarWidth, isResizing, isSidebarOpen } = useSelector((state) => state.ui)
 
     const notes = useSelector(state => state.notes.entities)
-    const notesArray = useMemo(() => Object.values(notes), [notes])
+    const notesArray = Object.values(notes)
     const user = useSelector(state => state.auth.user)
+    const userId = user?.userId
 
 
     const [favorites, others, shared] = useMemo(() => {
         const favs = [], otherNotes = [], sharedNotes = []
         notesArray.forEach(note => {
-            const isShared = note.collaborators.length > 0
+            const isShared = note.collaborators?.length > 0
+            const isCreator = note.creator === userId
+            const isCollaborator = note.collaborators?.some(c => c.userId === userId)
+
+            if (!isCreator && !isCollaborator) return
+
             if (isShared) {
                 sharedNotes.push(note)
-            }
-
-            if (!isShared && note.important) {
+            } else if (!isShared && note.important) {
                 favs.push(note)
             } else if (!isShared && !note.important) {
                 otherNotes.push(note)
@@ -80,16 +84,16 @@ const Sidebar = () => {
         const newNote = {
             title: "",
             content: {
-                    type: 'doc',
-                    content: [
-                        {
-                            type: 'paragraph',
-                            content: '',
-                        },
-                    ],
+                type: 'doc',
+                content: [
+                    {
+                        type: 'paragraph',
+                        content: '',
+                    },
+                ],
             },
             important: false,
-            creator: user.userId,
+            creator: user?.userId,
             collaborators: [],
         }
         const note = await dispatch(addNote(newNote))
@@ -180,11 +184,11 @@ const Sidebar = () => {
                     </button>
                 </div>
                 {/* Logout Modal */}
-                    <LogoutModal
-                        show={showLogoutModal}
-                        onClose={() => setShowLogoutModal(false)}
-                        onConfirm={handleLogout}
-                    />
+                <LogoutModal
+                    show={showLogoutModal}
+                    onClose={() => setShowLogoutModal(false)}
+                    onConfirm={handleLogout}
+                />
                 {/* Resizer Bar (only show when open) */}
                 {isSidebarOpen && (
                     <div
