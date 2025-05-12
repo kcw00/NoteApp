@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { socket } from "../../socket"
+import { socket } from "../../socket/socket"
 import { createCollabToken } from "../../redux/authSlice"
-import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes, noteDeletedRealtime, setCollaborators } from "../../redux/notesSlice"
+import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes } from "../../redux/notesSlice"
 import notesService from "../../services/notes"
 import NoteEditor from "./Editor/NoteEditor"
 import Sidebar from "./Sidebar"
@@ -41,7 +41,6 @@ const Notes = () => {
         if (!user?.token || !user?.userId) return
 
         console.log('Fetching notes...')
-
 
         // Fetch shared notes and regular notes concurrently
         const fetchNotesData = async () => {
@@ -91,7 +90,7 @@ const Notes = () => {
                 console.log('Shared notes:', sharedNotes)
 
 
-                dispatch(setSharedNotes(sharedNotes))
+                await dispatch(setSharedNotes(sharedNotes))
                 console.log('notes after setting shared notes:', notes)
 
 
@@ -113,22 +112,6 @@ const Notes = () => {
                 dispatch(setActiveUsers(data))
             })
 
-
-            socket.on('collaboratorAdded', (data) => {
-                console.log('socket listen ----- Collaborator added:', data)
-                // dispatch(setCollaborators({ noteId: data.noteId, collaborator: data.collaboratorSchema }))
-            })
-
-            socket.on('noteShared', (data) => {
-                console.log('socket listen ----- Note shared:', data)
-                dispatch(setSharedNotes(data))
-            })
-
-            socket.on('collaboratorRemoved', (data) => {
-                console.log('socket listen ----- Collaborator removed:', data)
-                // dispatch(setCollaborators(data))
-            })
-
         }
 
 
@@ -141,7 +124,7 @@ const Notes = () => {
 
         const fetchCollabToken = async () => {
             try {
-                await dispatch(createCollabToken({
+                dispatch(createCollabToken({
                     noteId: activeNoteId,
                     userId: user?.userId,
                     permissions: isType === 'viewer' ? 'read' : 'write',
@@ -157,8 +140,8 @@ const Notes = () => {
 
     // show alert when note is deleted
     useEffect(() => {
-        socket.on('noteDeleted', (data) => {
-            console.log('socket listen ----- Note deleted:', data.id)
+        socket.on('noteDeleted', ({ id }) => {
+            console.log('socket listen ----- Note deleted:', id)
             setAlertMessage("Note deleted")
             setShowAlert(true)
 
