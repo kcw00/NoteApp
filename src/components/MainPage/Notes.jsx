@@ -58,7 +58,7 @@ const Notes = () => {
                             content: [
                                 {
                                     type: 'paragraph',
-                                    content: [{ type: 'text', text: 'create your notes' }],
+                                    content: '',
                                 },
                             ],
                         },
