@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useImperativeHandle } from 'react'
 import { useSelector } from 'react-redux'
-import '../../../styles/SlashMenu.css'
+import '../../../styles/slashMenu.css'
 
 const SlashMenu = React.forwardRef(({ items = [], command }, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -71,14 +71,14 @@ const SlashMenu = React.forwardRef(({ items = [], command }, ref) => {
   const scrollItemIntoView = (index) => {
     const el = document.querySelector(`.slash-menu button[data-index="${index}"]`)
     const container = document.querySelector('.slash-menu')
-  
+
     if (!el || !container) return
-  
+
     const elTop = el.offsetTop
     const elBottom = elTop + el.offsetHeight
     const containerTop = container.scrollTop
     const containerBottom = containerTop + container.clientHeight
-  
+
     if (elTop < containerTop) {
       container.scrollTop = elTop
     } else if (elBottom > containerBottom) {
