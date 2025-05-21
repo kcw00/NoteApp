@@ -51,17 +51,22 @@ export const useSocketListeners = () => {
       dispatch(collaboratorRemoved({ noteId, collaboratorId }))
     })
 
-    // Set up socket listeners
-    socket.on('activeUsers', (data) => {
-      console.log('socket listen ----- Logged user:', data)
-      dispatch(setActiveUsers(data))
-    })
 
     return () => {
       socket.off('noteDeleted')
       socket.off('collaboratorAdded')
       socket.off('collaboratorRemoved')
-      socket.off('activeUsers')
     }
   }, [user, notes])
+
+  useEffect(() => {
+    // Set up socket listeners
+    socket.on('activeUsers', (data) => {
+      console.log('socket listen ----- Logged user:', data)
+      dispatch(setActiveUsers(data))
+    })
+    return () => {
+      socket.off('activeUsers')
+    }
+  }, [])
 }
