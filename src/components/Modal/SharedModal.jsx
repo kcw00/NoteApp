@@ -56,7 +56,7 @@ const SharedModal = () => {
                 console.error(errorMessage)
                 return
 
-            } else if (user.userType === 'viewer' || user.userType === 'editor') {
+            } else if (user.userType !== 'creator') {
                 const errorMessage = 'ONLY the creator can add collaborators'
                 setErrorMessage(errorMessage)
 
