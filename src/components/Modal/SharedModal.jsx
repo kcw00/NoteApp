@@ -28,7 +28,7 @@ const SharedModal = () => {
 
     // Get users from database
     useEffect(() => {
-        axios.get('/api/users')
+        axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users`)
             .then((response) => {
                 setUsers(response.data)
                 console.log('Fetched users:', response.data)
@@ -89,7 +89,7 @@ const SharedModal = () => {
                 collaboratorId: newCollaborator.id,
                 userType: newRole
             }))
-            
+
             // Generate a new collaboration token for creator or editor 
             dispatch(createCollabToken({
                 noteId: activeNoteId,
