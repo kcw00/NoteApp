@@ -56,8 +56,8 @@ const SharedModal = () => {
                 console.error(errorMessage)
                 return
 
-            } else if (user.userType === 'viewer') {
-                const errorMessage = 'Viewer cannot add a collaborator'
+            } else if (user.userType === 'viewer' || user.userType === 'editor') {
+                const errorMessage = 'ONLY the creator can add collaborators'
                 setErrorMessage(errorMessage)
 
                 // Set a timeout to clear the error message after 3 seconds
