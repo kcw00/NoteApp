@@ -23,7 +23,7 @@ const DefaultEditor = ({ noteId }) => {
         if (!collabToken || !noteId) return
 
         const p = new HocuspocusProvider({
-            url:`ws://${import.meta.env.VITE_BACKEND_ADDRESS}:1234`,
+            url: `${import.meta.env.VITE_BACKEND_COLLAB_URL}`,
             name: noteId,
             document: ydoc,
             token: collabToken,
@@ -96,13 +96,13 @@ const DefaultEditor = ({ noteId }) => {
     // it will be called every 5 seconds
     useEffect(() => {
         if (provider) {
-          const interval = setInterval(() => {
-            console.log('[Manual Save] Calling provider.storeDocument()')
-            provider.storeDocument?.()
-          }, 5000)
-          return () => clearInterval(interval)
+            const interval = setInterval(() => {
+                console.log('[Manual Save] Calling provider.storeDocument()')
+                provider.storeDocument?.()
+            }, 5000)
+            return () => clearInterval(interval)
         }
-      }, [provider])
+    }, [provider])
 
     return (
         <div>

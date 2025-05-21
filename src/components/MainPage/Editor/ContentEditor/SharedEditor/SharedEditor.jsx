@@ -58,7 +58,7 @@ const SharedEditor = ({ noteId, note }) => {
         if (!collabToken || !noteId) return
 
         const p = new HocuspocusProvider({
-            url: `ws://${import.meta.env.VITE_BACKEND_ADDRESS}:1234`,
+            url: `${import.meta.env.VITE_BACKEND_COLLAB_URL}`,
             name: noteId,
             document: ydoc,
             token: collabToken,
