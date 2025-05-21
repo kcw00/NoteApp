@@ -6,6 +6,7 @@ import {
   noteDeletedRealtime,
   setCollaborators,
   collaboratorRemoved,
+  setActiveUsers,
 } from '../redux/notesSlice'
 import axios from 'axios'
 
