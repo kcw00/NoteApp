@@ -20,7 +20,6 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, 
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
     window.localStorage.removeItem("loggedNoteappUser")
     socket.emit('logoutUser')
-    socket.disconnect()
     noteService.setToken(null)
     return null
 })
