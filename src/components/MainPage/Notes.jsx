@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { socket } from "../../socket/socket"
 import { createCollabToken } from "../../redux/authSlice"
-import { fetchNotes, addNote, setActiveNote, setActiveUsers, setSharedNotes, fetchSharedNotes } from "../../redux/notesSlice"
+import { fetchNotes, addNote, setActiveNote, setSharedNotes, fetchSharedNotes } from "../../redux/notesSlice"
 import notesService from "../../services/notes"
 import NoteEditor from "./Editor/NoteEditor"
 import Sidebar from "./Sidebar"
@@ -105,12 +105,6 @@ const Notes = () => {
         }
         if (user?.token && user?.userId) {
             fetchNotesData()
-
-            // Set up socket listeners
-            socket.on('activeUsers', (data) => {
-                console.log('socket listen ----- Logged user:', data)
-                dispatch(setActiveUsers(data))
-            })
 
         }
 
