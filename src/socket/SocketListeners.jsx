@@ -29,7 +29,7 @@ export const useSocketListeners = () => {
       if (!note) {
         // Note doesn't exist locally — fetch and store
         try {
-          const fetchedNote = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/notes/${noteId}`, {
+          const fetchedNote = await axios.get(`/api/notes/${noteId}`, {
             headers: {
               Authorization: `Bearer ${user.token}`,
             },

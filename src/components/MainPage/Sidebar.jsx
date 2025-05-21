@@ -75,7 +75,6 @@ const Sidebar = () => {
     }
 
     const [showLogoutModal, setShowLogoutModal] = useState(false)
-
     const handleLogout = () => {
         dispatch(logoutUser({ userId: user.userId }))
         navigate('/')

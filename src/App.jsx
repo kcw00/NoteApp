@@ -11,6 +11,7 @@ import { useSocketListeners } from './socket/SocketListeners'
 const App = () => {
   const loggedIn = useSelector(state => Boolean(state.auth.user?.userId))
   const theme = useSelector((state) => state.ui.mode)
+  const activeNoteId = useSelector(state => state.notes.activeNoteId)
 
   useSocketListeners()
 
