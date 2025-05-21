@@ -67,12 +67,12 @@ This app connects to a Socket.IO backend to respond to collaboration events.
 
 ### Handled Events:
 
-| Event Name           | When it triggers                                      |
-|----------------------|--------------------------------------------------------|
-| `collaboratorAdded`  | When a collaborator is added to a shared note         |
-| `collaboratorRemoved`| When a user is removed from a note                    |
-| `noteDeleted`        | When a shared note is deleted                         |
-| `activeUsers`        | When users connect or disconnect                      |
+| Event Name            | When it triggers                              |
+| --------------------- | --------------------------------------------- |
+| `collaboratorAdded`   | When a collaborator is added to a shared note |
+| `collaboratorRemoved` | When a user is removed from a note            |
+| `noteDeleted`         | When a shared note is deleted                 |
+| `activeUsers`         | When users connect or disconnect              |
 
 The frontend listens to these events via a `useSocketListeners()` hook and updates Redux state accordingly.
 
@@ -100,8 +100,10 @@ Create `.env` file in root directory
 
 `frontend/.env`
 ```bash
+#BACKEND_URL
 VITE_BACKEND_URL=backend-url
-VITE_BACKEND_ADDRESS=backend-address
+#BACKEND_COLLAB_URL
+VITE_BACKEND_COLLAB_URL=backend-url-for-collab
 ```
 
 ### 4. Start servers
