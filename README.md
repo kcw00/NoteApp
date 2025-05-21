@@ -152,7 +152,7 @@ cd frontend && npm run dev
       - this report will tell us the lines of untested code in each components
 
 
-### Unit testing
+### End-to-End testing
 
 **Testing with Playwright**
 Go to the "playwright" repo and follow the instructions
