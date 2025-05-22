@@ -44,6 +44,7 @@ Try it here: https://note-app-woad-five.vercel.app/
 - 🧠 **Rich-text formatting**: headings, lists, bold/italic/code, etc.
 - 🧵 **Slash command menu** (type `/` for inline actions)
 - 🧼 Clean, responsive UI with custom styles and **Bootstrap** modals
+- ⚙️ Automated CI/CD pipeline using GitHub Actions for seamless deployment
 
 ---
 
@@ -133,7 +134,21 @@ cd frontend && npm run dev
 ```
 
 ---
+## CI/CD Pipeline
 
+This project is fully automated with a secure and reliable CI/CD setup using **GitHub Actions**.
+
+### Workflow Overview
+- **Frontend Deployment**: Automatically deployed to [Vercel](https://vercel.com/) on every pushed commits.
+- **Backend Deployment**: Automatically deployed to a [DigitalOcean](https://www.digitalocean.com/) droplet using SSH and `pm2` after merging to `main`.
+
+
+### Required Check
+- `deploy.yml` must succeed before merging to `main`
+
+This ensures every change is reviewed, tested, and deployed automatically — keeping production up-to-date and safe.
+
+---
 
 ## Testing
 
