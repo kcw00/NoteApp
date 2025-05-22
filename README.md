@@ -11,23 +11,54 @@ Try it here: https://note-app-woad-five.vercel.app/
 
 
 **1. Slash Command Menu**  
-<img width="1336" alt="Screenshot 2025-05-21 at 14 52 22" src="https://github.com/user-attachments/assets/f0faa4af-9325-4f95-b7ba-29a1e7b8e1f6" />
+![ScreenRecording2025-05-22at01 23 55-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/c35f20e7-a039-4e1b-847d-ec0053a6c6b4)
 
-**2. Logout Modal**  
-<img width="1336" alt="Screenshot 2025-05-21 at 14 53 38" src="https://github.com/user-attachments/assets/17ff06d6-d3f7-4f3c-9a13-bd266a578580" />
+**2. Shared & Logout Modal**  
+![ScreenRecording2025-05-22at02 46 30-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/a98db14c-58f3-4e49-9d93-43c141d485fe)
 
-**3. Shared Modal**  
-<img width="1336" alt="Screenshot 2025-05-21 at 14 59 56" src="https://github.com/user-attachments/assets/c5fa6097-d70d-45da-a078-3272c643c6d7" />
-
-**4. Collaboration**  
+**3. Collaboration**  
 ![ezgif com-video-to-gif-converter (1)](https://github.com/user-attachments/assets/e4589180-3951-4d1e-9481-53149fe8d0e9)
 
-**5. Theme Mode Change**  
+**4. Theme Mode Change**  
 ![ScreenRecording2025-05-21at14 32 06-ezgif com-crop](https://github.com/user-attachments/assets/0bc99c4e-c303-4c41-aefc-cca96da480f8)
 
-**6. Resizable Sidebar**  
+**5. Resizable Sidebar**  
 ![ezgif com-video-to-gif-converter (2)](https://github.com/user-attachments/assets/ab6a2773-0c49-4234-9c5a-ed14fba5b0a2)
 
+---
+
+## 🛠️ Setup Instructions
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/your-username/NoteApp.git
+cd noteapp
+```
+
+### 2. Install dependencies
+
+```bash
+cd frontend
+npm install
+```
+
+### 3. Set up environment variables
+
+Create `.env` file in root directory
+
+`frontend/.env`
+```bash
+#BACKEND_URL
+VITE_BACKEND_URL=backend-url
+#BACKEND_COLLAB_URL
+VITE_BACKEND_COLLAB_URL=backend-url-for-collab
+```
+
+### 4. Start servers
+```bash
+cd frontend && npm run dev
+```
 ---
 ## 🚀 Features
 
@@ -97,41 +128,6 @@ This app connects to a Socket.IO backend to respond to collaboration events.
 | `activeUsers`         | When users connect or disconnect              |
 
 The frontend listens to these events via a `useSocketListeners()` hook and updates Redux state accordingly.
-
----
-
-## 🛠️ Setup Instructions
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/your-username/NoteApp.git
-cd noteapp
-```
-
-### 2. Install dependencies
-
-```bash
-cd frontend
-npm install
-```
-
-### 3. Set up environment variables
-
-Create `.env` file in root directory
-
-`frontend/.env`
-```bash
-#BACKEND_URL
-VITE_BACKEND_URL=backend-url
-#BACKEND_COLLAB_URL
-VITE_BACKEND_COLLAB_URL=backend-url-for-collab
-```
-
-### 4. Start servers
-```bash
-cd frontend && npm run dev
-```
 
 ---
 ## CI/CD Pipeline
