@@ -23,24 +23,20 @@ export const useSocketListeners = () => {
       dispatch(noteDeletedRealtime(id))
     })
 
-    socket.on('collaboratorAdded', async ({ noteId, collaborator }) => {
-      console.log('[socket.io] collaboratorAdded', noteId, collaborator)
-      const note = notes[noteId]
-      console.log('[socket.io] collaboratorAdded note:', note)
-      if (!note) {
-        // Note doesn't exist locally — fetch and store
-        try {
-          const fetchedNote = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/notes/${noteId}`, {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          })
-          console.log('[socket.io] fetched note:', fetchedNote)
-          dispatch(noteAddedRealtime(fetchedNote)) // Add the note to the local state
-          console.log('[socket.io] add note:', fetchedNote)
-        } catch (err) {
-          console.error('[socket.io] Failed to fetch shared note', err)
-        }
+    socket.on('collaboratorAdded', ({ noteId, collaborator }) => {
+      console.log('[socket.io] collaboratorAdded event received', { noteId, collaborator })
+      
+      // Only process if we have the note in our state
+      if (notes[noteId]) {
+        console.log(`[socket.io] Updating note ${noteId} with new collaborator`, collaborator)
+        
+        dispatch(setCollaborators({ 
+          noteId, 
+          collaborator,
+          isSocketUpdate: true  // This will prevent duplicate additions
+        }))
+      } else {
+        console.warn(`[socket.io] Note ${noteId} not found in state, skipping collaborator addition`)
       }
     })
 

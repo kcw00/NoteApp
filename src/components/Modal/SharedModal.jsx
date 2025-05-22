@@ -42,52 +42,57 @@ const SharedModal = () => {
     const handleAddCollaborator = async () => {
         try {
             // Find collaborator ID from the list of users
-            const newCollaborator = await users.find(user => user.username === newCollaboratorName)
+            const newCollaborator = users.find(user => user.username === newCollaboratorName)
 
             if (!newCollaborator) {
                 const errorMessage = 'User not found'
                 setErrorMessage(errorMessage)
-
-                // Set a timeout to clear the error message after 3 seconds
-                setTimeout(() => {
-                    setErrorMessage(null)
-                }, 3000)
-
-                console.error(errorMessage)
-                return
-
-            } else if (note.creator !== user.userId) {
-                const errorMessage = 'You do not have permission to add collaborators'
-                setErrorMessage(errorMessage)
-
-                // Set a timeout to clear the error message after 3 seconds
-                setTimeout(() => {
-                    setErrorMessage(null)
-                }, 3000)
-
+                setTimeout(() => setErrorMessage(null), 3000)
                 console.error(errorMessage)
                 return
             }
 
-            // Log the collaborator object before dispatching to Redux
-            console.log('Adding collaborator:', {
-                noteId: noteId,
-                collaboratorId: newCollaborator.id,
-                userType: newRole
-            })
+            if (note.creator !== user.userId) {
+                const errorMessage = 'You do not have permission to add collaborators'
+                setErrorMessage(errorMessage)
+                setTimeout(() => setErrorMessage(null), 3000)
+                console.error(errorMessage)
+                return
+            }
 
-            // Make an API request to add the collaborator with the selected role
-            await dispatch(addCollaborator({
+            // Check if user is already a collaborator
+            const isAlreadyCollaborator = note.collaborators?.some(
+                collab => collab.userId === newCollaborator.id
+            )
+            
+            if (isAlreadyCollaborator) {
+                const errorMessage = 'User is already a collaborator'
+                setErrorMessage(errorMessage)
+                setTimeout(() => setErrorMessage(null), 3000)
+                console.error(errorMessage)
+                return
+            }
+
+            // Make the API call first
+            const resultAction = await dispatch(addCollaborator({
                 noteId: noteId,
                 collaboratorId: newCollaborator.id,
                 userType: newRole
             }))
+            
+            // Only proceed if the API call was successful
+            if (addCollaborator.fulfilled.match(resultAction)) {
+                // The collaborator is already added by the fulfilled handler in the slice
+                // No need to update the UI again
+            } else {
+                throw new Error('Failed to add collaborator')
+            }
 
-            // Generate a new collaboration token for creator or editor 
-            dispatch(createCollabToken({
+            // Generate a new collaboration token
+            await dispatch(createCollabToken({
                 noteId: activeNoteId,
                 userId: user?.userId,
-                permissions: 'write', // adding a collaborator can only be done by creator or editor
+                permissions: 'write',
             }))
 
             // Reset the input fields
@@ -95,6 +100,15 @@ const SharedModal = () => {
             setNewRole('viewer')
         } catch (error) {
             console.error('Error adding collaborator:', error)
+            // If there's an error, remove the collaborator from the UI
+            if (newCollaborator) {
+                dispatch(collaboratorRemoved({ 
+                    noteId: noteId, 
+                    collaboratorId: newCollaborator.id 
+                }))
+            }
+            setErrorMessage(error.message || 'Failed to add collaborator')
+            setTimeout(() => setErrorMessage(null), 3000)
         }
     }
 
