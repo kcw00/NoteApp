@@ -5,13 +5,34 @@ A full-stack real-time note-taking application built with **React**, **Redux**, 
 > This is the frontend client. For server-side logic, visit [noteapp-backend](https://github.com/kcw00/noteapp-backend) repository
 
 ---
-## 📷 Live Demo
+## 📷 Live Demo and Screenshots
+
+Try it here: https://note-app-woad-five.vercel.app/
+
+
+**1. Slash Command Menu**  
+<img width="1336" alt="Screenshot 2025-05-21 at 14 52 22" src="https://github.com/user-attachments/assets/f0faa4af-9325-4f95-b7ba-29a1e7b8e1f6" />
+
+**2. Logout Modal**  
+<img width="1336" alt="Screenshot 2025-05-21 at 14 53 38" src="https://github.com/user-attachments/assets/17ff06d6-d3f7-4f3c-9a13-bd266a578580" />
+
+**3. Shared Modal**  
+<img width="1336" alt="Screenshot 2025-05-21 at 14 59 56" src="https://github.com/user-attachments/assets/c5fa6097-d70d-45da-a078-3272c643c6d7" />
+
+**4. Collaboration**  
+![ezgif com-video-to-gif-converter (1)](https://github.com/user-attachments/assets/e4589180-3951-4d1e-9481-53149fe8d0e9)
+
+**5. Theme Mode Change**  
+![ScreenRecording2025-05-21at14 32 06-ezgif com-crop](https://github.com/user-attachments/assets/0bc99c4e-c303-4c41-aefc-cca96da480f8)
+
+**6. Resizable Sidebar**  
+![ezgif com-video-to-gif-converter (2)](https://github.com/user-attachments/assets/ab6a2773-0c49-4234-9c5a-ed14fba5b0a2)
 
 ---
-
 ## 🚀 Features
 
 - 🧠 **Live collaboration** using [TipTap](https://tiptap.dev) + [Hocuspocus](https://tiptap.dev/docs/hocuspocus)
+- 🌐 Backend hosted on **DigitalOcean**, frontend on **Vercel**
 - 🧩 **Shared notes** between users with `viewer` and `editor` roles
 - 🔄 **Real-time updates** via Socket.IO:
   - Collaborators added/removed in real-time
