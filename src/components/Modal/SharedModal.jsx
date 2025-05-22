@@ -70,21 +70,14 @@ const SharedModal = () => {
             }
 
             // Log the collaborator object before dispatching to Redux
-            console.log('Collaborator object:', {
-                userId: newCollaborator.id,
-                userType: newRole,
+            console.log('Adding collaborator:', {
+                noteId: noteId,
+                collaboratorId: newCollaborator.id,
+                userType: newRole
             })
 
-            const collaboratorData = {
-                userId: newCollaborator.id,
-                username: newCollaborator.username,
-                userType: newRole,
-            }
-
-            dispatch(setCollaborators({ noteId: noteId, collaborator: collaboratorData }))
-
             // Make an API request to add the collaborator with the selected role
-            dispatch(addCollaborator({
+            await dispatch(addCollaborator({
                 noteId: noteId,
                 collaboratorId: newCollaborator.id,
                 userType: newRole
