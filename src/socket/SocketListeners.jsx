@@ -42,8 +42,6 @@ export const useSocketListeners = () => {
           console.error('[socket.io] Failed to fetch shared note', err)
         }
       }
-
-      dispatch(setCollaborators({ noteId, collaborator }))
     })
 
     socket.on('collaboratorRemoved', ({ noteId, collaboratorId }) => {
