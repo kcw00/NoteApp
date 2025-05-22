@@ -24,20 +24,12 @@ export const useSocketListeners = () => {
     })
 
     socket.on('collaboratorAdded', ({ noteId, collaborator }) => {
-      console.log('[socket.io] collaboratorAdded event received', { noteId, collaborator })
-      
-      // Only process if we have the note in our state
-      if (notes[noteId]) {
-        console.log(`[socket.io] Updating note ${noteId} with new collaborator`, collaborator)
-        
-        dispatch(setCollaborators({ 
-          noteId, 
-          collaborator,
-          isSocketUpdate: true  // This will prevent duplicate additions
-        }))
-      } else {
-        console.warn(`[socket.io] Note ${noteId} not found in state, skipping collaborator addition`)
-      }
+      console.log('[socket.io] collaboratorAdded', noteId, collaborator)
+
+      dispatch(setCollaborators({ 
+        noteId, 
+        collaborator,
+      }))
     })
 
     socket.on('collaboratorRemoved', ({ noteId, collaboratorId }) => {

@@ -67,35 +67,15 @@ export const deleteNote = createAsyncThunk("notes/deleteNote", async ({ id, user
 })
 
 // Add collaborator
-export const addCollaborator = createAsyncThunk("notes/addCollaborator", 
-    async ({ noteId, collaboratorId, userType }, { getState, rejectWithValue }) => {
-        try {
-            const state = getState()
-            const note = state.notes.entities[noteId]
-            
-            // Check if collaborator already exists
-            const isAlreadyCollaborator = note?.collaborators?.some(c => c.userId === collaboratorId)
-            if (isAlreadyCollaborator) {
-                return rejectWithValue("User is already a collaborator")
-            }
-            
-            const updatedNote = await notesService.addCollaborator(noteId, collaboratorId, userType)
-            
-            // Only emit socket event if the API call was successful
-            socket.emit("addCollaborator", { 
-                noteId, 
-                collaborator: {
-                    userId: collaboratorId,
-                    userType: userType
-                } 
-            })
-            
-            return updatedNote
-        } catch (error) {
-            return rejectWithValue(error.response?.data || "Failed to add collaborator")
-        }
+export const addCollaborator = createAsyncThunk("notes/addCollaborator", async ({ noteId, collaboratorId, userType }, { rejectWithValue }) => {
+    try {
+        const updatedNote = await notesService.addCollaborator(noteId, collaboratorId, userType)
+        socket.emit("addCollaborator", { noteId, collaboratorId }) // Notify other clients
+        return updatedNote
+    } catch (error) {
+        return rejectWithValue(error.response?.data || "Failed to add collaborator")
     }
-)
+})
 
 // Remove collaborator
 export const removeCollaborator = createAsyncThunk("notes/removeCollaborator", async ({ noteId, collaboratorId }, { rejectWithValue }) => {
@@ -151,44 +131,9 @@ const notesSlice = createSlice({
             }
         },
         setCollaborators: (state, action) => {
-            const { noteId, collaborator, isSocketUpdate } = action.payload
+            const { noteId, collaborator } = action.payload
             const note = state.entities[noteId]
-            
-            if (!note) {
-                console.warn(`[setCollaborators] Note ${noteId} not found`)
-                return
-            }
-            
-            // Create a new object to ensure state update
-            const updatedNote = { ...note }
-            
-            // Initialize collaborators array if it doesn't exist
-            if (!updatedNote.collaborators) {
-                updatedNote.collaborators = []
-            }
-            
-            // Create a new array to ensure React detects the change
-            const updatedCollaborators = [...updatedNote.collaborators]
-            
-            // Check if collaborator already exists
-            const existingIndex = updatedCollaborators.findIndex(c => c.userId === collaborator.userId)
-            
-            if (existingIndex === -1) {
-                // Add new collaborator
-                updatedCollaborators.push(collaborator)
-                console.log(`[setCollaborators] Added new collaborator ${collaborator.userId} to note ${noteId}`)
-            } else if (isSocketUpdate) {
-                // Update existing collaborator's role if it's a socket update
-                updatedCollaborators[existingIndex] = {
-                    ...updatedCollaborators[existingIndex],
-                    ...collaborator
-                }
-                console.log(`[setCollaborators] Updated collaborator ${collaborator.userId} in note ${noteId}`)
-            }
-            
-            // Update the note with the new collaborators array
-            updatedNote.collaborators = updatedCollaborators
-            state.entities[noteId] = updatedNote
+            note?.collaborators.push(collaborator)
         },
         collaboratorRemoved: (state, action) => {
             const { noteId, collaboratorId } = action.payload
@@ -256,25 +201,9 @@ const notesSlice = createSlice({
                 }
             })
             .addCase(addCollaborator.fulfilled, (state, action) => {
-                // The API returns the updated note with the new collaborator
-                const updatedNote = action.payload
-                if (updatedNote && updatedNote.id) {
-                    const existingNote = state.entities[updatedNote.id]
-                    if (existingNote) {
-                        // Only update the collaborators array, preserving other note data
-                        existingNote.collaborators = Array.isArray(updatedNote.collaborators) 
-                            ? updatedNote.collaborators 
-                            : []
-                    } else {
-                        // If note doesn't exist in state, add it with empty collaborators if needed
-                        state.entities[updatedNote.id] = {
-                            ...updatedNote,
-                            collaborators: Array.isArray(updatedNote.collaborators) 
-                                ? updatedNote.collaborators 
-                                : []
-                        }
-                    }
-                }
+                const { noteId, collaborator } = action.payload
+                const note = state.entities[noteId]
+                note?.collaborators.push(collaborator)
             })
             .addCase(removeCollaborator.fulfilled, (state, action) => {
                 const { noteId, collaboratorId } = action.payload
