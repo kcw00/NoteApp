@@ -56,7 +56,7 @@ const SharedModal = () => {
                 console.error(errorMessage)
                 return
 
-            } else if (user.userType == 'viewer' || 'editor') {
+            } else if (note.creator !== user.userId) {
                 const errorMessage = 'You do not have permission to add collaborators'
                 setErrorMessage(errorMessage)
 
