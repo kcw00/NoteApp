@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Notes from './Notes'
-import { fetchNotes } from '../../../redux/notesSlice'
+import { fetchNotes } from '../../reduxnotesSlice'
 
 // A wrapper component that redirects to the active note
 const NotesWithRedirect = () => {
