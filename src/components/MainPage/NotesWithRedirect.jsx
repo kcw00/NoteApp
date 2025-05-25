@@ -1,57 +1,41 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Notes from './Notes'
-import notesService from '../../../services/notes'
+import { fetchNotes } from '../../../redux/notesSlice'
 
 // A wrapper component that redirects to the active note
 const NotesWithRedirect = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const user = useSelector(state => state.auth.user)
   const activeNoteId = useSelector(state => state.notes.activeNoteId)
   const notes = useSelector(state => state.notes.entities)
-  const [isLoading, setIsLoading] = useState(true)
-  const [hasCheckedNotes, setHasCheckedNotes] = useState(false)
+  const status = useSelector(state => state.notes.status)
+  const error = useSelector(state => state.notes.error)
 
   useEffect(() => {
-    const checkNotes = async () => {
-      if (!user?.userId) return
-      
-      try {
-        // Set up the token for the notes service
-        notesService.setToken(user.token)
-        
-        // Wait for notes to be loaded
-        if (Object.keys(notes).length === 0) {
-          // If no notes in the store, wait a bit for the main notes fetch to complete
-          await new Promise(resolve => setTimeout(resolve, 1000))
-        }
-        
-        setHasCheckedNotes(true)
-        
-        // If we have an active note, redirect to it
-        if (activeNoteId) {
-          navigate(`/notes/${activeNoteId}`, { replace: true })
-        } else {
-          // If no active note but we have notes, redirect to the first one
-          const noteIds = Object.keys(notes)
-          if (noteIds.length > 0) {
-            navigate(`/notes/${noteIds[0]}`, { replace: true })
-          }
-        }
-      } catch (error) {
-        console.error('Error in NotesWithRedirect:', error)
-      } finally {
-        setIsLoading(false)
-      }
+    if (user?.userId && status === 'idle') {
+      // If notes haven't been loaded yet, fetch them
+      dispatch(fetchNotes(user.userId))
+    } else if (status === 'succeeded' && activeNoteId) {
+      // If notes are loaded and we have an active note, redirect to it
+      navigate(`/notes/${activeNoteId}`, { replace: true })
+    } else if (status === 'succeeded' && Object.keys(notes).length > 0) {
+      // If notes are loaded but no active note, redirect to the first note
+      const firstNoteId = Object.keys(notes)[0]
+      navigate(`/notes/${firstNoteId}`, { replace: true })
     }
-    
-    checkNotes()
-  }, [user, activeNoteId, notes, navigate])
+  }, [user, status, activeNoteId, notes, navigate, dispatch])
 
-  // Show loading state only if we're still checking notes
-  if (isLoading || !hasCheckedNotes) {
+  // Show loading state while fetching notes
+  if (status === 'loading' || status === 'idle') {
     return <div>Loading your notes...</div>
+  }
+
+  // Show error if notes failed to load
+  if (status === 'failed') {
+    return <div>Error loading notes: {error}</div>
   }
 
   // If we have no notes, the main Notes component will handle creating one
