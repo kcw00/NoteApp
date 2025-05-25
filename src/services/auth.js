@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const login = async credentials => {
     const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/login`, credentials)
-    console.log('Response from login:', response.data) // check if response.data is correct
+    // console.log('Response from login:', response.data) // check if response.data is correct
     return response.data
 }
 
