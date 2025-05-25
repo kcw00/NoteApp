@@ -90,7 +90,7 @@ const SharedEditor = ({ noteId, note }) => {
                 const hydratedDoc = TiptapTransformer.toYdoc(note.content, 'content')
                 const update = Y.encodeStateAsUpdate(hydratedDoc)
                 Y.applyUpdate(ydoc, update)
-                console.log('[SharedEditor] Injected note content into Yjs')
+                //console.log('[SharedEditor] Injected note content into Yjs')
             }
 
         })
@@ -112,12 +112,12 @@ const SharedEditor = ({ noteId, note }) => {
         })
         provider.awareness.on('update', () => {
             const states = provider.awareness.getStates()
-            console.log('[Cursor] Awareness updated:', states)
-
+            //console.log('[Cursor] Awareness updated:', states)
+            /*
             for (const [clientId, state] of states.entries()) {
                 console.log(`[Cursor] Client ${clientId}:`, state.user)
             }
-
+            */
         })
         return () => {
             setSynced(false)
@@ -129,7 +129,7 @@ const SharedEditor = ({ noteId, note }) => {
     useEffect(() => {
         if (provider) {
             const interval = setInterval(() => {
-                console.log('[Manual Save] Calling provider.storeDocument()')
+                //console.log('[Manual Save] Calling provider.storeDocument()')
                 provider.storeDocument?.()
             }, 5000)
             return () => clearInterval(interval)

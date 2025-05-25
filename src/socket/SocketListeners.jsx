@@ -19,21 +19,21 @@ export const useSocketListeners = () => {
     if (!user) return
 
     socket.on('noteDeleted', ({ id }) => {
-      console.log('[socket.io] noteDeleted', id)
+      // console.log('[socket.io] noteDeleted', id)
       dispatch(noteDeletedRealtime(id))
     })
 
     socket.on('collaboratorAdded', ({ noteId, collaborator }) => {
-      console.log('[socket.io] collaboratorAdded', noteId, collaborator)
+      // console.log('[socket.io] collaboratorAdded', noteId, collaborator)
 
-      dispatch(setCollaborators({ 
-        noteId, 
+      dispatch(setCollaborators({
+        noteId,
         collaborator,
       }))
     })
 
     socket.on('collaboratorRemoved', ({ noteId, collaboratorId }) => {
-      console.log('[socket.io] collaboratorRemoved', noteId, collaboratorId)
+      // console.log('[socket.io] collaboratorRemoved', noteId, collaboratorId)
       dispatch(collaboratorRemoved({ noteId, collaboratorId }))
     })
 
@@ -48,7 +48,7 @@ export const useSocketListeners = () => {
   useEffect(() => {
     // Set up socket listeners
     socket.on('activeUsers', (data) => {
-      console.log('socket listen ----- Logged user:', data)
+      // console.log('socket listen ----- Logged user:', data)
       dispatch(setActiveUsers(data))
     })
     return () => {

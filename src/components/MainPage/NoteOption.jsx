@@ -16,7 +16,7 @@ const NoteOption = ({ noteId }) => {
     const notesArray = useMemo(() => Object.values(notes), [notes])
     const userId = user?.userId
 
-    console.log('userId:', userId)
+    //console.log('userId:', userId)
 
 
 
@@ -33,7 +33,7 @@ const NoteOption = ({ noteId }) => {
         // Proceed with deletion
         noteService.setToken(user?.token)
         await dispatch(deleteNote({ id: noteId, userId: userId }))
-        console.log('DELETED NOTE:', noteId)
+        //console.log('DELETED NOTE:', noteId)
 
         // After deletion, find fallback note
         const remainingNotes = notesArray.filter(note => note.id !== noteId)

@@ -90,9 +90,9 @@ const TitleEditor = ({ noteId, note }) => {
             if (editor.isEmpty) return
             const titleJSON = editor.getJSON()
             const titleText = editor.getText().trim()
-            console.log('[TitleEditor] JSON update:', titleJSON)
-            console.log('[TitleEditor] is synced:', isSynced)
-            console.log('[TitleEditor] Yjs XML:', ydoc.getXmlFragment('title').toString())
+            //console.log('[TitleEditor] JSON update:', titleJSON)
+            //console.log('[TitleEditor] is synced:', isSynced)
+            //console.log('[TitleEditor] Yjs XML:', ydoc.getXmlFragment('title').toString())
             dispatch(titleUpdated({ noteId, title: titleText }))
         },
         editorProps: {

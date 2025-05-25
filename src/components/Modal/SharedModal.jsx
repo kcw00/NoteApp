@@ -31,7 +31,7 @@ const SharedModal = () => {
         axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users`)
             .then((response) => {
                 setUsers(response.data)
-                console.log('Fetched users:', response.data)
+                // console.log('Fetched users:', response.data)
             })
             .catch((error) => {
                 console.error('Error fetching users:', error)
@@ -70,10 +70,10 @@ const SharedModal = () => {
             }
 
             // Log the collaborator object before dispatching to Redux
-            console.log('Collaborator object:', {
+            /*console.log('Collaborator object:', {
                 userId: newCollaborator.id,
                 userType: newRole,
-            })
+            })*/
 
             const collaboratorData = {
                 userId: newCollaborator.id,

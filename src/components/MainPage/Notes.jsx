@@ -27,20 +27,20 @@ const Notes = () => {
 
     const isType = note?.collaborators ? note?.collaborators.find(collab => collab?.userId === user?.userId)?.userType : "editor"
 
-
+    /*
     console.log("Component re-rendered") // check when component is re-rendered
     console.log('Notes:', notesArray)
     console.log('notes length:', notesArray.length)
     console.log('Active Note:', note)
     console.log('noteId from routes', params.id)
-
+    */
     useEffect(() => {
-        console.log("main useEffect called")
+        // console.log("main useEffect called")
 
         // Avoid running the effect if the user is not authenticated
         if (!user?.token || !user?.userId) return
 
-        console.log('Fetching notes...')
+        // console.log('Fetching notes...')
 
         // Fetch shared notes and regular notes concurrently
         const fetchNotesData = async () => {
@@ -48,7 +48,7 @@ const Notes = () => {
                 notesService.setToken(user.token)
                 const fetchedNotesResult = await dispatch(fetchNotes(user.userId))
                 const fetchedNotes = fetchedNotesResult.payload
-                console.log('Fetched notes:', fetchedNotes)
+                // console.log('Fetched notes:', fetchedNotes)
                 if (fetchedNotes.length === 0) {
                     // Add a new empty note if no notes exist
                     await dispatch(addNote({
@@ -67,18 +67,18 @@ const Notes = () => {
                         important: false,
                     }))
                     dispatch(setActiveNote(fetchedNotes[0]?.id))
-                    console.log('Adding new empty note')
+                    // console.log('Adding new empty note')
 
                 } else if (fetchedNotes.length > 0 && !params.id) {
                     // Set the active note to the first unshared note once user logged in
                     const unsharedNotes = fetchedNotes.filter(note => note.collaborators.length === 0)
                     dispatch(setActiveNote(unsharedNotes[0]?.id))
-                    console.log('Setting active note to:', unsharedNotes[0]?.id)
+                    // console.log('Setting active note to:', unsharedNotes[0]?.id)
 
                 } else if (fetchedNotes.length > 0 && params.id) {
                     // Keep the current active note after page refresh
                     dispatch(setActiveNote(params.id))
-                    console.log('active note not changed')
+                    // console.log('active note not changed')
                 }
 
 
@@ -87,11 +87,11 @@ const Notes = () => {
                 const sharedNotesResult = await dispatch(fetchSharedNotes(user?.userId))
                 const sharedNotes = sharedNotesResult.payload || []
 
-                console.log('Shared notes:', sharedNotes)
+                // console.log('Shared notes:', sharedNotes)
 
 
                 await dispatch(setSharedNotes(sharedNotes))
-                console.log('notes after setting shared notes:', notes)
+                // console.log('notes after setting shared notes:', notes)
 
 
             } catch (error) {
@@ -113,7 +113,7 @@ const Notes = () => {
 
     // Set collab token when active note changes
     useEffect(() => {
-        console.log('collab useEffect called')
+        //console.log('collab useEffect called')
         if (!user?.userId || !note) return
 
         const fetchCollabToken = async () => {
@@ -135,7 +135,7 @@ const Notes = () => {
     // show alert when note is deleted
     useEffect(() => {
         socket.on('noteDeleted', ({ id }) => {
-            console.log('socket listen ----- Note deleted:', id)
+            //console.log('socket listen ----- Note deleted:', id)
             setAlertMessage("Note deleted")
             setShowAlert(true)
 

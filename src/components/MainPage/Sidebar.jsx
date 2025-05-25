@@ -98,8 +98,8 @@ const Sidebar = () => {
             collaborators: [],
         }
         const note = await dispatch(addNote(newNote))
-        console.log('NEW NOTE:', note.payload)
-        console.log('NEW NOTE ID:', note.payload.id)
+        //console.log('NEW NOTE:', note.payload)
+        //console.log('NEW NOTE ID:', note.payload.id)
         dispatch(setActiveNote(note.payload.id))
         setTimeout(() => navigate(`/notes/${note.payload.id}`), 50) // Slight delay to allow state update
     }

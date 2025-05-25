@@ -42,12 +42,12 @@ const EditorWithCursor = ({ provider, ydoc, currentUser, readOnly }) => {
     onCreate: ({ editor }) => {
       console.log('[Shared Editor] Created with cursor')
       setEditorInstance(editor)
-      console.log('[Extensions]', editor.extensionManager.extensions.map(ext => ext.name))
+      //console.log('[Extensions]', editor.extensionManager.extensions.map(ext => ext.name))
     },
     onUpdate: ({ editor }) => {
       if (editor.isEmpty) return
       const editorContent = editor.getJSON()
-      console.log('[Shared Editor] JSON update:', editorContent)
+      //console.log('[Shared Editor] JSON update:', editorContent)
     },
     editorProps: {
       attributes: {

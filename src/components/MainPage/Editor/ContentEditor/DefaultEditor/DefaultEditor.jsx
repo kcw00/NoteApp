@@ -84,9 +84,9 @@ const DefaultEditor = ({ noteId }) => {
         onUpdate: async ({ editor }) => {
             if (editor.isEmpty) return
             const editorContent = editor.getJSON()
-            console.log('[Editor] JSON update:', editorContent)
-            console.log('[Editor] is synced:', isSynced)
-            console.log('[Editor] Yjs XML:', ydoc.getXmlFragment('content').toString())
+            // console.log('[Editor] JSON update:', editorContent)
+            //console.log('[Editor] is synced:', isSynced)
+            //console.log('[Editor] Yjs XML:', ydoc.getXmlFragment('content').toString())
         }
     })
 
@@ -97,7 +97,7 @@ const DefaultEditor = ({ noteId }) => {
     useEffect(() => {
         if (provider) {
             const interval = setInterval(() => {
-                console.log('[Manual Save] Calling provider.storeDocument()')
+                //console.log('[Manual Save] Calling provider.storeDocument()')
                 provider.storeDocument?.()
             }, 5000)
             return () => clearInterval(interval)
