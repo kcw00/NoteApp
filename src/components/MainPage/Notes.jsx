@@ -67,6 +67,7 @@ const Notes = () => {
                         important: false,
                     }))
                     dispatch(setActiveNote(fetchedNotes[0]?.id))
+                    navigate(`/notes/${fetchedNotes[0]?.id}`, { replace: true })
                     // console.log('Adding new empty note')
 
                 } else if (fetchedNotes.length > 0 && !params.id) {

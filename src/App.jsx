@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import Notes from './components/MainPage/Notes'
-import NotesWithRedirect from './components/MainPage/NotesWithRedirect'
 import LoginForm from './components/Auth/LoginForm'
 import SignupForm from './components/Auth/SignupForm'
 import Home from './components/Home/Home'
@@ -27,7 +26,7 @@ const App = () => {
         />
 
 
-        {/* Home Route (redirects to notes with active note if logged in) */}
+        {/* Home Route (redirects to first note if logged in) */}
         <Route
           path="/"
           element={loggedIn ? <Navigate to="/notes" replace /> : <Home />}
@@ -36,11 +35,11 @@ const App = () => {
         {/* Notes Page */}
         <Route
           path="/notes"
-          element={loggedIn ? <NotesWithRedirect /> : <Navigate to="/" replace />}
+          element={loggedIn ? <Notes /> : <Navigate to="/" />}
         />
         <Route
           path="/notes/:id"
-          element={loggedIn ? <Notes /> : <Navigate to="/" replace />}
+          element={loggedIn ? <Notes /> : <Navigate to="/" />}
         />
       </Routes>
     </div>
