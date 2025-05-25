@@ -6,12 +6,13 @@ import { fetchNotes, addNote, setActiveNote, setSharedNotes, fetchSharedNotes } 
 import notesService from "../../services/notes"
 import NoteEditor from "./Editor/NoteEditor"
 import Sidebar from "./Sidebar"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import Alert from "../Alert/Alert"
 
 const Notes = () => {
     const dispatch = useDispatch()
     const params = useParams()
+    const navigate = useNavigate()
 
     const [loading, setLoading] = useState(true) // Track loading state
     const [showAlert, setShowAlert] = useState(false)
